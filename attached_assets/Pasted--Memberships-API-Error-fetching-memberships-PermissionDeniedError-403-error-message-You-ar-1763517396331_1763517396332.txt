@@ -1,0 +1,47 @@
+[Memberships API] Error fetching memberships: PermissionDeniedError: 403 {"error":{"message":"You are not authorized - requires: 'member:basic:read'","type":"forbidden"}}
+    at Function.generate (/home/runner/workspace/node_modules/@whop/sdk/src/core/error.ts:68:14)
+    at Whop.makeStatusError (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:499:28)
+    at Whop.makeRequest (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:718:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async PagePromise.[Symbol.asyncIterator] (/home/runner/workspace/node_modules/@whop/sdk/src/core/pagination.ts:103:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:641:26) {
+  status: 403,
+  headers: Headers {
+    date: 'Wed, 19 Nov 2025 01:50:21 GMT',
+    'content-type': 'application/json; charset=utf-8',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'content-encoding': 'br',
+    'cache-control': 'no-cache',
+    'referrer-policy': 'strict-origin-when-cross-origin',
+    'strict-transport-security': 'max-age=63072000; includeSubDomains',
+    vary: 'Accept, Origin',
+    'x-content-type-options': 'nosniff',
+    'x-frame-options': 'SAMEORIGIN',
+    'x-permitted-cross-domain-policies': 'none',
+    'x-request-id': '9a33a0f0-0229-45d1-9843-b88d827c71e1',
+    'x-runtime': '0.016706',
+    'x-xss-protection': '0',
+    'cf-cache-status': 'DYNAMIC',
+    'set-cookie': '__cf_bm=K.37vX07o772C8ZgGHgFLpywl4ba3S9i2zDfeF33VMU-1763517021-1.0.1.1-gO2Di6t89cPQ10jqUxj42LEKkhcfuDOc59VnahcWImp6K051UHNyQMsGXVauQi63NOIfv9wN59BA.s93Bjz.z7QqWuhiVw_qvvm3q4.7t_Y; path=/; expires=Wed, 19-Nov-25 02:20:21 GMT; domain=.whop.com; HttpOnly; Secure; SameSite=None',
+    'report-to': '{"endpoints":[{"url":"https:\\/\\/csp-reporting.cloudflare.com\\/cdn-cgi\\/script_monitor\\/report?m=xPKjC.59.e6V_Wd1oHWyp2ygMPnc3_2R3iFuzrZKFUA-1763517021-1.0.1.1-Ia3emtRPnBK2WfmOysrWfk.pIjYc1rprTRnK.8SAZOtZwoz79veJgW8GDFrlW0Efb5JYM8B3WR14yI4tM6l84n_V2CFCC6IhrhOK1iVzLV76J4QP788YD5vacJ78GMjcJr9FxUM6TJcbMBdbQbWPmOT4P7zA02hPCOMgJSCzryeI9dyxM8rlID376tQH1tix"}],"group":"cf-csp-endpoint","max_age":86400}',
+    'content-security-policy-report-only': "script-src 'none'; report-uri https://csp-reporting.cloudflare.com/cdn-cgi/script_monitor/report?m=xPKjC.59.e6V_Wd1oHWyp2ygMPnc3_2R3iFuzrZKFUA-1763517021-1.0.1.1-Ia3emtRPnBK2WfmOysrWfk.pIjYc1rprTRnK.8SAZOtZwoz79veJgW8GDFrlW0Efb5JYM8B3WR14yI4tM6l84n_V2CFCC6IhrhOK1iVzLV76J4QP788YD5vacJ78GMjcJr9FxUM6TJcbMBdbQbWPmOT4P7zA02hPCOMgJSCzryeI9dyxM8rlID376tQH1tix; report-to cf-csp-endpoint",
+    server: 'cloudflare',
+    'cf-ray': '9a0c0e673d6247d4-BOM',
+    'alt-svc': 'h3=":443"; ma=86400'
+  },
+  error: {
+    error: {
+      message: "You are not authorized - requires: 'member:basic:read'",
+      type: 'forbidden'
+    }
+  }
+}
+[Memberships API] Permission denied - 'member:basic:read' not granted
+[Memberships API] SOLUTION:
+[Memberships API] 1. Go to https://whop.com/dashboard/developer
+[Memberships API] 2. Select your app > Permissions tab
+[Memberships API] 3. Add 'member:basic:read' permission
+[Memberships API] 4. Save and then REINSTALL your app at: https://whop.com/apps/app_YOUR_APP_ID/install
+1:50:21 AM [express] GET /api/admin/memberships 500 in 254ms :: {"error":"Failed to fetch memberships from Whop","details":"403 {\"error\":{\"message\":\"You are not authorized - requires: 'member:basic:read'\",\"type\":\"forbidden\"}}"}
+1:50:22 AM [express] GET /api/auth/me 304 in 945ms :: {"id":"user_6SjB1Wo0chseh","username":"giducosalleyah","name":"alleyah","profile_pic_url":"https://content.whop.com/default_avatars/panda.png"}

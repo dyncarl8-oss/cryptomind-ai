@@ -1,0 +1,58 @@
+[Webhook] Received headers: {
+  'webhook-signature': undefined,
+  'webhook-timestamp': undefined,
+  'content-type': 'application/json'
+}
+[Webhook] Raw body length: 61
+[Webhook] Raw body preview: {"action":"payment.succeeded","api_version":"v1","data":null}
+[Webhook] Invalid webhook signature: Error: Missing required headers
+    at new ExtendableError (/home/runner/workspace/node_modules/standardwebhooks/src/index.ts:12:18)
+    at new WebhookVerificationError (/home/runner/workspace/node_modules/standardwebhooks/src/index.ts:18:5)
+    at Webhook.verify (/home/runner/workspace/node_modules/standardwebhooks/src/index.ts:73:13)
+    at Webhooks.unwrap (/home/runner/workspace/node_modules/@whop/sdk/src/resources/webhooks.ts:16:10)
+    at <anonymous> (/home/runner/workspace/server/routes.ts:825:40)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/workspace/node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (/home/runner/workspace/node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at <anonymous> (/home/runner/workspace/server/index.ts:43:3)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at urlencodedParser (/home/runner/workspace/node_modules/body-parser/lib/types/urlencoded.js:85:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at /home/runner/workspace/node_modules/body-parser/lib/read.js:137:5
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at invokeCallback (/home/runner/workspace/node_modules/raw-body/index.js:238:16)
+    at done (/home/runner/workspace/node_modules/raw-body/index.js:227:7)
+    at IncomingMessage.onEnd (/home/runner/workspace/node_modules/raw-body/index.js:287:7)
+    at IncomingMessage.emit (node:events:524:28)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+[Webhook] Headers passed to SDK: {
+  host: '541892fb-21c5-4323-ab90-4e588efd1932-00-4hknx1keeh6e.pike.replit.dev',
+  'user-agent': 'Typhoeus - https://github.com/typhoeus/typhoeus',
+  'content-length': '61',
+  accept: '*/*',
+  'accept-encoding': 'gzip',
+  'content-type': 'application/json',
+  'x-forwarded-for': '54.144.66.110, 10.84.4.29',
+  'x-forwarded-proto': 'https',
+  'x-replit-user-bio': '',
+  'x-replit-user-id': '',
+  'x-replit-user-name': '',
+  'x-replit-user-profile-image': '',
+  'x-replit-user-roles': '',
+  'x-replit-user-teams': '',
+  'x-replit-user-url': ''
+}
+11:11:47 AM [express] POST /api/webhooks/payment 401 in 2ms :: {"error":"Invalid webhook signature"}

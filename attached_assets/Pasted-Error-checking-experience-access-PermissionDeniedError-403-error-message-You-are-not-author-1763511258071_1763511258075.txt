@@ -1,0 +1,58 @@
+Error checking experience access: PermissionDeniedError: 403 {"error":{"message":"You are not authorized - ensure that you are a team member, or the app is installed","type":"forbidden"}}
+    at Function.generate (/home/runner/workspace/node_modules/@whop/sdk/src/core/error.ts:68:14)
+    at Whop.makeStatusError (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:499:28)
+    at Whop.makeRequest (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:718:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async checkExperienceAccess (/home/runner/workspace/server/lib/auth.ts:112:20)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:398:18) {
+  status: 403,
+  headers: Headers {
+    date: 'Wed, 19 Nov 2025 00:12:48 GMT',
+    'content-type': 'application/json; charset=utf-8',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'content-encoding': 'br',
+    'cache-control': 'no-cache',
+    'referrer-policy': 'strict-origin-when-cross-origin',
+    'strict-transport-security': 'max-age=63072000; includeSubDomains',
+    vary: 'Accept, Origin',
+    'x-content-type-options': 'nosniff',
+    'x-frame-options': 'SAMEORIGIN',
+    'x-permitted-cross-domain-policies': 'none',
+    'x-request-id': 'b6db9f00-f970-4595-82ce-7f501f4897a8',
+    'x-runtime': '0.015834',
+    'x-xss-protection': '0',
+    'cf-cache-status': 'DYNAMIC',
+    'set-cookie': '__cf_bm=qX1dZiCuKwqn6H2qckuEidN2eLEAORfHg02v9P1Y.3o-1763511168-1.0.1.1-9gQmmLBCDb9yLXv183QZ24nil4EKb5du_40JOX.x1caZ.MHF6mKqKQejf3yDIg0GH5Ml4g4kb6fOxhpsigeHfQlLUKzN.nMIjJBY3VfuydU; path=/; expires=Wed, 19-Nov-25 00:42:48 GMT; domain=.whop.com; HttpOnly; Secure; SameSite=None',
+    server: 'cloudflare',
+    'cf-ray': '9a0b7f7d7e4bff6b-BOM',
+    'alt-svc': 'h3=":443"; ma=86400'
+  },
+  error: {
+    error: {
+      message: 'You are not authorized - ensure that you are a team member, or the app is installed',
+      type: 'forbidden'
+    }
+  }
+}
+[Admin Check] Experience access - level: undefined, has access: false
+[Admin Check] Final result: isAdmin = false
+12:12:48 AM [express] POST /api/admin/check 200 in 858ms :: {"isAdmin":false}
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_6SjB1Wo0chseh
+[Whop Auth] JWT payload: {
+  "iat": 1763511168,
+  "exp": 1763511348,
+  "sub": "user_6SjB1Wo0chseh",
+  "iss": "urn:whopcom:exp-proxy",
+  "aud": "app_GvjXUanUsc061Z"
+}
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_6SjB1Wo0chseh
+[Whop Auth] JWT payload: {
+  "iat": 1763511168,
+  "exp": 1763511348,
+  "sub": "user_6SjB1Wo0chseh",
+  "iss": "urn:whopcom:exp-proxy",
+  "aud": "app_GvjXUanUsc061Z"
+}

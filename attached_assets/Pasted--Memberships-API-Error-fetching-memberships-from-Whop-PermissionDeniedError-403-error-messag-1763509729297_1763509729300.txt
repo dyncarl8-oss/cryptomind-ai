@@ -1,0 +1,39 @@
+[Memberships API] Error fetching memberships from Whop: PermissionDeniedError: 403 {"error":{"message":"You are not authorized - requires: 'member:basic:read'","type":"forbidden"}}
+    at Function.generate (/home/runner/workspace/node_modules/@whop/sdk/src/core/error.ts:68:14)
+    at Whop.makeStatusError (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:499:28)
+    at Whop.makeRequest (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:718:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async PagePromise.[Symbol.asyncIterator] (/home/runner/workspace/node_modules/@whop/sdk/src/core/pagination.ts:103:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:638:26) {
+  status: 403,
+  headers: Headers {
+    date: 'Tue, 18 Nov 2025 23:46:25 GMT',
+    'content-type': 'application/json; charset=utf-8',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'content-encoding': 'br',
+    'cache-control': 'no-cache',
+    'referrer-policy': 'strict-origin-when-cross-origin',
+    'strict-transport-security': 'max-age=63072000; includeSubDomains',
+    vary: 'Accept, Origin',
+    'x-content-type-options': 'nosniff',
+    'x-frame-options': 'SAMEORIGIN',
+    'x-permitted-cross-domain-policies': 'none',
+    'x-request-id': '779e0ca2-7b68-4067-8735-f6cc815a8a4b',
+    'x-runtime': '0.020720',
+    'x-xss-protection': '0',
+    'cf-cache-status': 'DYNAMIC',
+    'set-cookie': '__cf_bm=MI2dcXbIBgMRxztjGYYr_u4wBkbng0si9TWTfLdyrJY-1763509585-1.0.1.1-COmoC4tRuosroVeILFzt1jBWcHWuQ9RZpjmWzD8c76W8g6NF5C93yAxbY7UfaqEtKLcM.pfYEZ1.VODPgai.Xb4..sQGs4ZFplQtc1mqYDM; path=/; expires=Wed, 19-Nov-25 00:16:25 GMT; domain=.whop.com; HttpOnly; Secure; SameSite=None',
+    server: 'cloudflare',
+    'cf-ray': '9a0b58d7fd744226-BOM',
+    'alt-svc': 'h3=":443"; ma=86400'
+  },
+  error: {
+    error: {
+      message: "You are not authorized - requires: 'member:basic:read'",
+      type: 'forbidden'
+    }
+  }
+}
+11:46:25 PM [express] GET /api/admin/memberships 500 in 902ms :: {"error":"Failed to fetch memberships from Whop"}
+11:46:25 PM [express] GET /api/auth/me 200 in 986ms :: {"id":"user_6SjB1Wo0chseh","username":"giducosalleyah","name":"alleyah","profile_pic_url":"https://content.whop.com/default_avatars/panda.png"}

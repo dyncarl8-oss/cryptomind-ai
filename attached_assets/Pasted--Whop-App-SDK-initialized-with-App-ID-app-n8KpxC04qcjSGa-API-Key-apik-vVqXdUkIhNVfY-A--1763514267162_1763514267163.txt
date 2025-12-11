@@ -1,0 +1,124 @@
+✅ Whop App SDK initialized with:
+   App ID: app_n8KpxC04qcjSGa
+   API Key: apik_vVqXdUkIhNVfY_A...
+✅ Whop Company SDK initialized with:
+   Company API Key: apik_m111PsZ8NUtT4_C...
+   This key will be used for company operations (memberships, transfers, etc.)
+✓ Connected to MongoDB
+1:03:33 AM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 13 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+[Admin Check] Starting admin status check
+[Admin Check] Received resourceId from client: exp_l1V7hycSQMC06Y
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_6SjB1Wo0chseh
+[Whop Auth] JWT payload: {
+  "iat": 1763514219,
+  "exp": 1763514399,
+  "sub": "user_6SjB1Wo0chseh",
+  "iss": "urn:whopcom:exp-proxy",
+  "aud": "app_n8KpxC04qcjSGa"
+}
+[Admin Check] Verified user: user_6SjB1Wo0chseh
+[Admin Check] Resource context from JWT - type: undefined, id: undefined
+[Admin Check] Using client-provided resourceId: exp_l1V7hycSQMC06Y, companyId: biz_lq0iYcpZitqEqa
+[Admin Check] Checking access for resource: exp_l1V7hycSQMC06Y
+[Admin Check] Experience access - level: admin, has access: true
+[Admin Check] Final result: isAdmin = true
+[Admin Check] Auto-registered admin: user_6SjB1Wo0chseh for company: biz_lq0iYcpZitqEqa
+1:03:40 AM [express] POST /api/admin/check 200 in 1044ms :: {"isAdmin":true}
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_6SjB1Wo0chseh
+[Whop Auth] JWT payload: {
+  "iat": 1763514220,
+  "exp": 1763514400,
+  "sub": "user_6SjB1Wo0chseh",
+  "iss": "urn:whopcom:exp-proxy",
+  "aud": "app_n8KpxC04qcjSGa"
+}
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_6SjB1Wo0chseh
+[Whop Auth] JWT payload: {
+  "iat": 1763514220,
+  "exp": 1763514400,
+  "sub": "user_6SjB1Wo0chseh",
+  "iss": "urn:whopcom:exp-proxy",
+  "aud": "app_n8KpxC04qcjSGa"
+}
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_6SjB1Wo0chseh
+[Whop Auth] JWT payload: {
+  "iat": 1763514220,
+  "exp": 1763514400,
+  "sub": "user_6SjB1Wo0chseh",
+  "iss": "urn:whopcom:exp-proxy",
+  "aud": "app_n8KpxC04qcjSGa"
+}
+[Whop Auth] Found token, verifying...
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_6SjB1Wo0chseh
+[Whop Auth] JWT payload: {
+  "iat": 1763514220,
+  "exp": 1763514400,
+  "sub": "user_6SjB1Wo0chseh",
+  "iss": "urn:whopcom:exp-proxy",
+  "aud": "app_n8KpxC04qcjSGa"
+}
+[Whop Auth] Successfully verified Whop user: user_6SjB1Wo0chseh
+[Whop Auth] JWT payload: {
+  "iat": 1763514220,
+  "exp": 1763514400,
+  "sub": "user_6SjB1Wo0chseh",
+  "iss": "urn:whopcom:exp-proxy",
+  "aud": "app_n8KpxC04qcjSGa"
+}
+[Memberships API] Fetching memberships for company: biz_lq0iYcpZitqEqa
+[Memberships API] Using company SDK for memberships.list
+1:03:40 AM [express] GET /api/admin/commissions 304 in 113ms :: []
+1:03:41 AM [express] POST /api/auth/check-access 200 in 240ms :: {"hasAccess":true,"accessLevel":"admin"}
+1:03:41 AM [express] GET /api/admin/balance 304 in 243ms :: {"adminUserId":"user_6SjB1Wo0chseh","balance":0,"paymentCount":0}
+[Memberships API] Error fetching memberships: PermissionDeniedError: 403 {"error":{"message":"You are not authorized - requires: 'member:basic:read'","type":"forbidden"}}
+    at Function.generate (/home/runner/workspace/node_modules/@whop/sdk/src/core/error.ts:68:14)
+    at Whop.makeStatusError (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:499:28)
+    at Whop.makeRequest (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:718:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async PagePromise.[Symbol.asyncIterator] (/home/runner/workspace/node_modules/@whop/sdk/src/core/pagination.ts:103:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:641:26) {
+  status: 403,
+  headers: Headers {
+    date: 'Wed, 19 Nov 2025 01:03:41 GMT',
+    'content-type': 'application/json; charset=utf-8',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'content-encoding': 'br',
+    'cache-control': 'no-cache',
+    'referrer-policy': 'strict-origin-when-cross-origin',
+    'strict-transport-security': 'max-age=63072000; includeSubDomains',
+    vary: 'Accept, Origin',
+    'x-content-type-options': 'nosniff',
+    'x-frame-options': 'SAMEORIGIN',
+    'x-permitted-cross-domain-policies': 'none',
+    'x-request-id': 'af958492-0c08-4ae1-b9e1-ed8ae6544201',
+    'x-runtime': '0.017740',
+    'x-xss-protection': '0',
+    'cf-cache-status': 'DYNAMIC',
+    'set-cookie': '__cf_bm=mbqMOj_qjNKRS4NlZYSdhg0q6RYYoLPQ666VuCrvlVk-1763514221-1.0.1.1-lyXVxabhmdubTXQUcNoIfZg9IZiyAM4H3I.tZkJStDPdHKkvAYP1hC.2_7_B4HR3O2grDRqsxZdX8QyArDx.4waWbu6.sO8bgTH6mNYv6GU; path=/; expires=Wed, 19-Nov-25 01:33:41 GMT; domain=.whop.com; HttpOnly; Secure; SameSite=None',
+    server: 'cloudflare',
+    'cf-ray': '9a0bca087c0b470d-BOM',
+    'alt-svc': 'h3=":443"; ma=86400'
+  },
+  error: {
+    error: {
+      message: "You are not authorized - requires: 'member:basic:read'",
+      type: 'forbidden'
+    }
+  }
+}
+[Memberships API] Permission denied - 'member:basic:read' not granted
+[Memberships API] Your app needs to request this permission in the developer dashboard
+[Memberships API] Then reinstall the app on your company
+1:03:41 AM [express] GET /api/admin/memberships 500 in 866ms :: {"error":"Failed to fetch memberships from Whop","details":"403 {\"error\":{\"message\":\"You are not authorized - requires: 'member:basic:read'\",\"type\":\"forbidden\"}}"}
+1:03:41 AM [express] GET /api/auth/me 304 in 1157ms :: {"id":"user_6SjB1Wo0chseh","username":"giducosalleyah","name":"alleyah","profile_pic_url":"https://content.whop.com/default_avatars/panda.png"}
