@@ -336,7 +336,7 @@ export async function generateTransparentPrediction(
     data: {
       thinkingProcess: "",
       analysisTime: 0,
-      modelUsed: "CryptoMind AI (Thinking Mode)",
+      modelUsed: "Gemini 3 Pro (Thinking Mode)",
     },
   });
 
@@ -366,7 +366,7 @@ export async function generateTransparentPrediction(
     data: {
       thinkingProcess: "",
       analysisTime: Date.now() - aiStartTime,
-      modelUsed: "CryptoMind AI (Thinking Mode)",
+      modelUsed: "Gemini 3 Pro (Thinking Mode)",
     },
   });
 
@@ -382,7 +382,7 @@ export async function generateTransparentPrediction(
     data: {
       thinkingProcess: geminiDecision?.thinkingProcess || "AI deep analysis complete. Evaluating all technical indicators and market conditions to generate high-confidence prediction.",
       analysisTime: Date.now() - aiStartTime,
-      modelUsed: "CryptoMind AI (Thinking Mode)",
+      modelUsed: "Gemini 3 Pro (Thinking Mode)",
     },
   });
 
@@ -406,7 +406,7 @@ export async function generateTransparentPrediction(
     data: {
       thinkingProcess: geminiDecision?.thinkingProcess || "AI deep analysis complete. Evaluating all technical indicators and market conditions to generate high-confidence prediction.",
       analysisTime: aiDuration,
-      modelUsed: "CryptoMind AI (Thinking Mode)",
+      modelUsed: "Gemini 3 Pro (Thinking Mode)",
     },
   });
 
