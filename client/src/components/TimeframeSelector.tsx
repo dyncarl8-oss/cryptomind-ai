@@ -16,7 +16,7 @@ export function TimeframeSelector({ onSelectTimeframe, selectedTimeframe }: Time
       </div>
       
       <div className="space-y-2.5 md:space-y-3">
-        <div className="text-xs md:text-sm font-bold text-foreground/80 uppercase tracking-wider">Short Term</div>
+        <div className="text-xs md:text-sm font-bold text-foreground/80 uppercase tracking-wider">Quick Scalping</div>
         <div className="flex flex-wrap gap-2 md:gap-2.5 lg:gap-3">
           {["M1", "M3", "M5"].map((tf) => {
             const timeframe = tf as Timeframe;
@@ -37,7 +37,7 @@ export function TimeframeSelector({ onSelectTimeframe, selectedTimeframe }: Time
       </div>
 
       <div className="space-y-2.5 md:space-y-3">
-        <div className="text-xs md:text-sm font-bold text-foreground/80 uppercase tracking-wider">Medium Term</div>
+        <div className="text-xs md:text-sm font-bold text-foreground/80 uppercase tracking-wider">Swing Trading</div>
         <div className="flex flex-wrap gap-2 md:gap-2.5 lg:gap-3">
           {["M15", "M30", "M45", "H1"].map((tf) => {
             const timeframe = tf as Timeframe;
@@ -58,7 +58,7 @@ export function TimeframeSelector({ onSelectTimeframe, selectedTimeframe }: Time
       </div>
 
       <div className="space-y-2.5 md:space-y-3">
-        <div className="text-xs md:text-sm font-bold text-foreground/80 uppercase tracking-wider">Long Term</div>
+        <div className="text-xs md:text-sm font-bold text-foreground/80 uppercase tracking-wider">Position Trading</div>
         <div className="flex flex-wrap gap-2 md:gap-2.5 lg:gap-3">
           {["H2", "H3", "H4", "D1", "W1"].map((tf) => {
             const timeframe = tf as Timeframe;
