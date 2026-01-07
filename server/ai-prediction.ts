@@ -11,6 +11,11 @@ export interface Prediction {
   analysis?: string;
   rationale?: string;
   riskFactors?: string[];
+  tradeTargets?: {
+    entry: { low: number; high: number };
+    target: { low: number; high: number };
+    stop: number;
+  };
   detailedAnalysis?: {
     indicators?: IndicatorDetail[];
     upSignals?: WeightedSignal[];

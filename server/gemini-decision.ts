@@ -186,6 +186,8 @@ TRADE TARGET GUIDELINES:
 - For UP: stop < entry.low; target.high > entry.high
 - For DOWN: stop > entry.high; target.low < entry.low
 
+7. Duration: Provide a typical duration for this trade (e.g., "1-4 hours", "12-24 hours", etc.)
+
 CONFIDENCE CALIBRATION:
 - If signals are mixed or market regime is RANGING → 90-92%
 - If strong directional bias but some counter-signals → 93-94%
@@ -265,8 +267,9 @@ Based on this technical analysis, provide your trading decision.`;
         },
         required: ["entry", "target", "stop"],
       },
+      duration: { type: "string" },
     },
-    required: ["direction", "confidence", "rationale", "riskFactors", "keyFactors"],
+    required: ["direction", "confidence", "rationale", "riskFactors", "keyFactors", "tradeTargets", "duration"],
   };
 
   try {

@@ -244,11 +244,17 @@ export async function generateProgressivePrediction(
     await delay(1000);
     
     if (geminiDecision && geminiDecision.direction !== "NEUTRAL") {
+      const qualityScore = Math.round((signalAlignment * 0.4) + ((geminiDecision.confidence - 70) / 29 * 60));
+      
       sendStageUpdate(ws, "final_verdict", 100, "complete", {
         direction: geminiDecision.direction,
         confidence: geminiDecision.confidence,
         duration: geminiDecision.duration,
         signalQuality: "HIGH",
+        tradeTargets: geminiDecision.tradeTargets,
+        keyFactors: geminiDecision.keyFactors,
+        riskFactors: geminiDecision.riskFactors,
+        qualityScore,
       });
       
       return {
@@ -258,6 +264,7 @@ export async function generateProgressivePrediction(
         duration: geminiDecision.duration,
         rationale: geminiDecision.rationale,
         riskFactors: geminiDecision.riskFactors,
+        tradeTargets: geminiDecision.tradeTargets,
         detailedAnalysis: {
           indicators: signals.map(s => ({
             name: s.category,
@@ -273,7 +280,7 @@ export async function generateProgressivePrediction(
           upScore,
           downScore,
           signalAlignment: Math.round(signalAlignment),
-          qualityScore: Math.round((signalAlignment * 0.4) + ((geminiDecision.confidence - 70) / 29 * 60)),
+          qualityScore,
           marketRegime: indicators.marketRegime,
           confidenceBreakdown: {
             baseScore: upScore > downScore ? upScore : downScore,
@@ -294,6 +301,10 @@ export async function generateProgressivePrediction(
     sendStageUpdate(ws, "final_verdict", 100, "complete", {
       direction: "NEUTRAL",
       confidence: 0,
+      duration: "Waiting for setup",
+      qualityScore: 0,
+      keyFactors: ["Insufficient confluence"],
+      riskFactors: ["Market uncertainty"],
       message: "Insufficient confidence for trade signal"
     });
     
@@ -302,6 +313,10 @@ export async function generateProgressivePrediction(
       direction: "NEUTRAL",
       confidence: 0,
       duration: "Waiting for setup",
+      detailedAnalysis: {
+        qualityScore: 0,
+        keyFactors: ["Insufficient confluence"],
+      },
       analysis: "Market conditions unclear. Waiting for stronger setup.",
     };
     
@@ -310,6 +325,12 @@ export async function generateProgressivePrediction(
     
     sendStageUpdate(ws, "final_verdict", 100, "complete", {
       error: true,
+      direction: "NEUTRAL",
+      confidence: 0,
+      duration: "Data unavailable",
+      qualityScore: 0,
+      keyFactors: ["Data collection error"],
+      riskFactors: ["Technical failure"],
       message: "Analysis failed"
     });
     
@@ -318,6 +339,10 @@ export async function generateProgressivePrediction(
       direction: "NEUTRAL",
       confidence: 0,
       duration: "Data unavailable",
+      detailedAnalysis: {
+        qualityScore: 0,
+        keyFactors: ["Data collection error"],
+      },
       analysis: `Market data service temporarily unavailable. Cannot perform technical analysis for ${pair}. Please try again in a moment when live market data is restored.`,
     };
   }
