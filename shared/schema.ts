@@ -170,6 +170,7 @@ export const messageSchema = z.object({
     direction: z.enum(["UP", "DOWN", "NEUTRAL"]),
     confidence: z.number().min(0).max(100),
     duration: z.string(),
+    tradeTargets: tradeTargetsSchema.optional(),
     analysis: z.string().optional(),
     rationale: z.string().optional(),
     riskFactors: z.array(z.string()).optional(),
