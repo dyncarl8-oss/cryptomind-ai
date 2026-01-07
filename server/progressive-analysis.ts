@@ -181,7 +181,7 @@ export async function generateProgressivePrediction(
 
     // STAGE 4: AI Thinking (10-15 seconds)
     sendStageUpdate(ws, "ai_thinking", 0, "in_progress", {
-      message: "Gemini 2.5 Flash analyzing market conditions..."
+      message: "Gemini 3 Pro Preview analyzing market conditions..."
     });
     await delay(2000);
     
