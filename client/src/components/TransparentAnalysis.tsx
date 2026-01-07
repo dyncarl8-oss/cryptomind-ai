@@ -336,11 +336,8 @@ function FinalVerdictDisplay({ data }: { data: FinalVerdictData }) {
       </div>
 
       {data.explanation && (
-        <div>
-          <div className="text-sm font-semibold mb-2">AI Prediction & Analysis</div>
-          <div className="p-3 rounded-md bg-blue-500/10 border border-blue-500/20">
-            <p className="text-sm leading-relaxed">{data.explanation}</p>
-          </div>
+        <div className="p-3 rounded-md bg-blue-500/10 border border-blue-500/20">
+          <p className="text-sm leading-relaxed">{data.explanation}</p>
         </div>
       )}
 
