@@ -6,12 +6,14 @@ interface TradingViewAdvancedChartProps {
   symbol: string;
   interval: string;
   className?: string;
+  minimal?: boolean;
 }
 
 export function TradingViewAdvancedChart({
   symbol,
   interval,
   className,
+  minimal = false,
 }: TradingViewAdvancedChartProps) {
   const { theme } = useTheme();
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -26,12 +28,16 @@ export function TradingViewAdvancedChart({
       style: "1",
       locale: "en",
       enable_publishing: false,
-      allow_symbol_change: true,
+      allow_symbol_change: !minimal,
       save_image: false,
       calendar: false,
       support_host: "https://www.tradingview.com",
+      hide_top_toolbar: minimal,
+      hide_side_toolbar: minimal,
+      hide_legend: minimal,
+      withdateranges: !minimal,
     }),
-    [symbol, interval, theme]
+    [symbol, interval, theme, minimal]
   );
 
   useEffect(() => {
