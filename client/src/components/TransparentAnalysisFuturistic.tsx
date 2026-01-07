@@ -565,8 +565,7 @@ function FinalVerdictDisplay({
           <TradingViewAdvancedChart
             symbol={symbol}
             interval={interval}
-            className="h-[400px] sm:h-[450px]"
-            minimal
+            className="h-[280px] sm:h-[320px]"
           />
         </div>
       </div>
