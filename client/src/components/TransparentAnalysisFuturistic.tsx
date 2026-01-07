@@ -566,7 +566,7 @@ function FinalVerdictDisplay({
             symbol={symbol}
             interval={interval}
             minimal={true}
-            className="h-[180px] sm:h-[220px] md:h-[250px]"
+            className="h-[300px] sm:h-[350px] md:h-[400px]"
           />
         </div>
       </div>
