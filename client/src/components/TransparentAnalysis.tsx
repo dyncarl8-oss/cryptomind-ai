@@ -335,6 +335,15 @@ function FinalVerdictDisplay({ data }: { data: FinalVerdictData }) {
         </div>
       </div>
 
+      {data.rationale && (
+        <div className="p-3 rounded-md bg-card-elevated">
+          <div className="text-sm font-semibold mb-2">Analysis</div>
+          <div className="text-sm leading-relaxed text-foreground/90">
+            {data.rationale}
+          </div>
+        </div>
+      )}
+
       {data.direction !== "NEUTRAL" && data.tradeTargets && (
         <div>
           <div className="text-sm font-semibold mb-2">Trade Targets</div>
