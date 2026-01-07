@@ -133,6 +133,7 @@ export const finalVerdictDataSchema = z.object({
   keyFactors: z.array(z.string()),
   riskFactors: z.array(z.string()),
   tradeTargets: tradeTargetsSchema.optional(),
+  explanation: z.string().optional(),
 });
 
 export const analysisStageSchema = z.object({
