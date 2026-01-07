@@ -474,13 +474,13 @@ function FinalVerdictDisplay({
   const isActionable = data.direction !== "NEUTRAL";
 
   return (
-    <div className="space-y-6" data-testid="final-verdict-display">
-      <div className="grid grid-cols-3 gap-4 p-5 rounded-xl bg-gradient-to-br from-primary/10 via-accent/10 to-primary/10 border border-primary/30 backdrop-blur-sm">
+    <div className="space-y-4" data-testid="final-verdict-display">
+      <div className="grid grid-cols-3 gap-3 p-4 rounded-xl bg-gradient-to-br from-primary/10 via-accent/10 to-primary/10 border border-primary/30 backdrop-blur-sm">
         <div className="space-y-1">
           <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
             Direction
           </div>
-          <div className="text-3xl font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <div className="text-2xl sm:text-3xl font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             {data.direction}
           </div>
         </div>
@@ -488,7 +488,7 @@ function FinalVerdictDisplay({
           <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
             Confidence
           </div>
-          <div className="text-3xl font-black text-green-400">
+          <div className="text-2xl sm:text-3xl font-black text-green-400">
             {data.confidence}%
           </div>
         </div>
@@ -496,30 +496,30 @@ function FinalVerdictDisplay({
           <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
             Duration
           </div>
-          <div className="text-2xl font-bold text-primary">{data.duration}</div>
+          <div className="text-xl sm:text-2xl font-bold text-primary">{data.duration}</div>
         </div>
       </div>
 
       {data.explanation && (
-        <div className="p-5 rounded-xl bg-gradient-to-br from-blue-500/5 via-cyan-500/5 to-blue-500/5 border border-blue-500/20 backdrop-blur-sm">
+        <div className="p-4 rounded-xl bg-gradient-to-br from-blue-500/5 via-cyan-500/5 to-blue-500/5 border border-blue-500/20 backdrop-blur-sm">
           <p className="text-sm leading-relaxed whitespace-pre-wrap">{data.explanation}</p>
         </div>
       )}
 
-      <div className="space-y-6">
-        <div className="space-y-3">
+      <div className="space-y-4">
+        <div className="space-y-2">
           <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Trade Targets
           </div>
 
-          <div className="p-4 rounded-xl bg-card/50 border border-border/40 backdrop-blur-sm space-y-3">
+          <div className="p-3 rounded-xl bg-card/50 border border-border/40 backdrop-blur-sm space-y-3">
             {isActionable && data.tradeTargets ? (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div className="p-2 rounded-lg bg-primary/5 border border-primary/20">
                   <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     ENTRY
                   </div>
-                  <div className="font-mono text-lg font-bold text-primary">
+                  <div className="font-mono text-base sm:text-lg font-bold text-primary">
                     {formatRange(
                       data.tradeTargets.entry.low,
                       data.tradeTargets.entry.high,
@@ -528,11 +528,11 @@ function FinalVerdictDisplay({
                   </div>
                 </div>
 
-                <div className="p-3 rounded-lg bg-green-500/5 border border-green-500/20">
+                <div className="p-2 rounded-lg bg-green-500/5 border border-green-500/20">
                   <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     TARGET
                   </div>
-                  <div className="font-mono text-lg font-bold text-green-400">
+                  <div className="font-mono text-base sm:text-lg font-bold text-green-400">
                     {formatRange(
                       data.tradeTargets.target.low,
                       data.tradeTargets.target.high,
@@ -541,11 +541,11 @@ function FinalVerdictDisplay({
                   </div>
                 </div>
 
-                <div className="p-3 rounded-lg bg-red-500/5 border border-red-500/20">
+                <div className="p-2 rounded-lg bg-red-500/5 border border-red-500/20">
                   <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     STOP
                   </div>
-                  <div className="font-mono text-lg font-bold text-red-400">
+                  <div className="font-mono text-base sm:text-lg font-bold text-red-400">
                     {formatPrice(data.tradeTargets.stop, priceDecimals)}
                   </div>
                 </div>
@@ -558,29 +558,30 @@ function FinalVerdictDisplay({
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Live Chart
           </div>
           <TradingViewAdvancedChart
             symbol={symbol}
             interval={interval}
-            className="h-[280px] sm:h-[320px]"
+            minimal={true}
+            className="h-[180px] sm:h-[220px] md:h-[250px]"
           />
         </div>
       </div>
 
-      <div className="space-y-4">
-        <div className="space-y-3">
+      <div className="space-y-3">
+        <div className="space-y-2">
           <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-green-400" />
             KEY FACTORS
           </div>
-          <div className="space-y-2">
+          <div className="space-y-1">
             {(data.keyFactors ?? []).map((factor, idx) => (
               <div
                 key={idx}
-                className="flex items-start gap-3 p-3 rounded-lg bg-green-500/5 border border-green-500/20 backdrop-blur-sm"
+                className="flex items-start gap-3 p-2 rounded-lg bg-green-500/5 border border-green-500/20 backdrop-blur-sm"
               >
                 <span className="text-green-400 mt-0.5 font-bold">•</span>
                 <span className="text-sm leading-relaxed flex-1">{factor}</span>
@@ -589,16 +590,16 @@ function FinalVerdictDisplay({
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent flex items-center gap-2">
             <span className="text-orange-400">⚠</span>
             RISK FACTORS
           </div>
-          <div className="space-y-2">
+          <div className="space-y-1">
             {(data.riskFactors ?? []).map((risk, idx) => (
               <div
                 key={idx}
-                className="flex items-start gap-3 p-3 rounded-lg bg-orange-500/5 border border-orange-500/20 backdrop-blur-sm"
+                className="flex items-start gap-3 p-2 rounded-lg bg-orange-500/5 border border-orange-500/20 backdrop-blur-sm"
               >
                 <span className="text-orange-400 mt-0.5">⚠</span>
                 <span className="text-sm leading-relaxed flex-1">{risk}</span>
@@ -607,11 +608,11 @@ function FinalVerdictDisplay({
           </div>
         </div>
 
-        <div className="flex items-center justify-between p-4 rounded-xl bg-card/50 border border-border/40 backdrop-blur-sm">
+        <div className="flex items-center justify-between p-3 rounded-xl bg-card/50 border border-border/40 backdrop-blur-sm">
           <span className="text-sm font-medium uppercase tracking-wide">
             Quality Score
           </span>
-          <span className="text-2xl font-black text-primary">{data.qualityScore}%</span>
+          <span className="text-xl sm:text-2xl font-black text-primary">{data.qualityScore}%</span>
         </div>
       </div>
     </div>
