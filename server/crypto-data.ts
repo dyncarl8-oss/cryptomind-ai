@@ -63,16 +63,16 @@ const fetchHeaders = {
 
 const timeframeToMinutes = (timeframe: string): number => {
   const mapping: Record<string, number> = {
-    "SECONDS": 1,
     "M1": 1,
     "M3": 3,
     "M5": 5,
     "M15": 15,
     "M30": 30,
+    "M45": 45,
     "H1": 60,
     "H2": 120,
+    "H3": 180,
     "H4": 240,
-    "H8": 480,
     "D1": 1440,
     "W1": 10080,
   };
@@ -81,14 +81,14 @@ const timeframeToMinutes = (timeframe: string): number => {
 
 const getHistoEndpoint = (timeframe: string): { endpoint: string; aggregate: number; limit: number } => {
   // Use histominute for short timeframes with standard aggregates
-  if (["SECONDS", "M1", "M3", "M5", "M15", "M30"].includes(timeframe)) {
+  if (["M1", "M3", "M5", "M15", "M30", "M45"].includes(timeframe)) {
     const minutes = timeframeToMinutes(timeframe);
     return { endpoint: "histominute", aggregate: minutes, limit: 100 };
   }
   
   // Use histohour for hour-based timeframes (within API limits)
   // Note: limit * aggregate must be <= 2000 to avoid API reduction
-  if (["H1", "H2", "H4", "H8"].includes(timeframe)) {
+  if (["H1", "H2", "H3", "H4"].includes(timeframe)) {
     const hours = timeframeToMinutes(timeframe) / 60;
     return { endpoint: "histohour", aggregate: hours, limit: 100 };
   }
@@ -109,7 +109,7 @@ const getHistoEndpoint = (timeframe: string): { endpoint: string; aggregate: num
   return { endpoint: "histominute", aggregate: 1, limit: 100 };
 };
 
-export async function fetchMarketData(pair: TradingPair, timeframe: string = "SECONDS"): Promise<MarketData> {
+export async function fetchMarketData(pair: TradingPair, timeframe: string = "M1"): Promise<MarketData> {
   const { from, to } = pairToSymbols(pair);
   
   try {

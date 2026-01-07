@@ -2232,7 +2232,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         if (message.type === 'select_pair' && message.pair) {
           const userId = message.userId || "dev_user";
-          const timeframe = message.timeframe || "SECONDS";
+          const timeframe = message.timeframe || "M1";
           handlePairSelection(ws, message.pair, predictionHistory, userId, createAiThinkingCompletePromise, () => analysisInProgress, (val) => { analysisInProgress = val; }, timeframe);
         } else if (message.type === 'user_message' && message.content) {
           const userId = message.userId || "dev_user";
@@ -2316,7 +2316,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Generate transparent prediction with real-time stage updates
       const aiCompletePromise = createAiThinkingCompletePromise();
-      const prediction = await generateTransparentPrediction(pair, ws, () => aiCompletePromise, timeframe || "SECONDS");
+      const prediction = await generateTransparentPrediction(pair, ws, () => aiCompletePromise, timeframe || "M1");
       
       if (ws.readyState !== WebSocket.OPEN) return;
 
