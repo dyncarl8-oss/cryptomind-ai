@@ -500,6 +500,18 @@ function FinalVerdictDisplay({
         </div>
       </div>
 
+      {data.explanation && (
+        <div className="space-y-3">
+          <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent flex items-center gap-2">
+            <Brain className="w-4 h-4 text-blue-400" />
+            AI PREDICTION & ANALYSIS
+          </div>
+          <div className="p-5 rounded-xl bg-gradient-to-br from-blue-500/5 via-cyan-500/5 to-blue-500/5 border border-blue-500/20 backdrop-blur-sm">
+            <p className="text-sm leading-relaxed whitespace-pre-wrap">{data.explanation}</p>
+          </div>
+        </div>
+      )}
+
       <div className="grid gap-5 lg:grid-cols-5">
         <div className="lg:col-span-2 space-y-3">
           <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
