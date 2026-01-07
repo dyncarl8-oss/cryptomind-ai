@@ -40,33 +40,33 @@ export const forexPairs = [
 export const tradingPairs = [...cryptoPairs, ...forexPairs] as const;
 
 export const timeframes = [
-  "SECONDS",
   "M1",
   "M3",
   "M5",
   "M15",
   "M30",
+  "M45",
   "H1",
   "H2",
+  "H3",
   "H4",
-  "H8",
   "D1",
   "W1",
 ] as const;
 
 export const timeframeLabels: Record<typeof timeframes[number], string> = {
-  SECONDS: "30-60 Seconds",
-  M1: "1 Minute",
-  M3: "3 Minutes",
-  M5: "5 Minutes",
-  M15: "15 Minutes",
-  M30: "30 Minutes",
-  H1: "1 Hour",
-  H2: "2 Hours",
-  H4: "4 Hours",
-  H8: "8 Hours",
-  D1: "1 Day",
-  W1: "1 Week",
+  M1: "1min",
+  M3: "3min",
+  M5: "5min",
+  M15: "15min",
+  M30: "30min",
+  M45: "45min",
+  H1: "1hr",
+  H2: "2hr",
+  H3: "3hr",
+  H4: "4hr",
+  D1: "1d",
+  W1: "1w",
 };
 
 export const indicatorSignalSchema = z.object({

@@ -403,7 +403,7 @@ export default function Chat() {
                                          message.content.includes("trading timeframe") &&
                                          index === messages.length - 1 &&
                                          awaitingTimeframeSelection;
-            const validTimeframes = ["SECONDS", "M1", "M3", "M5", "M15", "M30", "H1", "H2", "H4", "H8", "D1", "W1"];
+            const validTimeframes = ["M1", "M3", "M5", "M15", "M30", "M45", "H1", "H2", "H3", "H4", "D1", "W1"];
             const isUserTimeframeSelection = message.sender === "user" && message.content && validTimeframes.includes(message.content);
             const shouldShowAnalysisAfter = isUserTimeframeSelection && showAnalysis && analysisStages.length > 0;
             

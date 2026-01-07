@@ -120,7 +120,7 @@ export async function generateTransparentPrediction(
   pair: TradingPair,
   ws: WebSocket,
   waitForAiThinkingComplete?: () => Promise<void>,
-  timeframe: string = "SECONDS"
+  timeframe: string = "M1"
 ): Promise<Prediction> {
   const overallStartTime = Date.now();
 
@@ -423,20 +423,20 @@ export async function generateTransparentPrediction(
 
   const getDurationBasedOnTimeframe = (tf: string): string => {
     const durations: Record<string, string> = {
-      "SECONDS": "30-60 seconds",
       "M1": "1-2 minutes",
       "M3": "3-5 minutes",
       "M5": "5-8 minutes",
       "M15": "15-20 minutes",
       "M30": "30-45 minutes",
+      "M45": "45-60 minutes",
       "H1": "1-2 hours",
       "H2": "2-4 hours",
+      "H3": "3-5 hours",
       "H4": "4-6 hours",
-      "H8": "8-12 hours",
       "D1": "1-2 days",
       "W1": "1-2 weeks",
     };
-    return durations[tf] || "30-60 seconds";
+    return durations[tf] || "1-2 minutes";
   };
 
   const direction = geminiDecision?.direction || (upScore > downScore ? "UP" : "DOWN") as "UP" | "DOWN" | "NEUTRAL";
