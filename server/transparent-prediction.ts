@@ -1,5 +1,5 @@
 import { WebSocket } from "ws";
-import { type TradingPair } from "@shared/schema";
+import { type TradeTargets, type TradingPair } from "@shared/schema";
 import { fetchMarketData } from "./crypto-data";
 import { analyzeMarket, type TechnicalIndicators } from "./technical-analysis";
 import { getGeminiPrediction } from "./gemini-decision";
@@ -22,6 +22,98 @@ function sendStageUpdate(ws: WebSocket, update: StageUpdateMessage) {
   if (ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify(update));
   }
+}
+
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function computeFallbackTradeTargets(
+  direction: "UP" | "DOWN",
+  currentPrice: number,
+  atr: number
+): TradeTargets {
+  const safeAtr = Math.max(Math.abs(atr), Math.abs(currentPrice) * 0.002);
+  const entryBand = safeAtr * 0.25;
+
+  if (direction === "UP") {
+    const entryLow = currentPrice - entryBand;
+    const entryHigh = currentPrice + entryBand * 0.5;
+
+    return {
+      entry: { low: Math.min(entryLow, entryHigh), high: Math.max(entryLow, entryHigh) },
+      target: {
+        low: currentPrice + safeAtr * 1.5,
+        high: currentPrice + safeAtr * 2.4,
+      },
+      stop: entryLow - safeAtr * 1.05,
+    };
+  }
+
+  const entryLow = currentPrice - entryBand * 0.5;
+  const entryHigh = currentPrice + entryBand;
+
+  return {
+    entry: { low: Math.min(entryLow, entryHigh), high: Math.max(entryLow, entryHigh) },
+    target: {
+      low: currentPrice - safeAtr * 2.4,
+      high: currentPrice - safeAtr * 1.5,
+    },
+    stop: entryHigh + safeAtr * 1.05,
+  };
+}
+
+function normalizeTradeTargets(
+  maybeTargets: unknown,
+  direction: "UP" | "DOWN",
+  currentPrice: number,
+  atr: number
+): TradeTargets | null {
+  if (!maybeTargets || typeof maybeTargets !== "object") return null;
+  const t = maybeTargets as any;
+
+  if (
+    !t.entry ||
+    !t.target ||
+    !isFiniteNumber(t.stop) ||
+    !isFiniteNumber(t.entry.low) ||
+    !isFiniteNumber(t.entry.high) ||
+    !isFiniteNumber(t.target.low) ||
+    !isFiniteNumber(t.target.high)
+  ) {
+    return null;
+  }
+
+  const entryLow = Math.min(t.entry.low, t.entry.high);
+  const entryHigh = Math.max(t.entry.low, t.entry.high);
+  const targetLow = Math.min(t.target.low, t.target.high);
+  const targetHigh = Math.max(t.target.low, t.target.high);
+
+  const fallback = computeFallbackTradeTargets(direction, currentPrice, atr);
+
+  let stop = t.stop;
+
+  if (direction === "UP") {
+    if (!(stop < entryLow)) {
+      stop = fallback.stop;
+    }
+    if (!(targetHigh > entryHigh)) {
+      return fallback;
+    }
+  } else {
+    if (!(stop > entryHigh)) {
+      stop = fallback.stop;
+    }
+    if (!(targetLow < entryLow)) {
+      return fallback;
+    }
+  }
+
+  return {
+    entry: { low: entryLow, high: entryHigh },
+    target: { low: targetLow, high: targetHigh },
+    stop,
+  };
 }
 
 export async function generateTransparentPrediction(
@@ -363,6 +455,21 @@ export async function generateTransparentPrediction(
     indicators.atr > 3 ? "High volatility - wider stops recommended" : "Normal volatility range",
   ];
 
+  const tradeTargets: TradeTargets | undefined =
+    direction === "NEUTRAL"
+      ? undefined
+      : normalizeTradeTargets(
+            geminiDecision?.tradeTargets,
+            direction,
+            marketData.currentPrice,
+            indicators.atr
+          ) ??
+          computeFallbackTradeTargets(
+            direction,
+            marketData.currentPrice,
+            indicators.atr
+          );
+
   await delay(1500);
 
   const finalDuration = Date.now() - overallStartTime;
@@ -380,6 +487,7 @@ export async function generateTransparentPrediction(
       qualityScore,
       keyFactors,
       riskFactors,
+      tradeTargets,
     },
   });
 

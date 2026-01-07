@@ -113,6 +113,18 @@ export const aiThinkingDataSchema = z.object({
   modelUsed: z.string(),
 });
 
+export const tradeTargetsSchema = z.object({
+  entry: z.object({
+    low: z.number(),
+    high: z.number(),
+  }),
+  target: z.object({
+    low: z.number(),
+    high: z.number(),
+  }),
+  stop: z.number(),
+});
+
 export const finalVerdictDataSchema = z.object({
   direction: z.enum(["UP", "DOWN", "NEUTRAL"]),
   confidence: z.number(),
@@ -120,6 +132,7 @@ export const finalVerdictDataSchema = z.object({
   qualityScore: z.number(),
   keyFactors: z.array(z.string()),
   riskFactors: z.array(z.string()),
+  tradeTargets: tradeTargetsSchema.optional(),
 });
 
 export const analysisStageSchema = z.object({
@@ -185,6 +198,7 @@ export type MarketDataSnapshot = z.infer<typeof marketDataSnapshotSchema>;
 export type TechnicalIndicatorDetail = z.infer<typeof technicalIndicatorDetailSchema>;
 export type SignalAggregationData = z.infer<typeof signalAggregationDataSchema>;
 export type AIThinkingData = z.infer<typeof aiThinkingDataSchema>;
+export type TradeTargets = z.infer<typeof tradeTargetsSchema>;
 export type FinalVerdictData = z.infer<typeof finalVerdictDataSchema>;
 export type TradingPair = typeof tradingPairs[number];
 export type CryptoPair = typeof cryptoPairs[number];
