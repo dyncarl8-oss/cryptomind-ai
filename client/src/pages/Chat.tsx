@@ -173,6 +173,16 @@ export default function Chat() {
 
     setIsTyping(false);
 
+    // Check if we should skip this message to avoid duplicates
+    const allStagesComplete = analysisStages.length > 0 && analysisStages.every(s => s.status === "complete");
+    const isFinalVerdictComplete = allStagesComplete && analysisStages.some(s => s.stage === "final_verdict" && s.status === "complete");
+    const isPredictionMessage = latestMessage.type === "prediction";
+    
+    // Skip the prediction message if final verdict is already complete (to avoid duplicates)
+    if (isPredictionMessage && isFinalVerdictComplete) {
+      return;
+    }
+
     const newMessage: Message = {
       id: Date.now().toString() + Math.random(),
       sender: "bot",

@@ -488,6 +488,7 @@ export async function generateTransparentPrediction(
       keyFactors,
       riskFactors,
       tradeTargets,
+      explanation: geminiDecision?.rationale || `Strong ${direction} signal detected with ${confidence}% confidence`,
     },
   });
 
