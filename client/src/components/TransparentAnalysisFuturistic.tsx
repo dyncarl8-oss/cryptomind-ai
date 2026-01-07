@@ -71,7 +71,7 @@ const stageConfig = {
   ai_thinking: {
     icon: Brain,
     title: "AI Deep Analysis",
-    description: "CryptoMind AI analyzing market conditions",
+    description: "Gemini 3 Pro analyzing market conditions",
     gradient: "from-pink-500 to-rose-500",
     color: "text-pink-400",
   },
