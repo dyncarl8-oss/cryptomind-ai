@@ -1,0 +1,71 @@
+[Whop] Resolving company ID from experience: exp_l1V7hycSQMC06Y
+[Whop] Fetching experience: exp_l1V7hycSQMC06Y
+[Whop] Experience API response: {
+  "id": "exp_l1V7hycSQMC06Y",
+  "name": "test",
+  "order": "1763510379041.0",
+  "created_at": "2025-11-18T23:59:39.042Z",
+  "app": {
+    "id": "app_n8KpxC04qcjSGa",
+    "name": "test",
+    "icon": {
+      "url": "https://img-v2-prod.whop.com/nW2v6gCY3btl5JQ0n77qKVqqsjdCmtlL9sF6YRzj6IQ/mb:180000/plain/https://pub-a1dc6f8107c2492a8769db1059666e2f.r2.dev/custom-perk-icon.svg"
+    }
+  },
+  "image": null,
+  "company": {
+    "id": "biz_EJiipG1woT7zhb",
+    "title": "TradeVision Software Solutions",
+    "route": "tradevision-software-solutions-1624"
+  },
+  "products": [
+    {
+      "id": "prod_eoM4WrEfc9Z77",
+      "route": "tradevision-algostudio",
+      "title": "TradeVision AlgoStudio"
+    }
+  ]
+}
+[Whop] Resolved company_id: biz_EJiipG1woT7zhb
+[Whop] Registering admin user_6SjB1Wo0chseh with company: biz_EJiipG1woT7zhb
+2:39:07 AM [express] POST /api/admin/check 200 in 1838ms :: {"isAdmin":true}
+2:39:07 AM [express] GET /api/admin/commissions 304 in 115ms :: []
+2:39:07 AM [express] POST /api/auth/check-access 200 in 221ms :: {"hasAccess":true,"accessLevel":"admin"}
+2:39:07 AM [express] GET /api/auth/me 304 in 340ms :: {"id":"user_6SjB1Wo0chseh","username":"giducosalleyah","name":"alleyah","profile_pic_url":"https://content.whop.com/default_avatars/panda.png"}
+[Whop] Using stored company ID: biz_EJiipG1woT7zhb for admin: user_6SjB1Wo0chseh
+[Whop] Calling memberships.list with company_id: biz_EJiipG1woT7zhb, limit: 50
+2:39:07 AM [express] GET /api/admin/balance 304 in 221ms :: {"adminUserId":"user_6SjB1Wo0chseh","balance":0,"paymentCount":0}
+[Whop] Successfully fetched 2 memberships
+[Whop] Sample membership data: {
+  "id": "mem_A3z3jf2ifkyp6Z",
+  "status": "completed",
+  "created_at": "2025-11-18T23:59:38.741Z",
+  "updated_at": "2025-11-18T23:59:38.937Z",
+  "manage_url": "https://whop.com/billing/manage/mber_jg0fY3uCuMCal",
+  "member": {
+    "id": "mber_jg0fY3uCuMCal"
+  },
+  "user": null,
+  "renewal_period_start": null,
+  "renewal_period_end": null,
+  "cancel_at_period_end": false,
+  "cancellation_reason": null,
+  "canceled_at": null,
+  "currency": null,
+  "company": {
+    "id": "biz_EJiipG1woT7zhb",
+    "title": "TradeVision Software Solutions"
+  },
+  "plan": {
+    "id": "plan_PPExPSPhKeGJA"
+  },
+  "promo_code": null,
+  "product": {
+    "id": "prod_5iiBncW6ClAuk",
+    "title": "test"
+  },
+  "license_key": null,
+  "metadata": {},
+  "payment_collection_paused": false
+}
+2:39:08 AM [express] GET /api/admin/memberships 200 in 592ms :: {"data":[{"id":"mem_A3z3jf2ifkyp6Z","status":"completed","created_at":"2025-11-18T23:59:38.741Z","updated_at":"2025-11-18T23:59:38.937Z","manage_url":"https://whop.com/billing/manage/mber_jg0fY3uCuMCal","member":{"id":"mber_jg0fY3uCuMCal"},"user":null,"renewal_period_start":null,"renewal_period_end":null,"cancel_at_period_end":false,"cancellation_reason":null,"canceled_at":null,"currency":null,"company":{"id":"biz_EJiipG1woT7zhb","title":"TradeVision Software Solutions"},"plan":{"id":"plan_PPExPSPhKeGJA"},"promo_code":null,"product":{"id":"prod_5iiBncW6ClAuk","title":"test"},"license_key":null,"metadata":{},"payment_collection_paused":false},{"id":"mem_VbQKwARrn6SFeV","status":"completed","created_at":"2025-11-19T01:51:30.315Z","updated_at":"2025-11-19T01:51:30.595Z","manage_url":"https://whop.com/billing/manage/mber_mcW4H0G4ZrV6U","member":{"id":"mber_mcW4H0G4ZrV6U"},"user":{"id":"user_19t0ngmjS3ya9","username":"dujx","name":"dujx3388"},"renewal_period_start":null,"renewal_period_end":null,"cancel_at_period_end":false,"cancellation_reason":null,"canceled_at":null,"currency":null,"company":{"id":"biz_EJiipG1woT7zhb","title":"TradeVision Software Solutions"},"plan":{"id":"plan_7BFIKyH56HKrB"},"promo_code":null,"product":{"id":"prod_eoM4WrEfc9Z77","title":"TradeVision AlgoStudio"},"license_key":null,"metadata":{},"payment_collection_paused":false}],"page_info":{"has_next_page":false,"has_previous_page":false}}

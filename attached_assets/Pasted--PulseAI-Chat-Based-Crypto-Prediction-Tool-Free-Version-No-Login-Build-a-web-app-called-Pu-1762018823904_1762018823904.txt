@@ -1,0 +1,91 @@
+⚡ PulseAI — Chat-Based Crypto Prediction Tool (Free Version, No Login)
+
+Build a web app called “PulseAI”, an AI-powered chatbot that predicts short-term crypto market movements through a simple chat interface (like Discord or Telegram).
+
+The goal is to let users freely chat with the bot, ask for crypto predictions, and receive realistic analysis messages — no login, no landing page, no monetization.
+
+🧱 Core Features
+
+Chat Interface (Main UI)
+
+A one-page web app with a modern, Discord-style dark theme.
+
+Messages alternate between user and AI bot.
+
+User can type messages or choose from quick-select buttons for crypto pairs like:
+
+BTC/USDT
+
+ETH/USDT
+
+BNB/USDT
+
+SOL/USDT
+
+XRP/USDT
+
+DOGE/USDT
+
+ADA/USDT
+
+Bot replies naturally, e.g.:
+
+“Analysing BTC/USDT…”
+“✅ Prediction: UP in the next 45 seconds — Confidence: 82%.”
+“Suggested trade: SHORT duration, moderate volatility.”
+
+AI Prediction Logic (Simulated for MVP)
+
+Generate realistic random predictions with:
+
+Direction: UP or DOWN
+
+Confidence score (0–100%)
+
+Duration (15s, 30s, 1m, etc.)
+
+Keep prediction logic modular so it can later be replaced by a real data model.
+
+Add short “typing” or “analysing…” delays for realism.
+
+Interaction Flow
+
+User starts by pressing a “Start” button or sending a message.
+
+Bot introduces itself:
+
+“Hey there 👋 I’m PulseAI — I analyse crypto markets in real time. Pick a pair and I’ll show you my prediction.”
+
+After each result, bot suggests next actions like “Check another pair” or “Run another analysis.”
+
+Optional Features (still simple)
+
+Command /history to show the last 5 predictions.
+
+Refresh or “New Session” button to clear chat.
+
+Timestamp beside each message.
+
+No Login / No Signup / No Landing Page
+
+The app opens directly to the chat screen.
+
+Everything runs locally or via lightweight backend simulation.
+
+100% free and publicly accessible.
+
+💻 Tech Stack Recommendation
+
+Frontend: React or Next.js + Tailwind CSS
+
+Backend (optional): Node.js or Python FastAPI for simulated predictions
+
+Realtime: WebSockets or simple setTimeout delays for message flow
+
+
+🪙 Description Summary
+
+PulseAI is a free, chat-based crypto prediction bot that lets users talk to an AI trading assistant in real time.
+It analyses popular crypto pairs, generates short-term market predictions with confidence scores and durations, and responds conversationally — all inside a sleek, Discord-like chat.
+
+No accounts, no payment, no setup — just pure, interactive trading predictions.

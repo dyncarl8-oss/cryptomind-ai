@@ -1,0 +1,80 @@
+[Whop] Resolved company_id: biz_EJiipG1woT7zhb
+7:26:23 PM [express] POST /api/admin/check 200 in 1141ms :: {"isAdmin":false}
+7:26:23 PM [express] GET /api/auth/me 304 in 350ms :: {"id":"user_19t0ngmjS3ya9","username":"dujx","name":"dujx3388","profile_pic_url":"https://content.whop.com/default_avatars/goggles.png"}
+Client connected
+7:26:24 PM [express] POST /api/auth/check-access 200 in 804ms :: {"hasAccess":true,"accessLevel":"customer"}
+[Credits] Error checking membership status: BadRequestError: 400 {"error":{"message":"The Company ID parameter is required","type":"bad_request"}}
+    at Function.generate (/home/runner/workspace/node_modules/@whop/sdk/src/core/error.ts:60:14)
+    at Whop.makeStatusError (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:499:28)
+    at Whop.makeRequest (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:718:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async PagePromise.[Symbol.asyncIterator] (/home/runner/workspace/node_modules/@whop/sdk/src/core/pagination.ts:103:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:204:28) {
+  status: 400,
+  headers: Headers {
+    date: 'Wed, 19 Nov 2025 19:26:24 GMT',
+    'content-type': 'application/json; charset=utf-8',
+    'content-length': '81',
+    connection: 'keep-alive',
+    'cf-ray': '9a12195a38163ac9-BOM',
+    'cache-control': 'no-cache',
+    'referrer-policy': 'strict-origin-when-cross-origin',
+    'strict-transport-security': 'max-age=63072000; includeSubDomains',
+    vary: 'Accept, Origin',
+    'x-content-type-options': 'nosniff',
+    'x-frame-options': 'SAMEORIGIN',
+    'x-permitted-cross-domain-policies': 'none',
+    'x-request-id': '72bd691a-8e63-49ce-b1d5-6479da15ac9a',
+    'x-runtime': '0.012213',
+    'x-xss-protection': '0',
+    'cf-cache-status': 'DYNAMIC',
+    'set-cookie': '__cf_bm=Sn3k62kTN86AyUJUqy9rPkTqxeXjD3vWB8t5M_NEtM4-1763580384-1.0.1.1-YseLegRmLuEzYl_AgXG7NTh7EIhzcbcKBBoSQUT8hMgL2XkVFosq3FVo4gV5OnBqFMS4Q4ovm.hEPY0eHsVniGomU0sDMvdIMrh0P3yyhM4; path=/; expires=Wed, 19-Nov-25 19:56:24 GMT; domain=.whop.com; HttpOnly; Secure; SameSite=None',
+    server: 'cloudflare',
+    'alt-svc': 'h3=":443"; ma=86400'
+  },
+  error: {
+    error: {
+      message: 'The Company ID parameter is required',
+      type: 'bad_request'
+    }
+  }
+}
+7:26:24 PM [express] GET /api/credits 304 in 397ms :: {"userId":"user_19t0ngmjS3ya9","credits":5,"hasUnlimitedAccess":true}
+[Manage URL] Fetching subscription manage URL for user: user_19t0ngmjS3ya9
+Error fetching subscription manage URL: BadRequestError: 400 {"error":{"message":"The Company ID parameter is required","type":"bad_request"}}
+    at Function.generate (/home/runner/workspace/node_modules/@whop/sdk/src/core/error.ts:60:14)
+    at Whop.makeStatusError (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:499:28)
+    at Whop.makeRequest (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:718:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async PagePromise.[Symbol.asyncIterator] (/home/runner/workspace/node_modules/@whop/sdk/src/core/pagination.ts:103:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:253:24) {
+  status: 400,
+  headers: Headers {
+    date: 'Wed, 19 Nov 2025 19:26:25 GMT',
+    'content-type': 'application/json; charset=utf-8',
+    'content-length': '81',
+    connection: 'keep-alive',
+    'cf-ray': '9a12195ce9123ac9-BOM',
+    'cache-control': 'no-cache',
+    'referrer-policy': 'strict-origin-when-cross-origin',
+    'strict-transport-security': 'max-age=63072000; includeSubDomains',
+    vary: 'Accept, Origin',
+    'x-content-type-options': 'nosniff',
+    'x-frame-options': 'SAMEORIGIN',
+    'x-permitted-cross-domain-policies': 'none',
+    'x-request-id': '7f634390-ea3f-4513-8f80-87fda2b1f38f',
+    'x-runtime': '0.027978',
+    'x-xss-protection': '0',
+    'cf-cache-status': 'DYNAMIC',
+    'set-cookie': '__cf_bm=eRSHxCGXUGV23OoyZivZyhHfIA97JWvDrz.99pCH3sY-1763580385-1.0.1.1-vYdEoQKF0AfENJ4pAOw_q2D4gwqBPb22LBFDenTZ64eE_AJy37wYSSZb6.dtMiTCp0lbFQqR3ASqBiMY1TC.kkS0WHNC_m_JE6nAfr_ksyI; path=/; expires=Wed, 19-Nov-25 19:56:25 GMT; domain=.whop.com; HttpOnly; Secure; SameSite=None',
+    server: 'cloudflare',
+    'alt-svc': 'h3=":443"; ma=86400'
+  },
+  error: {
+    error: {
+      message: 'The Company ID parameter is required',
+      type: 'bad_request'
+    }
+  }
+}
+7:26:25 PM [express] GET /api/subscription/manage-url 500 in 243ms :: {"error":"Failed to fetch subscription details"}

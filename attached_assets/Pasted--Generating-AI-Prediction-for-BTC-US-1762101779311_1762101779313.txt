@@ -1,0 +1,101 @@
+============================================================
+🔮 Generating AI Prediction for BTC/USDT
+============================================================
+[CoinGecko API] Fetching market data for BTC/USDT (bitcoin)
+💹 Market Data:
+[CoinGecko API] Chart data error - Status: 401
+  Current Price: $110023.00
+  24h Change: -0.30%
+  Volume Change: 0.0%
+📉 Technical Indicators:
+  Market Regime: RANGING
+  Trend Strength: 7.1%
+  ADX: 8.5 | RSI: 51.6
+  MACD Histogram: -24.0825
+📊 Analyzing Signals:
+  ➡️  Momentum: RSI neutral
+  ↗️  Momentum: Stochastic bullish crossover signal (Strength: 65, Weight: 1.0)
+  ↘️  Trend: MACD strong bearish momentum (Strength: 100, Weight: 1.4)
+  ↗️  Trend: 4/6 MA indicators bullish (Strength: 67, Weight: 1.3)
+  ➡️  Volatility: Price at BB middle
+  ➡️  Trend: Weak trend, ranging market
+  ➡️  Momentum: Momentum neutral
+  ↗️  Price Action: Price at strong support level (Strength: 90, Weight: 1.3)
+📈 Score Summary:
+  UP Score: 268.7 (3 signals)
+  DOWN Score: 140.0 (1 signals)
+  Direction: UP | Alignment: 75%
+🎯 Confidence Calculation:
+  Raw Score: 186.7
+  Normalized: 100.0%
+  Penalty: 82.0
+  Regime (RANGING): 0.90x
+  Final Confidence: 89%
+  Quality Score: 69%
+🔊 Volume Analysis:
+  Volume Bonus: 0.0
+📊 Analyzing Signals:
+  ➡️  Momentum: RSI neutral
+  ↗️  Momentum: Stochastic bullish crossover signal (Strength: 65, Weight: 1.0)
+  ↘️  Trend: MACD strong bearish momentum (Strength: 100, Weight: 1.4)
+  ↗️  Trend: 4/6 MA indicators bullish (Strength: 67, Weight: 1.3)
+  ➡️  Volatility: Price at BB middle
+  ➡️  Trend: Weak trend, ranging market
+  ➡️  Momentum: Momentum neutral
+  ↗️  Price Action: Price at strong support level (Strength: 90, Weight: 1.3)
+📈 Score Summary:
+  UP Score: 268.7 (3 signals)
+  DOWN Score: 140.0 (1 signals)
+  Direction: UP | Alignment: 75%
+🎯 Confidence Calculation:
+  Raw Score: 186.7
+  Normalized: 100.0%
+  Penalty: 82.0
+  Regime (RANGING): 0.90x
+  Final Confidence: 89%
+  Quality Score: 69%
+⏳ Confidence too low (89%) - waiting for better setup
+============================================================
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_JaBx79tOt0qf1
+4:41:32 PM [express] GET /api/credits 200 in 138ms :: {"userId":"user_JaBx79tOt0qf1","credits":9,"ha…
+============================================================
+🔮 Generating AI Prediction for ETH/USDT
+============================================================
+[CoinGecko API] Fetching market data for ETH/USDT (ethereum)
+[CoinGecko API] Current price error - Status: 429, Body: {"status":{"error_code":429,"error_message":"You've exceeded the Rate Limit. Please visit https://www.coingecko.com/en/api/pricing to subscribe to our API plans for higher rate limits."}}
+Error fetching market data for ETH/USDT: Error: Failed to fetch current price for ETH/USDT: Status 429
+    at fetchMarketData (file:///opt/render/project/src/dist/index.js:175:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async generateAIPrediction (file:///opt/render/project/src/dist/index.js:1258:24)
+    at async generatePrediction (file:///opt/render/project/src/dist/index.js:1405:22)
+    at async handlePairSelection (file:///opt/render/project/src/dist/index.js:1811:26)
+❌ AI Prediction error for ETH/USDT: Error: Failed to fetch current price for ETH/USDT: Status 429
+    at fetchMarketData (file:///opt/render/project/src/dist/index.js:175:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async generateAIPrediction (file:///opt/render/project/src/dist/index.js:1258:24)
+    at async generatePrediction (file:///opt/render/project/src/dist/index.js:1405:22)
+    at async handlePairSelection (file:///opt/render/project/src/dist/index.js:1811:26)
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_JaBx79tOt0qf1
+4:41:57 PM [express] GET /api/credits 200 in 136ms :: {"userId":"user_JaBx79tOt0qf1","credits":8,"ha…
+============================================================
+🔮 Generating AI Prediction for BNB/USDT
+============================================================
+[CoinGecko API] Fetching market data for BNB/USDT (binancecoin)
+[CoinGecko API] Current price error - Status: 429, Body: {"status":{"error_code":429,"error_message":"You've exceeded the Rate Limit. Please visit https://www.coingecko.com/en/api/pricing to subscribe to our API plans for higher rate limits."}}
+Error fetching market data for BNB/USDT: Error: Failed to fetch current price for BNB/USDT: Status 429
+    at fetchMarketData (file:///opt/render/project/src/dist/index.js:175:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async generateAIPrediction (file:///opt/render/project/src/dist/index.js:1258:24)
+    at async generatePrediction (file:///opt/render/project/src/dist/index.js:1405:22)
+    at async handlePairSelection (file:///opt/render/project/src/dist/index.js:1811:26)
+❌ AI Prediction error for BNB/USDT: Error: Failed to fetch current price for BNB/USDT: Status 429
+    at fetchMarketData (file:///opt/render/project/src/dist/index.js:175:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async generateAIPrediction (file:///opt/render/project/src/dist/index.js:1258:24)
+    at async generatePrediction (file:///opt/render/project/src/dist/index.js:1405:22)
+    at async handlePairSelection (file:///opt/render/project/src/dist/index.js:1811:26)
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_JaBx79tOt0qf1
+4:42:03 PM [express] GET /api/credits 200 in 136ms :: {"userId":"user_JaBx79tOt0qf1","credits":7,"ha…

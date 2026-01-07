@@ -1,0 +1,50 @@
+🔮 Generating AI Prediction for BTC/USDT
+============================================================
+Error fetching market data for BTC/USDT: Error: Failed to fetch ticker for BTCUSDT (BTC/USDT): 
+    at fetchMarketData (file:///opt/render/project/src/dist/index.js:163:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async generateAIPrediction (file:///opt/render/project/src/dist/index.js:1202:24)
+    at async generatePrediction (file:///opt/render/project/src/dist/index.js:1349:22)
+    at async handlePairSelection (file:///opt/render/project/src/dist/index.js:1755:26)
+❌ AI Prediction error for BTC/USDT: Error: Failed to fetch ticker for BTCUSDT (BTC/USDT): 
+    at fetchMarketData (file:///opt/render/project/src/dist/index.js:163:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async generateAIPrediction (file:///opt/render/project/src/dist/index.js:1202:24)
+    at async generatePrediction (file:///opt/render/project/src/dist/index.js:1349:22)
+    at async handlePairSelection (file:///opt/render/project/src/dist/index.js:1755:26)
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_JaBx79tOt0qf1
+3:27:32 PM [express] GET /api/credits 200 in 134ms :: {"userId":"user_JaBx79tOt0qf1","credits":4,"ha…
+============================================================
+🔮 Generating AI Prediction for BTC/USDT
+============================================================
+Error fetching market data for BTC/USDT: Error: Failed to fetch ticker for BTCUSDT (BTC/USDT): 
+    at fetchMarketData (file:///opt/render/project/src/dist/index.js:163:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async generateAIPrediction (file:///opt/render/project/src/dist/index.js:1202:24)
+    at async generatePrediction (file:///opt/render/project/src/dist/index.js:1349:22)
+    at async handlePairSelection (file:///opt/render/project/src/dist/index.js:1755:26)
+❌ AI Prediction error for BTC/USDT: Error: Failed to fetch ticker for BTCUSDT (BTC/USDT): 
+    at fetchMarketData (file:///opt/render/project/src/dist/index.js:163:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async generateAIPrediction (file:///opt/render/project/src/dist/index.js:1202:24)
+    at async generatePrediction (file:///opt/render/project/src/dist/index.js:1349:22)
+    at async handlePairSelection (file:///opt/render/project/src/dist/index.js:1755:26)
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_JaBx79tOt0qf1
+3:27:39 PM [express] GET /api/credits 200 in 134ms :: {"userId":"user_JaBx79tOt0qf1","credits":3,"ha…
+============================================================
+🔮 Generating AI Prediction for ETH/USDT
+============================================================
+Error fetching market data for ETH/USDT: Error: Failed to fetch ticker for ETHUSDT (ETH/USDT): 
+    at fetchMarketData (file:///opt/render/project/src/dist/index.js:163:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async generateAIPrediction (file:///opt/render/project/src/dist/index.js:1202:24)
+    at async generatePrediction (file:///opt/render/project/src/dist/index.js:1349:22)
+    at async handlePairSelection (file:///opt/render/project/src/dist/index.js:1755:26)
+❌ AI Prediction error for ETH/USDT: Error: Failed to fetch ticker for ETHUSDT (ETH/USDT): 
+    at fetchMarketData (file:///opt/render/project/src/dist/index.js:163:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async generateAIPrediction (file:///opt/render/project/src/dist/index.js:1202:24)
+    at async generatePrediction (file:///opt/render/project/src/dist/index.js:1349:22)
+    at async handlePairSelection (file:///opt/render/project/src/dist/index.js:1755:26)

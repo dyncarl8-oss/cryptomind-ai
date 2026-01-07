@@ -1,0 +1,138 @@
+[Admin Check] Verified user: user_6SjB1Wo0chseh
+[Admin Check] Resource context from JWT - type: undefined, id: undefined
+[Admin Check] Using client-provided resourceId: exp_l1V7hycSQMC06Y, companyId: biz_lq0iYcpZitqEqa
+[Admin Check] Checking access for resource: exp_l1V7hycSQMC06Y
+[Admin Check] Experience access - level: admin, has access: true
+[Admin Check] Final result: isAdmin = true
+[Admin Check] Auto-registered admin: user_6SjB1Wo0chseh for company: biz_lq0iYcpZitqEqa
+12:20:57 AM [express] POST /api/admin/check 200 in 1031ms :: {"isAdmin":true}
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_6SjB1Wo0chseh
+[Whop Auth] JWT payload: {
+  "iat": 1763511657,
+  "exp": 1763511837,
+  "sub": "user_6SjB1Wo0chseh",
+  "iss": "urn:whopcom:exp-proxy",
+  "aud": "app_n8KpxC04qcjSGa"
+}
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_6SjB1Wo0chseh
+[Whop Auth] JWT payload: {
+  "iat": 1763511657,
+  "exp": 1763511837,
+  "sub": "user_6SjB1Wo0chseh",
+  "iss": "urn:whopcom:exp-proxy",
+  "aud": "app_n8KpxC04qcjSGa"
+}
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_6SjB1Wo0chseh
+[Whop Auth] JWT payload: {
+  "iat": 1763511658,
+  "exp": 1763511838,
+  "sub": "user_6SjB1Wo0chseh",
+  "iss": "urn:whopcom:exp-proxy",
+  "aud": "app_n8KpxC04qcjSGa"
+}
+12:20:58 AM [express] POST /api/auth/check-access 200 in 228ms :: {"hasAccess":true,"accessLevel":"admin"}
+12:20:58 AM [express] GET /api/admin/balance 304 in 234ms :: {"adminUserId":"user_6SjB1Wo0chseh","balance":0,"paymentCount":0}
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_6SjB1Wo0chseh
+[Whop Auth] JWT payload: {
+  "iat": 1763511658,
+  "exp": 1763511838,
+  "sub": "user_6SjB1Wo0chseh",
+  "iss": "urn:whopcom:exp-proxy",
+  "aud": "app_n8KpxC04qcjSGa"
+}
+[Memberships API] Attempting to list memberships...
+[Memberships API] Company ID: biz_lq0iYcpZitqEqa
+[Memberships API] API Key present: true
+[Memberships API] App ID: app_n8KpxC04qcjSGa
+[Memberships API] Trying to list ALL memberships first (no company filter)...
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_6SjB1Wo0chseh
+[Whop Auth] JWT payload: {
+  "iat": 1763511658,
+  "exp": 1763511838,
+  "sub": "user_6SjB1Wo0chseh",
+  "iss": "urn:whopcom:exp-proxy",
+  "aud": "app_n8KpxC04qcjSGa"
+}
+12:20:58 AM [express] GET /api/admin/commissions 304 in 116ms :: []
+[Memberships API] Error in test listing: BadRequestError: 400 {"error":{"message":"The Company ID parameter is required","type":"bad_request"}}
+    at Function.generate (/home/runner/workspace/node_modules/@whop/sdk/src/core/error.ts:60:14)
+    at Whop.makeStatusError (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:499:28)
+    at Whop.makeRequest (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:718:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async PagePromise.[Symbol.asyncIterator] (/home/runner/workspace/node_modules/@whop/sdk/src/core/pagination.ts:103:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:647:28) {
+  status: 400,
+  headers: Headers {
+    date: 'Wed, 19 Nov 2025 00:20:58 GMT',
+    'content-type': 'application/json; charset=utf-8',
+    'content-length': '81',
+    connection: 'keep-alive',
+    'cf-ray': '9a0b8b78bdf2c739-BOM',
+    'cache-control': 'no-cache',
+    'referrer-policy': 'strict-origin-when-cross-origin',
+    'strict-transport-security': 'max-age=63072000; includeSubDomains',
+    vary: 'Accept, Origin',
+    'x-content-type-options': 'nosniff',
+    'x-frame-options': 'SAMEORIGIN',
+    'x-permitted-cross-domain-policies': 'none',
+    'x-request-id': '992eecd0-3d39-47a5-b398-a399865a24d7',
+    'x-runtime': '0.014036',
+    'x-xss-protection': '0',
+    'cf-cache-status': 'DYNAMIC',
+    'set-cookie': '__cf_bm=9nTRJsDL_W2yEVlTzdJ1V62nB64eAxzp_HFfItf7u3c-1763511658-1.0.1.1-8S4fiDxs4r8G4LqCn5zz12tNtW2AH5TWyJsMxKVKTr2qfE47wmMDCGIOfx7eF6C5w9ZisQznMk8pHb8piLURvaqVMgOHBHdahh4UEvWF6bQ; path=/; expires=Wed, 19-Nov-25 00:50:58 GMT; domain=.whop.com; HttpOnly; Secure; SameSite=None',
+    server: 'cloudflare',
+    'alt-svc': 'h3=":443"; ma=86400'
+  },
+  error: {
+    error: {
+      message: 'The Company ID parameter is required',
+      type: 'bad_request'
+    }
+  }
+}
+[Memberships API] Error fetching memberships from Whop: BadRequestError: 400 {"error":{"message":"The Company ID parameter is required","type":"bad_request"}}
+    at Function.generate (/home/runner/workspace/node_modules/@whop/sdk/src/core/error.ts:60:14)
+    at Whop.makeStatusError (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:499:28)
+    at Whop.makeRequest (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:718:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async PagePromise.[Symbol.asyncIterator] (/home/runner/workspace/node_modules/@whop/sdk/src/core/pagination.ts:103:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:647:28) {
+  status: 400,
+  headers: Headers {
+    date: 'Wed, 19 Nov 2025 00:20:58 GMT',
+    'content-type': 'application/json; charset=utf-8',
+    'content-length': '81',
+    connection: 'keep-alive',
+    'cf-ray': '9a0b8b78bdf2c739-BOM',
+    'cache-control': 'no-cache',
+    'referrer-policy': 'strict-origin-when-cross-origin',
+    'strict-transport-security': 'max-age=63072000; includeSubDomains',
+    vary: 'Accept, Origin',
+    'x-content-type-options': 'nosniff',
+    'x-frame-options': 'SAMEORIGIN',
+    'x-permitted-cross-domain-policies': 'none',
+    'x-request-id': '992eecd0-3d39-47a5-b398-a399865a24d7',
+    'x-runtime': '0.014036',
+    'x-xss-protection': '0',
+    'cf-cache-status': 'DYNAMIC',
+    'set-cookie': '__cf_bm=9nTRJsDL_W2yEVlTzdJ1V62nB64eAxzp_HFfItf7u3c-1763511658-1.0.1.1-8S4fiDxs4r8G4LqCn5zz12tNtW2AH5TWyJsMxKVKTr2qfE47wmMDCGIOfx7eF6C5w9ZisQznMk8pHb8piLURvaqVMgOHBHdahh4UEvWF6bQ; path=/; expires=Wed, 19-Nov-25 00:50:58 GMT; domain=.whop.com; HttpOnly; Secure; SameSite=None',
+    server: 'cloudflare',
+    'alt-svc': 'h3=":443"; ma=86400'
+  },
+  error: {
+    error: {
+      message: 'The Company ID parameter is required',
+      type: 'bad_request'
+    }
+  }
+}
+[Memberships API] This means the 'member:basic:read' permission is NOT granted to your app
+[Memberships API] Go to: https://whop.com/dashboard/settings/authorized-apps
+[Memberships API] Find your app and click 'Re-approve' to grant the permission
+12:20:58 AM [express] GET /api/admin/memberships 500 in 239ms :: {"error":"Failed to fetch memberships from Whop","hint":"The app doesn't have 'member:basic:read' permission. Go to whop.com/dashboard/settings/authorized-apps and re-approve your app."}
+12:20:58 AM [express] GET /api/auth/me 304 in 939ms :: {"id":"user_6SjB1Wo0chseh","username":"giducosalleyah","name":"alleyah","profile_pic_url":"https://content.whop.com/default_avatars/panda.png"}

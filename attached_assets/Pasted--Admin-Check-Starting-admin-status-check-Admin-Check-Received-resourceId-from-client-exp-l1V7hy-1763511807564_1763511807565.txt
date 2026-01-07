@@ -1,0 +1,110 @@
+[Admin Check] Starting admin status check
+[Admin Check] Received resourceId from client: exp_l1V7hycSQMC06Y
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_6SjB1Wo0chseh
+[Whop Auth] JWT payload: {
+  "iat": 1763511776,
+  "exp": 1763511956,
+  "sub": "user_6SjB1Wo0chseh",
+  "iss": "urn:whopcom:exp-proxy",
+  "aud": "app_n8KpxC04qcjSGa"
+}
+[Admin Check] Verified user: user_6SjB1Wo0chseh
+[Admin Check] Resource context from JWT - type: undefined, id: undefined
+[Admin Check] Using client-provided resourceId: exp_l1V7hycSQMC06Y, companyId: biz_lq0iYcpZitqEqa
+[Admin Check] Checking access for resource: exp_l1V7hycSQMC06Y
+[Admin Check] Experience access - level: admin, has access: true
+[Admin Check] Final result: isAdmin = true
+[Admin Check] Auto-registered admin: user_6SjB1Wo0chseh for company: biz_lq0iYcpZitqEqa
+12:22:58 AM [express] POST /api/admin/check 200 in 1335ms :: {"isAdmin":true}
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_6SjB1Wo0chseh
+[Whop Auth] JWT payload: {
+  "iat": 1763511778,
+  "exp": 1763511958,
+  "sub": "user_6SjB1Wo0chseh",
+  "iss": "urn:whopcom:exp-proxy",
+  "aud": "app_n8KpxC04qcjSGa"
+}
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_6SjB1Wo0chseh
+[Whop Auth] JWT payload: {
+  "iat": 1763511778,
+  "exp": 1763511958,
+  "sub": "user_6SjB1Wo0chseh",
+  "iss": "urn:whopcom:exp-proxy",
+  "aud": "app_n8KpxC04qcjSGa"
+}
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_6SjB1Wo0chseh
+[Whop Auth] JWT payload: {
+  "iat": 1763511778,
+  "exp": 1763511958,
+  "sub": "user_6SjB1Wo0chseh",
+  "iss": "urn:whopcom:exp-proxy",
+  "aud": "app_n8KpxC04qcjSGa"
+}
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_6SjB1Wo0chseh
+[Whop Auth] JWT payload: {
+  "iat": 1763511778,
+  "exp": 1763511958,
+  "sub": "user_6SjB1Wo0chseh",
+  "iss": "urn:whopcom:exp-proxy",
+  "aud": "app_n8KpxC04qcjSGa"
+}
+[Whop Auth] Found token, verifying...
+[Whop Auth] Successfully verified Whop user: user_6SjB1Wo0chseh
+[Whop Auth] JWT payload: {
+  "iat": 1763511778,
+  "exp": 1763511958,
+  "sub": "user_6SjB1Wo0chseh",
+  "iss": "urn:whopcom:exp-proxy",
+  "aud": "app_n8KpxC04qcjSGa"
+}
+[Memberships API] Fetching memberships for company: biz_lq0iYcpZitqEqa
+12:22:58 AM [express] GET /api/admin/commissions 304 in 109ms :: []
+12:22:58 AM [express] POST /api/auth/check-access 200 in 232ms :: {"hasAccess":true,"accessLevel":"admin"}
+12:22:58 AM [express] GET /api/admin/balance 304 in 230ms :: {"adminUserId":"user_6SjB1Wo0chseh","balance":0,"paymentCount":0}
+[Memberships API] Error fetching memberships: PermissionDeniedError: 403 {"error":{"message":"You are not authorized - requires: 'member:basic:read'","type":"forbidden"}}
+    at Function.generate (/home/runner/workspace/node_modules/@whop/sdk/src/core/error.ts:68:14)
+    at Whop.makeStatusError (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:499:28)
+    at Whop.makeRequest (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:718:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async PagePromise.[Symbol.asyncIterator] (/home/runner/workspace/node_modules/@whop/sdk/src/core/pagination.ts:103:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:640:26) {
+  status: 403,
+  headers: Headers {
+    date: 'Wed, 19 Nov 2025 00:22:59 GMT',
+    'content-type': 'application/json; charset=utf-8',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'content-encoding': 'br',
+    'cache-control': 'no-cache',
+    'referrer-policy': 'strict-origin-when-cross-origin',
+    'strict-transport-security': 'max-age=63072000; includeSubDomains',
+    vary: 'Accept, Origin',
+    'x-content-type-options': 'nosniff',
+    'x-frame-options': 'SAMEORIGIN',
+    'x-permitted-cross-domain-policies': 'none',
+    'x-request-id': 'cc876817-22b4-4c85-8b9a-a0d4269a7d1e',
+    'x-runtime': '0.020347',
+    'x-xss-protection': '0',
+    'cf-cache-status': 'DYNAMIC',
+    'set-cookie': '__cf_bm=5RGIZN7Wz479h060fVByEJ.2rrR5NRadCHs_PMz9eHc-1763511779-1.0.1.1-tIETquZDsUucleysHjW55fIdaDdyQMny2rRvbEW1rPg2kV3ffJ6Gua9MC3AZ8.JWqM7iCfAYPOBipYx5v1ojnmOQJM_P0RwVNH9hqC.ujqo; path=/; expires=Wed, 19-Nov-25 00:52:59 GMT; domain=.whop.com; HttpOnly; Secure; SameSite=None',
+    server: 'cloudflare',
+    'cf-ray': '9a0b8e66cbbb7e53-BOM',
+    'alt-svc': 'h3=":443"; ma=86400'
+  },
+  error: {
+    error: {
+      message: "You are not authorized - requires: 'member:basic:read'",
+      type: 'forbidden'
+    }
+  }
+}
+[Memberships API] Permission denied - 'member:basic:read' not granted
+[Memberships API] Your app needs to request this permission in the developer dashboard
+[Memberships API] Then reinstall the app on your company
+12:22:59 AM [express] GET /api/admin/memberships 500 in 836ms :: {"error":"Failed to fetch memberships from Whop","details":"403 {\"error\":{\"message\":\"You are not authorized - requires: 'member:basic:read'\",\"type\":\"forbidden\"}}"}
+12:22:59 AM [express] GET /api/auth/me 304 in 963ms :: {"id":"user_6SjB1Wo0chseh","username":"giducosalleyah","name":"alleyah","profile_pic_url":"https://content.whop.com/default_avatars/panda.png"}

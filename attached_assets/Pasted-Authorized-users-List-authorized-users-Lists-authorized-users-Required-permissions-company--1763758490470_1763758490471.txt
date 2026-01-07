@@ -1,0 +1,132 @@
+Authorized users
+List authorized users
+Lists authorized users
+
+Required permissions:
+
+company:authorized_user:read
+member:email:read
+GET
+/
+authorized_users
+
+Try it
+Authorizations
+​
+Authorization
+stringheaderrequired
+The app API key from an app from the /dashboard/developer page
+
+Query Parameters
+​
+after
+string | null
+Returns the elements in the list that come after the specified cursor.
+
+​
+before
+string | null
+Returns the elements in the list that come before the specified cursor.
+
+​
+first
+integer | null
+Returns the first n elements from the list.
+
+Example:
+42
+
+​
+last
+integer | null
+Returns the last n elements from the list.
+
+Example:
+42
+
+​
+company_id
+stringrequired
+The ID of the company to list authorized users for
+
+Example:
+"biz_xxxxxxxxxxxxxx"
+
+​
+user_id
+string | null
+Filter by the user ID to check if the user is an authorized user
+
+Example:
+"user_xxxxxxxxxxxxx"
+
+​
+role
+enum<string> | null
+Filter by the role of the authorized user to list
+Possible roles an authorized user can have
+
+Available options: owner, admin, sales_manager, moderator, app_manager, support, manager 
+Response
+
+200
+
+application/json
+A successful response
+
+The connection type for AuthorizedUser.
+
+​
+data
+object[]required
+A list of nodes.
+
+Hide child attributes
+
+​
+id
+stringrequired
+A unique ID representing the authorized user object.
+
+Example:
+"ausr_xxxxxxxxxxxxx"
+
+​
+role
+enum<string>required
+The role of the authorized user in the company.
+
+Available options: owner, admin, sales_manager, moderator, app_manager, support, manager 
+​
+user
+objectrequired
+The user associated with the authorized user.
+
+Show child attributes
+
+​
+page_info
+objectrequired
+Information to aid in pagination.
+
+Hide child attributes
+
+​
+page_info.end_cursor
+string | nullrequired
+When paginating forwards, the cursor to continue.
+
+​
+page_info.start_cursor
+string | nullrequired
+When paginating backwards, the cursor to continue.
+
+​
+page_info.has_next_page
+booleanrequired
+When paginating forwards, are there more items?
+
+​
+page_info.has_previous_page
+booleanrequired
+When paginating backwards, are there more items?

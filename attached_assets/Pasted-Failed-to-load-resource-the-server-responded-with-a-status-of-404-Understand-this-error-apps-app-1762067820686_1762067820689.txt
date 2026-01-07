@@ -1,0 +1,336 @@
+Failed to load resource: the server responded with a status of 404 ()Understand this error
+/apps/app_9XIwjkYgJhP9Xc/install/:1 Unable to download payment manifest "https://apple.com/apple-pay". ERR_CONNECTION_RESET (-101)Understand this error
+/apps/app_9XIwjkYgJhP9Xc/install/:1 Unable to download payment manifest "https://apple.com/apple-pay". ERR_CONNECTION_RESET (-101)Understand this error
+b9f8d8d1f8f803dc.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:2 WebSocket connection to 'wss://ws-prod.whop.com/ws?platform_type=web' failed: 
+t._connectSocket @ b9f8d8d1f8f803dc.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:2Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:ERROR] Event
+(anonymous) @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Exponential backoff: 100ms
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection closed after 0 ms CloseEvent
+img-v2-prod.whop.com/86Wr-xcZQkDWSRm7zDx6GKGxukeo0a6P3jridIIvKDU/resize:fill/width:180/height:180/enlarge:true/plain/https://pub-a1dc6f8107c2492a8769db1059666e2f.r2.dev/custom-perk-icon.svg:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+17[Violation] Potential permissions policy violation: ch-dpr is not allowed in this document.Understand this error
+5Manifest: found icon with no valid size.Understand this warning
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection established
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Successful webSocket connection confirmed after 319ms
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33 Unrecognized feature: 'ambient-light-sensor'.
+ti @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33Understand this warning
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33 Unrecognized feature: 'battery'.
+ti @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33Understand this warning
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33 Unrecognized feature: 'document-domain'.
+ti @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33Understand this warning
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33 Unrecognized feature: 'execution-while-not-rendered'.
+ti @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33Understand this warning
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33 Unrecognized feature: 'execution-while-out-of-viewport'.
+ti @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33Understand this warning
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33 Unrecognized feature: 'navigation-override'.
+ti @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33Understand this warning
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33 Unrecognized feature: 'speaker-selection'.
+ti @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33Understand this warning
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33 Unrecognized feature: 'conversion-measurement'.
+ti @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33Understand this warning
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33 Unrecognized feature: 'focus-without-user-activation'.
+ti @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33Understand this warning
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33 Unrecognized feature: 'sync-script'.
+ti @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33Understand this warning
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33 Unrecognized feature: 'trust-token-redemption'.
+ti @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33Understand this warning
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33 Unrecognized feature: 'window-placement'.
+ti @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33Understand this warning
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33 Unrecognized feature: 'vertical-scroll'.
+ti @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33Understand this warning
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33 Allow attribute will take precedence over 'allowfullscreen'.
+u8 @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33Understand this warning
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33 An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing.
+ow @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:33Understand this warning
+543Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('<URL>') does not match the recipient window's origin ('<URL>').Understand this warning
+ WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/?token=xpiZhUbNdx66' failed: 
+setupWebSocket @ client:536Understand this error
+client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=xpiZhUbNdx66' is invalid.Understand this error
+ VITE_WHOP_APP_ID environment variable is not set - Whop iframe features disabled
+(anonymous) @ injected.js:27Understand this warning
+1wm9vpacqyns7jes44m3.apps.whop.com/api/auth/check-access:1  Failed to load resource: the server responded with a status of 401 ()Understand this error
+ WebSocket connected
+ WebSocket disconnected
+ WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/?token=xpiZhUbNdx66' failed: 
+setupWebSocket @ client:536Understand this error
+client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=xpiZhUbNdx66' is invalid.Understand this error
+ VITE_WHOP_APP_ID environment variable is not set - Whop iframe features disabled
+(anonymous) @ injected.js:27Understand this warning
+1wm9vpacqyns7jes44m3.apps.whop.com/api/auth/check-access:1  Failed to load resource: the server responded with a status of 401 ()Understand this error
+ WebSocket connected
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection closed after 281227 ms CloseEvent
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:ERROR] CloseEvent
+(anonymous) @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25Understand this error
+ WebSocket disconnected
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Exponential backoff: 100ms
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection established
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Successful webSocket connection confirmed after 353ms
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection closed after 200313 ms CloseEvent
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:ERROR] CloseEvent
+(anonymous) @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Exponential backoff: 100ms
+b9f8d8d1f8f803dc.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:2 WebSocket connection to 'wss://ws-prod.whop.com/ws?anon_user_id=9810b035-58ba-4751-95d5-91f2e8b9d955&platform_type=web' failed: 
+t._connectSocket @ b9f8d8d1f8f803dc.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:2Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:ERROR] Event
+(anonymous) @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Exponential backoff: 200ms
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection closed after 514880 ms CloseEvent
+b9f8d8d1f8f803dc.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:2 WebSocket connection to 'wss://ws-prod.whop.com/ws?anon_user_id=9810b035-58ba-4751-95d5-91f2e8b9d955&platform_type=web' failed: 
+t._connectSocket @ b9f8d8d1f8f803dc.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:2Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:ERROR] Event
+(anonymous) @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Exponential backoff: 400ms
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection closed after 515316 ms CloseEvent
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection established
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Successful webSocket connection confirmed after 316ms
+ WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/?token=DOhqhA1C1geI' failed: 
+setupWebSocket @ client:536Understand this error
+client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=DOhqhA1C1geI' is invalid.Understand this error
+ [useWhopAuth] Checking access for experienceId: exp_UquBHXQI8CQsgD
+ [useWhopAuth] Making request to /api/auth/check-access
+1wm9vpacqyns7jes44m3.apps.whop.com/api/auth/check-access:1  Failed to load resource: the server responded with a status of 401 ()Understand this error
+ WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/ws' failed: 
+(anonymous) @ useWebSocket.ts:10Understand this error
+ WebSocket error: [object Event]
+(anonymous) @ injected.js:27Understand this error
+ WebSocket disconnected
+ [useWhopAuth] Response status: 401
+ [useWhopAuth] Access denied: [object Object]
+(anonymous) @ injected.js:27Understand this error
+ WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/?token=DOhqhA1C1geI' failed: 
+setupWebSocket @ client:536Understand this error
+client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=DOhqhA1C1geI' is invalid.Understand this error
+ [useWhopAuth] Checking access for experienceId: exp_UquBHXQI8CQsgD
+ [useWhopAuth] Making request to /api/auth/check-access
+1wm9vpacqyns7jes44m3.apps.whop.com/api/auth/check-access:1  Failed to load resource: the server responded with a status of 401 ()Understand this error
+ [useWhopAuth] Response status: 401
+ [useWhopAuth] Access denied: [object Object]
+(anonymous) @ injected.js:27Understand this error
+ WebSocket connected
+ WebSocket disconnected
+ WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/?token=D0EJNyhwc3Wk' failed: 
+setupWebSocket @ client:536Understand this error
+client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=D0EJNyhwc3Wk' is invalid.Understand this error
+ [useWhopAuth] Checking access for experienceId: exp_UquBHXQI8CQsgD
+ [useWhopAuth] Making request to /api/auth/check-access
+1wm9vpacqyns7jes44m3.apps.whop.com/api/auth/check-access:1  Failed to load resource: the server responded with a status of 401 ()Understand this error
+ [useWhopAuth] Response status: 401
+ [useWhopAuth] Access denied: [object Object]
+(anonymous) @ injected.js:27Understand this error
+ WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/ws' failed: 
+(anonymous) @ useWebSocket.ts:10Understand this error
+ WebSocket error: [object Event]
+(anonymous) @ injected.js:27Understand this error
+ WebSocket disconnected
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection closed after 130330 ms CloseEvent
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:ERROR] CloseEvent
+(anonymous) @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Exponential backoff: 100ms
+b9f8d8d1f8f803dc.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:2 WebSocket connection to 'wss://ws-prod.whop.com/ws?token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyX0phQng3OXRPdDBxZjEiLCJleHAiOjE3NjIwNjUyNDUsImF1ZCI6IndlYnNvY2tldHMifQ.WBQ5Zaqz5HClYBD4z8xlgbm5Qx1yCHWlAr1yHnByW5w&anon_user_id=9810b035-58ba-4751-95d5-91f2e8b9d955&platform_type=web' failed: 
+t._connectSocket @ b9f8d8d1f8f803dc.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:2Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:ERROR] Event
+(anonymous) @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Exponential backoff: 200ms
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection closed after 232181 ms CloseEvent
+b9f8d8d1f8f803dc.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:2 WebSocket connection to 'wss://ws-prod.whop.com/ws?token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyX0phQng3OXRPdDBxZjEiLCJleHAiOjE3NjIwNjUyNDUsImF1ZCI6IndlYnNvY2tldHMifQ.WBQ5Zaqz5HClYBD4z8xlgbm5Qx1yCHWlAr1yHnByW5w&anon_user_id=9810b035-58ba-4751-95d5-91f2e8b9d955&platform_type=web' failed: 
+t._connectSocket @ b9f8d8d1f8f803dc.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:2Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:ERROR] Event
+(anonymous) @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Exponential backoff: 400ms
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection closed after 232624 ms CloseEvent
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection established
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Successful webSocket connection confirmed after 324ms
+ WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/?token=8zNeGEiMuHVv' failed: 
+setupWebSocket @ client:536Understand this error
+client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=8zNeGEiMuHVv' is invalid.Understand this error
+ [useWhopAuth] Checking access for experienceId: exp_UquBHXQI8CQsgD
+ [useWhopAuth] Making request to /api/auth/check-access
+ [useWhopAuth] Response status: 200
+ [useWhopAuth] Access granted: [object Object]
+ WebSocket connected
+ WebSocket disconnected
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection closed after 351063 ms CloseEvent
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:ERROR] CloseEvent
+(anonymous) @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Exponential backoff: 100ms
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection established
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Successful webSocket connection confirmed after 330ms
+ WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/?token=8Iy317-wYPDh' failed: 
+setupWebSocket @ client:536Understand this error
+client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=8Iy317-wYPDh' is invalid.Understand this error
+ [useWhopAuth] Checking access for experienceId: exp_UquBHXQI8CQsgD
+ [useWhopAuth] Making request to /api/auth/check-access
+ [useWhopAuth] Response status: 200
+ [useWhopAuth] Access granted: [object Object]
+ WebSocket connected
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection closed after 111023 ms CloseEvent
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:ERROR] CloseEvent
+(anonymous) @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25Understand this error
+ WebSocket disconnected
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Exponential backoff: 100ms
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection established
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Successful webSocket connection confirmed after 335ms
+ WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/?token=J8r4pMIcDWxe' failed: 
+setupWebSocket @ client:536Understand this error
+client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=J8r4pMIcDWxe' is invalid.Understand this error
+ [useWhopAuth] Checking access for experienceId: exp_UquBHXQI8CQsgD
+ [useWhopAuth] Making request to /api/auth/check-access
+ [useWhopAuth] Response status: 200
+ [useWhopAuth] Access granted: [object Object]
+ WebSocket connected
+ WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/?token=J8r4pMIcDWxe' failed: 
+setupWebSocket @ client:536Understand this error
+client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=J8r4pMIcDWxe' is invalid.Understand this error
+ [useWhopAuth] Checking access for experienceId: exp_UquBHXQI8CQsgD
+ [useWhopAuth] Making request to /api/auth/check-access
+ [useWhopAuth] Response status: 200
+ [useWhopAuth] Access granted: [object Object]
+ WebSocket connected
+ WebSocket disconnected
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection closed after 171153 ms CloseEvent
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:ERROR] CloseEvent
+(anonymous) @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Exponential backoff: 100ms
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection established
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Successful webSocket connection confirmed after 368ms
+ WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/?token=J8r4pMIcDWxe' failed: 
+setupWebSocket @ client:536Understand this error
+client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=J8r4pMIcDWxe' is invalid.Understand this error
+ [useWhopAuth] Checking access for experienceId: exp_UquBHXQI8CQsgD
+ [useWhopAuth] Making request to /api/auth/check-access
+ [useWhopAuth] Response status: 200
+ [useWhopAuth] Access granted: [object Object]
+ WebSocket connected
+ WebSocket disconnected
+ WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/?token=d1IRPD-Inzgk' failed: 
+setupWebSocket @ client:536Understand this error
+client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=d1IRPD-Inzgk' is invalid.Understand this error
+ [useWhopAuth] Checking access for experienceId: exp_UquBHXQI8CQsgD
+ [useWhopAuth] Making request to /api/auth/check-access
+ [useWhopAuth] Response status: 200
+ [useWhopAuth] Access granted: [object Object]
+ WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/ws' failed: 
+(anonymous) @ useWebSocket.ts:10Understand this error
+ WebSocket error: [object Event]
+(anonymous) @ injected.js:27Understand this error
+ WebSocket disconnected
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection closed after 200854 ms CloseEvent
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:ERROR] CloseEvent
+(anonymous) @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Exponential backoff: 100ms
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection established
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Successful webSocket connection confirmed after 361ms
+ WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/?token=9k3CWNuu7jIl' failed: 
+setupWebSocket @ client:536Understand this error
+client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=9k3CWNuu7jIl' is invalid.Understand this error
+ [useWhopAuth] Checking access for experienceId: exp_UquBHXQI8CQsgD
+ [useWhopAuth] Making request to /api/auth/check-access
+ [useWhopAuth] Response status: 200
+ [useWhopAuth] Access granted: [object Object]
+ WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/ws' failed: 
+(anonymous) @ useWebSocket.ts:10Understand this error
+ WebSocket error: [object Event]
+(anonymous) @ injected.js:27Understand this error
+ WebSocket disconnected
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection closed after 133673 ms CloseEvent
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:ERROR] CloseEvent
+(anonymous) @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Exponential backoff: 100ms
+b9f8d8d1f8f803dc.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:2 WebSocket connection to 'wss://ws-prod.whop.com/ws?token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyX0phQng3OXRPdDBxZjEiLCJleHAiOjE3NjIwNjY5NTIsImF1ZCI6IndlYnNvY2tldHMifQ.wg102-hNmiz3HwQICtTCfguITIWSrRIsfmIRuHtPG2U&anon_user_id=9810b035-58ba-4751-95d5-91f2e8b9d955&platform_type=web' failed: 
+t._connectSocket @ b9f8d8d1f8f803dc.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:2Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:ERROR] Event
+(anonymous) @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Exponential backoff: 200ms
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection closed after 187361 ms CloseEvent
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection established
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Successful webSocket connection confirmed after 324ms
+ WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/?token=9k3CWNuu7jIl' failed: 
+setupWebSocket @ client:536Understand this error
+1wm9vpacqyns7jes44m3…om/@vite/client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=9k3CWNuu7jIl' is invalid.Understand this error
+ [useWhopAuth] Checking access for experienceId: exp_UquBHXQI8CQsgD
+ [useWhopAuth] Making request to /api/auth/check-access
+ [useWhopAuth] Response status: 200
+ WebSocket connected
+ [useWhopAuth] Access granted: [object Object]
+ WebSocket disconnected
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection closed after 184783 ms CloseEvent
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:ERROR] CloseEvent
+(anonymous) @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Exponential backoff: 100ms
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection established
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Successful webSocket connection confirmed after 380ms
+57[Report Only] Refused to load the script '<URL>' because it violates the following Content Security Policy directive: "script-src 'none'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback.
+
+exp_UquBHXQI8CQsgD:5 [Report Only] Refused to execute inline script because it violates the following Content Security Policy directive: "script-src 'none'". Either the 'unsafe-inline' keyword, a hash ('sha256-/HsLXshd8XnMuZyJMBOYAnelGEOOFBIF2nC7tbHHjfw='), or a nonce ('nonce-...') is required to enable inline execution.
+
+exp_UquBHXQI8CQsgD:29 [Report Only] Refused to execute inline script because it violates the following Content Security Policy directive: "script-src 'none'". Either the 'unsafe-inline' keyword, a hash ('sha256-Z2/iFzh9VMlVkEOar1f/oSHWwQk3ve1qk/C2WdsC4Xk='), or a nonce ('nonce-...') is required to enable inline execution.
+
+exp_UquBHXQI8CQsgD:44 [Report Only] Refused to execute inline script because it violates the following Content Security Policy directive: "script-src 'none'". Either the 'unsafe-inline' keyword, a hash ('sha256-E8yr6EbBKPXQDLWNoesbbsHWNpI+9yR3eBkPFWIjQY0='), or a nonce ('nonce-...') is required to enable inline execution.
+
+exp_UquBHXQI8CQsgD:140 [Report Only] Refused to execute inline script because it violates the following Content Security Policy directive: "script-src 'none'". Either the 'unsafe-inline' keyword, a hash ('sha256-PPwTASmTVazuBTsDwM/AcO+5wtMN9wdcpxdqb0evAfs='), or a nonce ('nonce-...') is required to enable inline execution.
+
+7[Report Only] Refused to connect to '<URL>' because it violates the following Content Security Policy directive: "connect-src 'none'".
+
+ WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/?token=VqwfANCwyZOK' failed: 
+setupWebSocket @ client:536Understand this error
+1wm9vpacqyns7jes44m3…om/@vite/client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=VqwfANCwyZOK' is invalid.Understand this error
+ [Report Only] Refused to execute inline script because it violates the following Content Security Policy directive: "script-src 'none'". Either the 'unsafe-inline' keyword, a hash ('sha256-xlBVz4qpZmUiqq1yw4fIylrjtVryYL4oJZrHvTPmt2A='), or a nonce ('nonce-...') is required to enable inline execution.
+
+ [useWhopAuth] Checking access for experienceId: exp_UquBHXQI8CQsgD
+ [useWhopAuth] Making request to /api/auth/check-access
+about:blank:1 [Report Only] Refused to load the script 'https://1wm9vpacqyns7jes44m3.apps.whop.com/cdn-cgi/challenge-platform/h/b/scripts/jsd/e8e65e95f26d/main.js?' because it violates the following Content Security Policy directive: "script-src 'none'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback.
+
+ [Report Only] Refused to connect to 'https://1wm9vpacqyns7jes44m3.apps.whop.com/cdn-cgi/rum?' because it violates the following Content Security Policy directive: "connect-src 'none'".
+
+ WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/ws' failed: 
+(anonymous) @ useWebSocket.ts:10Understand this error
+ WebSocket error: [object Event]
+(anonymous) @ injected.js:27Understand this error
+ WebSocket disconnected
+ [useWhopAuth] Response status: 200
+ [useWhopAuth] Access granted: [object Object]
+about:blank:1 [Report Only] Refused to load the script 'https://1wm9vpacqyns7jes44m3.apps.whop.com/cdn-cgi/challenge-platform/h/b/scripts/jsd/e8e65e95f26d/main.js?' because it violates the following Content Security Policy directive: "script-src 'none'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback.
+
+bank.png:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+ [Report Only] Refused to connect to 'https://1wm9vpacqyns7jes44m3.apps.whop.com/cdn-cgi/rum?' because it violates the following Content Security Policy directive: "connect-src 'none'".
+
+ [Report Only] Refused to connect to 'https://1wm9vpacqyns7jes44m3.apps.whop.com/cdn-cgi/rum?' because it violates the following Content Security Policy directive: "connect-src 'none'".
+
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection closed after 200553 ms CloseEvent
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:ERROR] CloseEvent
+(anonymous) @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Exponential backoff: 100ms
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection established
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Successful webSocket connection confirmed after 364ms
+ WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/?token=lbDvKur5oyOD' failed: 
+setupWebSocket @ client:536Understand this error
+1wm9vpacqyns7jes44m3…om/@vite/client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=lbDvKur5oyOD' is invalid.Understand this error
+injected.js:27 [useWhopAuth] Checking access for experienceId: exp_UquBHXQI8CQsgD
+injected.js:27 [useWhopAuth] Making request to /api/auth/check-access
+injected.js:27 WebSocket connected
+injected.js:27 [useWhopAuth] Response status: 200
+injected.js:27 [useWhopAuth] Access granted: [object Object]
+bank.png:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+injected.js:27 WebSocket disconnected
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection closed after 121099 ms CloseEvent
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:ERROR] CloseEvent
+(anonymous) @ 22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25Understand this error
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Exponential backoff: 100ms
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] WebSocket connection established
+22c44139e992c83c.js?dpl=dpl_3iZnEUuAbx9TMAC9JPDMW5zPF3jq:25 [WS:LOG] Successful webSocket connection confirmed after 344ms
+client:536 WebSocket connection to 'wss://1wm9vpacqyns7jes44m3.apps.whop.com/?token=UnPX7Z3yaGLg' failed: 
+setupWebSocket @ client:536Understand this error
+client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=UnPX7Z3yaGLg' is invalid.
+    at setupWebSocket (client:536:19)
+    at fallback (client:509:16)
+    at WebSocket.<anonymous> (client:555:7)Understand this error
+injected.js:27 [useWhopAuth] Checking access for experienceId: exp_UquBHXQI8CQsgD
+injected.js:27 [useWhopAuth] Making request to /api/auth/check-access
+injected.js:27 WebSocket connected
+injected.js:27 [useWhopAuth] Response status: 200
+injected.js:27 [useWhopAuth] Access granted: Object
+injected.js:27 [ChatHeader] User data: undefined
+injected.js:27 [ChatHeader] Profile pic URL: undefined
+injected.js:27 [ChatHeader] User data: Object
+injected.js:27 [ChatHeader] Profile pic URL: https://img-v2-prod.whop.com/1jhEgnr1TwSTY-ry7ICjLeQAcpe0T-uInp-mHTVng7U/mb:180000/plain/https://img-v2-prod.whop.com/fHNd6gPt0uxzzuCraLybScyM0ri7do79nZ7V_cwJbQA/resize:fill/width:80/height:80/enlarge:true/dpr:2/plain/https://content.whop.com/default_avatars/bank.png
+bank.png:1  Failed to load resource: the server responded with a status of 404 ()

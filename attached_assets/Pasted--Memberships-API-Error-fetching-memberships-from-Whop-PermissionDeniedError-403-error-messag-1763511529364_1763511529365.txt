@@ -1,0 +1,37 @@
+[Memberships API] Error fetching memberships from Whop: PermissionDeniedError: 403 {"error":{"message":"You are not authorized - requires: 'member:basic:read'","type":"forbidden"}}
+    at Function.generate (/home/runner/workspace/node_modules/@whop/sdk/src/core/error.ts:68:14)
+    at Whop.makeStatusError (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:499:28)
+    at Whop.makeRequest (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:718:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async PagePromise.[Symbol.asyncIterator] (/home/runner/workspace/node_modules/@whop/sdk/src/core/pagination.ts:103:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:638:26) {
+  status: 403,
+  headers: Headers {
+    date: 'Wed, 19 Nov 2025 00:13:22 GMT',
+    'content-type': 'application/json; charset=utf-8',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'content-encoding': 'br',
+    'cache-control': 'no-cache',
+    'referrer-policy': 'strict-origin-when-cross-origin',
+    'strict-transport-security': 'max-age=63072000; includeSubDomains',
+    vary: 'Accept, Origin',
+    'x-content-type-options': 'nosniff',
+    'x-frame-options': 'SAMEORIGIN',
+    'x-permitted-cross-domain-policies': 'none',
+    'x-request-id': '7b00255d-b178-402b-8299-b8b60e73560d',
+    'x-runtime': '0.017533',
+    'x-xss-protection': '0',
+    'cf-cache-status': 'DYNAMIC',
+    'set-cookie': '__cf_bm=ukz_RJgY2FKRKRFRoLHW6pB80.0mKRdPooeEY0Gyg9Y-1763511202-1.0.1.1-AH8EHkAoJX2YJFXd7xIiCV7.x6P.9nQuy3.WK410kt8zP5wtHR8nvobJVI59HpQHU8zMJ4NfJYTdkiIkXY5rNaqKJ7BjOk4VKuNPiYZBUzY; path=/; expires=Wed, 19-Nov-25 00:43:22 GMT; domain=.whop.com; HttpOnly; Secure; SameSite=None',
+    server: 'cloudflare',
+    'cf-ray': '9a0b80579bdbff63-BOM',
+    'alt-svc': 'h3=":443"; ma=86400'
+  },
+  error: {
+    error: {
+      message: "You are not authorized - requires: 'member:basic:read'",
+      type: 'forbidden'
+    }
+  }
+}

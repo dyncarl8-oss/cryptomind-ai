@@ -1,0 +1,42 @@
+[Memberships API] Error fetching memberships: PermissionDeniedError: 403 {"error":{"message":"You are not authorized - requires: 'member:basic:read'","type":"forbidden"}}
+    at Function.generate (/home/runner/workspace/node_modules/@whop/sdk/src/core/error.ts:68:14)
+    at Whop.makeStatusError (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:499:28)
+    at Whop.makeRequest (/home/runner/workspace/node_modules/@whop/sdk/src/client.ts:718:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async PagePromise.[Symbol.asyncIterator] (/home/runner/workspace/node_modules/@whop/sdk/src/core/pagination.ts:103:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:641:26) {
+  status: 403,
+  headers: Headers {
+    date: 'Wed, 19 Nov 2025 01:18:00 GMT',
+    'content-type': 'application/json; charset=utf-8',
+    'transfer-encoding': 'chunked',
+    connection: 'keep-alive',
+    'content-encoding': 'br',
+    'cache-control': 'no-cache',
+    'referrer-policy': 'strict-origin-when-cross-origin',
+    'strict-transport-security': 'max-age=63072000; includeSubDomains',
+    vary: 'Accept, Origin',
+    'x-content-type-options': 'nosniff',
+    'x-frame-options': 'SAMEORIGIN',
+    'x-permitted-cross-domain-policies': 'none',
+    'x-request-id': 'a931a1ce-0f84-4ea6-8ff9-084dd20a1387',
+    'x-runtime': '0.013900',
+    'x-xss-protection': '0',
+    'cf-cache-status': 'DYNAMIC',
+    'set-cookie': '__cf_bm=twRx.yF1c9YVVbA95tBuomM08JLMRBYKxpBKjrOrrC0-1763515080-1.0.1.1-h1hmAyDHDHgTUP88VyispDgEYYCg5_XmyQmp0Mpz13E0IU6j48El2U42VIAI8kb4woChaJOkMtCECDbP0ozwfaNv_etKnHUAXlmBh2qbmvw; path=/; expires=Wed, 19-Nov-25 01:48:00 GMT; domain=.whop.com; HttpOnly; Secure; SameSite=None',
+    server: 'cloudflare',
+    'cf-ray': '9a0bdf003c80400f-BOM',
+    'alt-svc': 'h3=":443"; ma=86400'
+  },
+  error: {
+    error: {
+      message: "You are not authorized - requires: 'member:basic:read'",
+      type: 'forbidden'
+    }
+  }
+}
+[Memberships API] Permission denied - 'member:basic:read' not granted
+[Memberships API] Your app needs to request this permission in the developer dashboard
+[Memberships API] Then reinstall the app on your company
+1:18:00 AM [express] GET /api/admin/memberships 500 in 887ms :: {"error":"Failed to fetch memberships from Whop","details":"403 {\"error\":{\"message\":\"You are not authorized - requires: 'member:basic:read'\",\"type\":\"forbidden\"}}"}
+1:18:00 AM [express] GET /api/auth/me 304 in 968ms :: {"id":"user_6SjB1Wo0chseh","username":"giducosalleyah","name":"alleyah","profile_pic_url":"https://content.whop.com/default_avatars/panda.png"}

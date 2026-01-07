@@ -1,0 +1,99 @@
+[Whop Auth] Request headers: {
+  "host": "b3d1a61b-675a-49b6-985c-15514b4ddf1a-00-1v7m4b3pef7xx.sisko.replit.dev",
+  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+  "accept": "*/*",
+  "accept-encoding": "gzip",
+  "accept-language": "en-US,en;q=0.9,ceb;q=0.8",
+  "cdn-loop": "cloudflare; loops=1; subreqs=1",
+  "cf-connecting-ip": "124.6.140.97",
+  "cf-ew-via": "15",
+  "cf-ipcity": "Quezon City",
+  "cf-ipcontinent": "AS",
+  "cf-iplatitude": "14.64880",
+  "cf-iplongitude": "121.05090",
+  "cf-postal-code": "1100",
+  "cf-ray": "9981bd238563ce85-SIN",
+  "cf-region": "Metro Manila",
+  "cf-region-code": "00",
+  "cf-timezone": "Asia/Manila",
+  "cf-visitor": "{\"scheme\":\"https\"}",
+  "cf-worker": "whop.com",
+  "cookie": "__stripe_mid=2c15614b-7481-4b33-865a-074e7da3badccea8dc; whop-frosted-theme=appearance:dark; _ga=GA1.1.1610508958.1757292747; rskxRunCookie=0; rCookie=wil3zr5llz6gz4fiy5gdbmfaeqcmr; _fbp=fb.1.1757339144757.577776952820649700; intercom-id-llm7ll78=6f75a79a-107f-4c3a-8e72-cf8db4fa636f; intercom-device-id-llm7ll78=267d282c-d842-455d-b69d-1313a7559f42; _tt_enable_cookie=1; _ttp=01K5MTSNB82JWY6FKNRWY6YW7C_.tt.1; ttcsid_CSHHE4BC77U3K05HFFEG=1758414558581::dZ2nlBrQ8G6CS6T2xHYh.1.1758414569553.0; _rdt_uuid=1758415442421.78446206-0187-4f7e-bf07-75d3d98b8ca2; ttcsid_CMQLACJC77UEANSKITB0=1758415719224::QqEpujG5BRkhRVZ_8m8J.1.1758415948847.0; ttcsid_D29NUIJC77U9PLHEEBO0=1758506126799::ekuWMW9Gv0Sq9YlG0DjX.2.1758506304458.0; lastRskxRun=1759103479630; ph_phc_s763lKnP4OsRYcBMXyNukEIpSNcgvqNe5ElChpiar1F_posthog=%7B%22distinct_id%22%3A%22user_JaBx79tOt0qf1%22%2C%22%24sesid%22%3A%5B1759517662036%2C%220199ab6c-162e-711c-8831-4e8753ecda1e%22%2C1759517611566%5D%2C%22%24epp%22%3Atrue%2C%22%24initial_person_info%22%3A%7B%22r%22%3A%22https%3A%2F%2Fwhop.com%2F%22%2C%22u%22%3A%22https%3A%2F%2F0h1j60ve8hke1nxoaxq7.apps.whop.com%2Fexperiences%2Fexp_S4O9vgHU6zH1DK%2F%22%7D%7D; ttcsid_D034Q3RC77U7QLNJ4IS0=1760197141298::0TcrRS6_326noIOT_qTb.1.1760197233169.0; ph_phc_TXdpocbGVeZVm5VJmAsHTMrCofBQu3e0kN8HGMNGTVW_posthog=%7B%22distinct_id%22%3A%220198024c-bdf5-7675-9f81-79d661d5a37c%22%2C%22%24sesid%22%3A%5B1760918458277%2C%220199feca-fedc-7528-b59d-66dee615ab65%22%2C1760916340444%5D%7D; ph_phc_WMXb9il7bn6uCoNPeunrFsxPfJhOUWie5DFDfTzkiFA_posthog=%7B%22distinct_id%22%3A%22019a1565-a968-7068-b97a-c87a9d7d62ee%22%2C%22%24sesid%22%3A%5B1761296169305%2C%22019a1565-a966-7cfd-ba0b-326707db67fe%22%2C1761295575398%5D%2C%22%24initial_person_info%22%3A%7B%22r%22%3A%22https%3A%2F%2Fmail.google.com%2F%22%2C%22u%22%3A%22https%3A%2F%2Froadmap.whop.com%2Froadmap%22%7D%7D; ph_phc_wu7iKjxnL9ax9z497vFBbfnTfSAwfjmDZar6lDggVpO_posthog=%7B%22distinct_id%22%3A%22user_JaBx79tOt0qf1%22%2C%22%24sesid%22%3A%5B1761739427699%2C%22019a2fda-47a8-780f-a744-1b9b6b9c7c57%22%2C1761739425700%5D%2C%22%24epp%22%3Atrue%2C%22%24initial_person_info%22%3A%7B%22r%22%3A%22https%3A%2F%2Fwhop.com%2F%22%2C%22u%22%3A%22https%3A%2F%2Fwebapp.apps.whop.com%2Fexp_6waGxEjqi41AmR%2Fapp%22%7D%7D; _gcl_au=1.1.468910114.1757292747.62966924.1761892449.1761892449; ajs_user_id=user_JaBx79tOt0qf1; ajs_anonymous_id=9810b035-58ba-4751-95d5-91f2e8b9d955; whop-core.user-id=user_JaBx79tOt0qf1; intercom-session-llm7ll78=; ttcsid=1762059703738::m6ovPqZcp_-A2k9h0eVk.4.1762059704265.0; ttcsid_CTI5JLJC77U8ATAVHT20=1762059703735::gtDP86r7Y7tTgW7q8Vuy.1.1762059704266.0; whop-core.ssk=a51ac0fc-92d3-4364-ac14-7f26f2b900f9; _ga_NGD3HKQGSV=GS2.1.s1762062714$o335$g1$t1762066074$j59$l0$h0; whop-core.uid-token=eyJraWQiOiJkZWZhdWx0LWtleS1pZC1lczI1Ni1wcm9kIiwiYWxnIjoiRVMyNTYifQ.eyJleHAiOjE3NjIwNjk4NjksInN1YiI6InVzZXJfSmFCeDc5dE90MHFmMSIsImlhdCI6MTc2MjA2NjI2OSwiaXNzIjoid2hvcC1yYWlscy1wcm9kIiwidHlwIjoidWlkIn0.gAVq_x5fEdoV7hBiYZ0JUfyX4H0Hcl7sefr5exJSm5uzLnxE2YShS0on2pJuGqX-HmnjjG8DIj3UccqwePRV2Q; cf_clearance=gBdm4FeTz2JmIM2t2khDA7laB38BkA5earQDT6kBcgE-1762066379-1.2.1.1-u7ZkRS34OatxXFe9is__4DZUZT8546bHjoBG0DqH0wvlq_x7TCkXAv7Wurm3w.v7K2B0XizbDaKUKTwLyZd0kpl0G4Ydn74EtwfL4lyDhXKsVRX0HVS6MVObvwufhTftTB4oNJNri52uW7S2OM_WgFb7tj8R04hqvUPiU0ALYDSLsHQzPQJVcDcZU1H_0sqyJwIWFFE6TmzXvJpkZ2k7vgyf2kG8VonVHvImZQCyXL4; whop.app-config=eyJhbGciOiJIUzI1NiJ9.eyJ2IjowLCJ1cHN0cmVhbSI6eyJwcm9kdWN0aW9uIjp7Imhvc3QiOiJiM2QxYTYxYi02NzVhLTQ5YjYtOTg1Yy0xNTUxNGI0ZGRmMWEtMDAtMXY3bTRiM3BlZjd4eC5zaXNrby5yZXBsaXQuZGV2In19LCJkaWQiOiIxd205dnBhY3F5bnM3amVzNDRtMyIsInN1YiI6ImFwcF85WEl3amtZZ0poUDlYYyIsImV4cCI6MTc2MjA2NzI1NCwiaWF0IjoxNzYyMDY2NjU0LCJpc3MiOiJ1cm46d2hvcGNvbTphcHAtY29uZmlnIn0.Ywkj-fFgI7RIKDKo3zzSborjnW6_5PuWYL-rN7e1ITg; __cf_bm=SiyicoWAxDjdHUe0WZA1ZA9WqRTRH6CH_BqDC.ZeWsA-1762066654-1.0.1.1-MUQW.QE.Gw6jzNxWHYIFquoAf73urwD2QTCdG_I7ma0rDFASk.lZju2ojyAvRr.4SXHjXZ14fMp9XpnD_DaDqCbxwsgyJSQDHW6AhzSjOzI; whop_user_token=eyJhbGciOiJFUzI1NiJ9.eyJpYXQiOjE3NjIwNjY2NTcsImV4cCI6MTc2MjA2NjgzNywic3ViIjoidXNlcl9KYUJ4Nzl0T3QwcWYxIiwiaXNzIjoidXJuOndob3Bjb206ZXhwLXByb3h5IiwiYXVkIjoiYXBwXzlYSXdqa1lnSmhQOVhjIn0.w78fp_2iNpJAy7enWeIyHn0gxrTf_oXtnHe4ZCNovlh5aSVf1P3JPZShR4i2fPIjuR8NHqGg_FGdc3-ji2qa8Q",
+  "if-none-match": "W/\"52-Ou9PThl8qQ5Luu9MOfhG2EpWvDU\"",
+  "ngrok-skip-browser-warning": "1",
+  "priority": "u=1, i",
+  "referer": "https://1wm9vpacqyns7jes44m3.apps.whop.com/experiences/exp_UquBHXQI8CQsgD",
+  "sec-ch-ua": "\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"",
+  "sec-ch-ua-mobile": "?0",
+  "sec-ch-ua-platform": "\"Windows\"",
+  "sec-fetch-dest": "empty",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-site": "same-origin",
+  "traceparent": "00-32452b00f3fb1fecaa87fc0816d1225a-6b793618fe762a8c-01",
+  "true-client-ip": "124.6.140.97",
+  "x-forwarded-for": "124.6.140.97, 172.71.124.161, 10.84.5.108",
+  "x-forwarded-host": "1wm9vpacqyns7jes44m3.apps.whop.com",
+  "x-forwarded-proto": "https",
+  "x-replit-user-bio": "",
+  "x-replit-user-id": "",
+  "x-replit-user-name": "",
+  "x-replit-user-profile-image": "",
+  "x-replit-user-roles": "",
+  "x-replit-user-teams": "",
+  "x-replit-user-url": "",
+  "x-whop-app-id": "app_9XIwjkYgJhP9Xc",
+  "x-whop-user-token": "eyJhbGciOiJFUzI1NiJ9.eyJpYXQiOjE3NjIwNjY2NTcsImV4cCI6MTc2MjA2NjgzNywic3ViIjoidXNlcl9KYUJ4Nzl0T3QwcWYxIiwiaXNzIjoidXJuOndob3Bjb206ZXhwLXByb3h5IiwiYXVkIjoiYXBwXzlYSXdqa1lnSmhQOVhjIn0.w78fp_2iNpJAy7enWeIyHn0gxrTf_oXtnHe4ZCNovlh5aSVf1P3JPZShR4i2fPIjuR8NHqGg_FGdc3-ji2qa8Q"
+}
+[Whop Auth] Request origin: undefined
+[Whop Auth] Request referer: https://1wm9vpacqyns7jes44m3.apps.whop.com/experiences/exp_UquBHXQI8CQsgD
+[Whop Auth] Found token, verifying...
+[Whop Auth] Error verifying Whop token: Error: Whop user token not found. If you are the app developer, ensure you are developing in the whop.com iframe and have the dev proxy enabled.
+    at internalVerifyUserToken (/home/runner/workspace/node_modules/@whop/sdk/src/lib/verify-user-token.ts:91:13)
+    at Whop.verifyUserToken (/home/runner/workspace/node_modules/@whop/sdk/src/lib/verify-user-token.ts:65:18)
+    at verifyWhopToken (/home/runner/workspace/server/lib/auth.ts:31:38)
+    at <anonymous> (/home/runner/workspace/server/routes.ts:59:26)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/workspace/node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (/home/runner/workspace/node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at <anonymous> (/home/runner/workspace/server/index.ts:46:3)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at urlencodedParser (/home/runner/workspace/node_modules/body-parser/lib/types/urlencoded.js:94:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at jsonParser (/home/runner/workspace/node_modules/body-parser/lib/types/json.js:113:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at expressInit (/home/runner/workspace/node_modules/express/lib/middleware/init.js:40:5)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at query (/home/runner/workspace/node_modules/express/lib/middleware/query.js:45:5)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at Function.handle (/home/runner/workspace/node_modules/express/lib/router/index.js:175:3)
+    at Function.handle (/home/runner/workspace/node_modules/express/lib/application.js:181:10)
+    at Server.app (/home/runner/workspace/node_modules/express/lib/express.js:39:9)
+    at Server.emit (node:events:524:28)
+    at parserOnIncoming (node:_http_server:1141:12)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:118:17)
+[Whop Auth] Error message: Whop user token not found. If you are the app developer, ensure you are developing in the whop.com iframe and have the dev proxy enabled.
+6:57:37 AM [express] GET /api/auth/me 304 in 35ms :: {"id":"dev_user","username":"developer","name":…

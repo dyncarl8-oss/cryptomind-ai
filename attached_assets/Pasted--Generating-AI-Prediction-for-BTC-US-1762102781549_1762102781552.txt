@@ -1,0 +1,64 @@
+============================================================
+🔮 Generating AI Prediction for BTC/USDT
+============================================================
+[CryptoCompare API] Fetching market data for BTC/USDT (BTC/USDT)
+[CryptoCompare API] Successfully fetched data for BTC/USDT: $110113.59, 24h: -0.31%
+💹 Market Data:
+  Current Price: $110113.59
+  24h Change: -0.31%
+  Volume Change: -15.4%
+📉 Technical Indicators:
+  Market Regime: TRENDING
+  Trend Strength: 15.4%
+  ADX: 25.9 | RSI: 44.3
+  MACD Histogram: 25.1550
+📊 Analyzing Signals:
+  ➡️  Momentum: RSI neutral
+  ↘️  Momentum: Stochastic bearish crossover signal (Strength: 65, Weight: 1.0)
+  ↗️  Trend: MACD strong bullish momentum (Strength: 100, Weight: 1.4)
+  ↘️  Trend: 6/6 MA indicators strongly bearish (Strength: 95, Weight: 1.5)
+  ➡️  Volatility: Price at BB middle
+  ↘️  Trend: Moderate downtrend forming (Strength: 60, Weight: 1.1)
+  ➡️  Momentum: Momentum neutral
+  ↗️  Price Action: Price at strong support level (Strength: 90, Weight: 1.3)
+📈 Score Summary:
+  UP Score: 257.0 (2 signals)
+  DOWN Score: 273.5 (3 signals)
+  Direction: DOWN | Alignment: 60%
+🎯 Confidence Calculation:
+  Raw Score: 115.0
+  Normalized: 63.9%
+  Penalty: 158.5
+  Regime (TRENDING): 1.05x
+  Final Confidence: 93%
+  Quality Score: 72%
+🔊 Volume Analysis:
+  Volume Bonus: +25.0
+📊 Analyzing Signals:
+  ➡️  Momentum: RSI neutral
+  ↘️  Momentum: Stochastic bearish crossover signal (Strength: 65, Weight: 1.0)
+  ↗️  Trend: MACD strong bullish momentum (Strength: 100, Weight: 1.4)
+  ↘️  Trend: 6/6 MA indicators strongly bearish (Strength: 95, Weight: 1.5)
+  ➡️  Volatility: Price at BB middle
+  ↘️  Trend: Moderate downtrend forming (Strength: 60, Weight: 1.1)
+  ➡️  Momentum: Momentum neutral
+  ↗️  Price Action: Price at strong support level (Strength: 90, Weight: 1.3)
+📈 Score Summary:
+  UP Score: 257.0 (2 signals)
+  DOWN Score: 273.5 (3 signals)
+  Direction: DOWN | Alignment: 60%
+🎯 Confidence Calculation:
+  Raw Score: 140.0
+  Normalized: 77.8%
+  Penalty: 158.5
+  Regime (TRENDING): 1.05x
+  Final Confidence: 97%
+  Quality Score: 80%
+🤖 Calling Gemini 2.5 Pro for prediction...
+✅ Gemini 2.5 Pro Decision: DOWN | 92% | 30-45 seconds
+   Rationale: The decision is primarily driven by the strong bearish confluence across all six moving average indicators, which is a powerful trend signal. This downward pressure is further confirmed by the negative volume indicator and an RSI below 50, suggesting sellers are in control for the immediate term.
+✅ GEMINI AI TRADE SIGNAL
+  Direction: DOWN
+  Confidence: 92%
+  Duration: 30-45 seconds
+  Rationale: The decision is primarily driven by the strong bearish confluence across all six moving average indicators, which is a powerful trend signal. This downward pressure is further confirmed by the negative volume indicator and an RSI below 50, suggesting sellers are in control for the immediate term.
