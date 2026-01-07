@@ -244,11 +244,44 @@ export async function generateProgressivePrediction(
     await delay(1000);
     
     if (geminiDecision && geminiDecision.direction !== "NEUTRAL") {
+      // Generate trade targets based on direction and current price
+      const calculateTradeTargets = () => {
+        const currentPrice = marketData.currentPrice;
+        const atr = indicators.atr || 0.5;
+        
+        if (geminiDecision.direction === "UP") {
+          return {
+            entry: `${currentPrice.toFixed(4)}`,
+            takeProfit: [
+              `${(currentPrice + atr * 1.5).toFixed(4)}`,
+              `${(currentPrice + atr * 3).toFixed(4)}`,
+              `${(currentPrice + atr * 5).toFixed(4)}`,
+            ],
+            stopLoss: `${(currentPrice - atr * 2).toFixed(4)}`,
+          };
+        } else if (geminiDecision.direction === "DOWN") {
+          return {
+            entry: `${currentPrice.toFixed(4)}`,
+            takeProfit: [
+              `${(currentPrice - atr * 1.5).toFixed(4)}`,
+              `${(currentPrice - atr * 3).toFixed(4)}`,
+              `${(currentPrice - atr * 5).toFixed(4)}`,
+            ],
+            stopLoss: `${(currentPrice + atr * 2).toFixed(4)}`,
+          };
+        }
+        return undefined;
+      };
+
+      const tradeTargets = calculateTradeTargets();
+
       sendStageUpdate(ws, "final_verdict", 100, "complete", {
         direction: geminiDecision.direction,
         confidence: geminiDecision.confidence,
         duration: geminiDecision.duration,
         signalQuality: "HIGH",
+        rationale: geminiDecision.rationale,
+        tradeTargets,
       });
       
       return {

@@ -374,6 +374,25 @@ function AIThinkingDisplay({ data, onComplete, isLoadedSession }: { data: AIThin
     }, 1000);
   };
 
+  // Clean the thinking process text to remove direction mentions that are part of internal reasoning
+  const cleanThinkingText = (text: string) => {
+    // Remove lines that just state the final direction as part of reasoning
+    return text
+      .replace(/I'm now (going to be|briting the final|about to) .*?(UP|DOWN|NEUTRAL)[.,]?/gi, '')
+      .replace(/My (final |)recommendation is .*?(UP|DOWN|NEUTRAL)[.,]?/gi, '')
+      .replace(/I recommend .*?(UP|DOWN|NEUTRAL)[.,]?/gi, '')
+      .replace(/Direction: .*?(UP|DOWN|NEUTRAL)[.,]?/gi, '')
+      .replace(/\n\n(DOWN|UP|NEUTRAL)\n/gi, '\n')
+      .replace(/\n(DOWN|UP|NEUTRAL):/g, ':')
+      .replace(/\nFinal decision: .*?(UP|DOWN|NEUTRAL)/gi, '')
+      .replace(/So the prediction is .*?(UP|DOWN|NEUTRAL)/gi, '')
+      .replace(/My prediction is .*?(UP|DOWN|NEUTRAL)/gi, '')
+      .replace(/Therefore, .*?(UP|DOWN|NEUTRAL)/gi, '')
+      .replace(/^.*?direction is (being|going to be) .*?(UP|DOWN|NEUTRAL).*$/gim, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between p-3 rounded-xl bg-card/50 border border-border/40 backdrop-blur-sm">
@@ -391,7 +410,7 @@ function AIThinkingDisplay({ data, onComplete, isLoadedSession }: { data: AIThin
         className="p-5 rounded-xl bg-card/50 border border-primary/30 backdrop-blur-sm max-h-80 overflow-y-auto scroll-smooth"
       >
         <div className="text-sm font-mono leading-relaxed whitespace-pre-wrap">
-          {displayedText || "AI is analyzing..."}
+          {cleanThinkingText(displayedText) || "AI is analyzing..."}
           {isTyping && displayedText && <span className="animate-pulse text-primary ml-1">▊</span>}
         </div>
       </div>
@@ -422,6 +441,60 @@ function FinalVerdictDisplay({ data }: { data: FinalVerdictData }) {
           </div>
         </div>
       </div>
+
+      {data.rationale && (
+        <div className="p-4 rounded-xl bg-card/50 border border-border/40 backdrop-blur-sm">
+          <div className="text-sm font-medium text-muted-foreground mb-2">AI Analysis</div>
+          <div className="text-sm leading-relaxed">{data.rationale}</div>
+        </div>
+      )}
+
+      {data.tradeTargets && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="p-5 rounded-xl bg-gradient-to-br from-chart-2/10 via-chart-1/5 to-chart-2/10 border border-chart-2/30 backdrop-blur-sm h-[300px]">
+            <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-chart-2 to-chart-1 bg-clip-text text-transparent mb-4">
+              Trade Targets
+            </div>
+            <div className="space-y-3">
+              {data.tradeTargets.entry && (
+                <div className="flex items-center justify-between p-3 rounded-lg bg-chart-2/10 border border-chart-2/20">
+                  <span className="text-sm font-medium">Entry Zone</span>
+                  <span className="font-mono font-bold text-chart-2">{data.tradeTargets.entry}</span>
+                </div>
+              )}
+              {data.tradeTargets.takeProfit && data.tradeTargets.takeProfit.length > 0 && (
+                <div className="space-y-2">
+                  <span className="text-sm font-medium text-muted-foreground">Take Profit Levels</span>
+                  {data.tradeTargets.takeProfit.map((tp, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+                      <span className="text-sm font-medium">TP {idx + 1}</span>
+                      <span className="font-mono font-bold text-green-400">{tp}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {data.tradeTargets.stopLoss && (
+                <div className="flex items-center justify-between p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+                  <span className="text-sm font-medium">Stop Loss</span>
+                  <span className="font-mono font-bold text-destructive">{data.tradeTargets.stopLoss}</span>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="p-5 rounded-xl bg-card/50 border border-border/40 backdrop-blur-sm h-[300px] flex items-center justify-center">
+            <div className="text-center text-muted-foreground">
+              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-muted/50 flex items-center justify-center">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                </svg>
+              </div>
+              <div className="text-sm font-medium">Live Chart</div>
+              <div className="text-xs text-muted-foreground mt-1">TradingView Widget</div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="space-y-4">
         <div className="space-y-3">

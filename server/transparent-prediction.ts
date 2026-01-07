@@ -363,6 +363,37 @@ export async function generateTransparentPrediction(
     indicators.atr > 3 ? "High volatility - wider stops recommended" : "Normal volatility range",
   ];
 
+  // Generate trade targets based on direction and current price
+  const calculateTradeTargets = () => {
+    const currentPrice = marketData.currentPrice;
+    const atr = indicators.atr;
+    
+    if (direction === "UP") {
+      return {
+        entry: `${currentPrice.toFixed(4)}`,
+        takeProfit: [
+          `${(currentPrice + atr * 1.5).toFixed(4)}`,
+          `${(currentPrice + atr * 3).toFixed(4)}`,
+          `${(currentPrice + atr * 5).toFixed(4)}`,
+        ],
+        stopLoss: `${(currentPrice - atr * 2).toFixed(4)}`,
+      };
+    } else if (direction === "DOWN") {
+      return {
+        entry: `${currentPrice.toFixed(4)}`,
+        takeProfit: [
+          `${(currentPrice - atr * 1.5).toFixed(4)}`,
+          `${(currentPrice - atr * 3).toFixed(4)}`,
+          `${(currentPrice - atr * 5).toFixed(4)}`,
+        ],
+        stopLoss: `${(currentPrice + atr * 2).toFixed(4)}`,
+      };
+    }
+    return undefined;
+  };
+
+  const tradeTargets = direction !== "NEUTRAL" ? calculateTradeTargets() : undefined;
+
   await delay(1500);
 
   const finalDuration = Date.now() - overallStartTime;
@@ -380,6 +411,8 @@ export async function generateTransparentPrediction(
       qualityScore,
       keyFactors,
       riskFactors,
+      rationale: geminiDecision?.rationale || `Strong ${direction} signal detected with ${confidence}% confidence based on ${signalAlignment.toFixed(1)}% signal alignment and ${indicators.marketRegime} market conditions.`,
+      tradeTargets,
     },
   });
 

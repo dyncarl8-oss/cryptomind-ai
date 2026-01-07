@@ -120,6 +120,12 @@ export const finalVerdictDataSchema = z.object({
   qualityScore: z.number(),
   keyFactors: z.array(z.string()),
   riskFactors: z.array(z.string()),
+  rationale: z.string().optional(),
+  tradeTargets: z.object({
+    entry: z.string().optional(),
+    takeProfit: z.array(z.string()).optional(),
+    stopLoss: z.string().optional(),
+  }).optional(),
 });
 
 export const analysisStageSchema = z.object({
