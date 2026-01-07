@@ -252,6 +252,7 @@ export async function generateProgressivePrediction(
         duration: geminiDecision.duration,
         signalQuality: "HIGH",
         tradeTargets: geminiDecision.tradeTargets,
+        rationale: geminiDecision.rationale,
         keyFactors: geminiDecision.keyFactors,
         riskFactors: geminiDecision.riskFactors,
         qualityScore,
