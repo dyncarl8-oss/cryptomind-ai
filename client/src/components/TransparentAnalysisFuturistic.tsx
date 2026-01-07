@@ -475,15 +475,7 @@ function FinalVerdictDisplay({
 
   return (
     <div className="space-y-6" data-testid="final-verdict-display">
-      <div className="grid grid-cols-3 gap-4 p-5 rounded-xl bg-gradient-to-br from-primary/10 via-accent/10 to-primary/10 border border-primary/30 backdrop-blur-sm">
-        <div className="space-y-1">
-          <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
-            Direction
-          </div>
-          <div className="text-3xl font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            {data.direction}
-          </div>
-        </div>
+      <div className="grid grid-cols-2 gap-4 p-5 rounded-xl bg-gradient-to-br from-primary/10 via-accent/10 to-primary/10 border border-primary/30 backdrop-blur-sm">
         <div className="space-y-1">
           <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
             Confidence
@@ -505,6 +497,17 @@ function FinalVerdictDisplay({
           <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Trade Targets
           </div>
+
+          {data.rationale && (
+            <div className="p-4 rounded-xl bg-card/50 border border-border/40 backdrop-blur-sm">
+              <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                Analysis
+              </div>
+              <div className="text-sm leading-relaxed text-foreground/90">
+                {data.rationale}
+              </div>
+            </div>
+          )}
 
           <div className="p-4 rounded-xl bg-card/50 border border-border/40 backdrop-blur-sm space-y-3">
             {isActionable && data.tradeTargets ? (
@@ -559,7 +562,7 @@ function FinalVerdictDisplay({
           <TradingViewAdvancedChart
             symbol={symbol}
             interval={interval}
-            className="h-[420px] sm:h-[460px] lg:h-[520px]"
+            className="h-full min-h-[420px]"
           />
         </div>
       </div>

@@ -130,6 +130,7 @@ export const finalVerdictDataSchema = z.object({
   confidence: z.number(),
   duration: z.string(),
   qualityScore: z.number(),
+  rationale: z.string().optional(),
   keyFactors: z.array(z.string()),
   riskFactors: z.array(z.string()),
   tradeTargets: tradeTargetsSchema.optional(),
