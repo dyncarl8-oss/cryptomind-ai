@@ -4,6 +4,12 @@ import { WebSocket } from "ws";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
+export interface GeminiTradeTargets {
+  entry: { low: number; high: number };
+  target: { low: number; high: number };
+  stop: number;
+}
+
 export interface GeminiPredictionDecision {
   direction: "UP" | "DOWN" | "NEUTRAL";
   confidence: number;
@@ -11,6 +17,8 @@ export interface GeminiPredictionDecision {
   riskFactors: string[];
   thinkingProcess?: string;
   keyFactors?: string[];
+  tradeTargets?: GeminiTradeTargets;
+  duration?: string;
 }
 
 interface TechnicalAnalysisSnapshot {
@@ -167,6 +175,16 @@ CRITICAL REQUIREMENTS:
 3. Rationale: 2-3 sentences explaining the key factors driving your decision
 4. Risk Factors: 2-4 specific risks to this trade
 5. Key Factors: 3-6 bullet points listing the most important indicators supporting your decision
+6. Trade Targets (required for UP/DOWN): Provide a clean, actionable plan using the current price and ATR/volatility:
+   - entry: a tight ENTRY range around the current price (low/high)
+   - target: a realistic TARGET range in the trade direction (low/high)
+   - stop: a STOP price that invalidates the setup (single number)
+
+TRADE TARGET GUIDELINES:
+- Keep ENTRY close to current price (a small band, not a huge zone)
+- Use ATR/volatility to size distances (targets typically 1.5–2.5x ATR away, stops ~0.8–1.3x ATR away)
+- For UP: stop < entry.low; target.high > entry.high
+- For DOWN: stop > entry.high; target.low < entry.low
 
 CONFIDENCE CALIBRATION:
 - If signals are mixed or market regime is RANGING → 90-92%
@@ -202,30 +220,53 @@ Based on this technical analysis, provide your trading decision.`;
   const schema = {
     type: "object",
     properties: {
-      direction: { 
+      direction: {
         type: "string",
-        enum: ["UP", "DOWN", "NEUTRAL"]
+        enum: ["UP", "DOWN", "NEUTRAL"],
       },
-      confidence: { 
+      confidence: {
         type: "number",
         minimum: 90,
-        maximum: 98
+        maximum: 98,
       },
       rationale: { type: "string" },
-      riskFactors: { 
+      riskFactors: {
         type: "array",
         items: { type: "string" },
         minItems: 2,
-        maxItems: 4
+        maxItems: 4,
       },
       keyFactors: {
         type: "array",
         items: { type: "string" },
         minItems: 3,
-        maxItems: 6
-      }
+        maxItems: 6,
+      },
+      tradeTargets: {
+        type: "object",
+        properties: {
+          entry: {
+            type: "object",
+            properties: {
+              low: { type: "number" },
+              high: { type: "number" },
+            },
+            required: ["low", "high"],
+          },
+          target: {
+            type: "object",
+            properties: {
+              low: { type: "number" },
+              high: { type: "number" },
+            },
+            required: ["low", "high"],
+          },
+          stop: { type: "number" },
+        },
+        required: ["entry", "target", "stop"],
+      },
     },
-    required: ["direction", "confidence", "rationale", "riskFactors", "keyFactors"]
+    required: ["direction", "confidence", "rationale", "riskFactors", "keyFactors"],
   };
 
   try {

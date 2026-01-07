@@ -33,10 +33,15 @@ import type {
   SignalAggregationData,
   AIThinkingData,
   FinalVerdictData,
+  TradingPair,
+  Timeframe,
 } from "@shared/schema";
+import { TradingViewAdvancedChart } from "@/components/TradingViewAdvancedChart";
 
 interface TransparentAnalysisProps {
   stages: AnalysisStage[];
+  tradingPair?: TradingPair;
+  timeframe?: Timeframe;
   onStageComplete?: (stage: string) => void;
   isLoadedSession?: boolean;
 }
@@ -78,6 +83,56 @@ const stageConfig = {
     color: "text-green-400",
   },
 };
+
+const timeframeToTradingViewInterval: Record<Timeframe, string> = {
+  SECONDS: "1",
+  M1: "1",
+  M3: "3",
+  M5: "5",
+  M15: "15",
+  M30: "30",
+  H1: "60",
+  H2: "120",
+  H4: "240",
+  H8: "480",
+  D1: "D",
+  W1: "W",
+};
+
+function toTradingViewSymbol(pair?: TradingPair): string {
+  if (!pair) return "BINANCE:BTCUSDT";
+  const [base, quote] = pair.split("/");
+  if (!base || !quote) return pair;
+
+  if (quote === "USDT") {
+    return `BINANCE:${base}${quote}`;
+  }
+
+  if (quote === "USD") {
+    return `FX:${base}${quote}`;
+  }
+
+  return `${base}${quote}`;
+}
+
+function getPriceDecimals(price?: number) {
+  if (price === undefined) return 2;
+  if (price >= 100) return 2;
+  if (price >= 10) return 3;
+  if (price >= 1) return 4;
+  return 6;
+}
+
+function formatPrice(value: number, decimals: number) {
+  return value.toLocaleString(undefined, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
+
+function formatRange(low: number, high: number, decimals: number) {
+  return `${formatPrice(low, decimals)} - ${formatPrice(high, decimals)}`;
+}
 
 function StageIndicator({ stage }: { stage: AnalysisStage }) {
   const config = stageConfig[stage.stage];
@@ -399,27 +454,113 @@ function AIThinkingDisplay({ data, onComplete, isLoadedSession }: { data: AIThin
   );
 }
 
-function FinalVerdictDisplay({ data }: { data: FinalVerdictData }) {
+function FinalVerdictDisplay({
+  data,
+  tradingPair,
+  timeframe,
+  currentPrice,
+}: {
+  data: FinalVerdictData;
+  tradingPair?: TradingPair;
+  timeframe?: Timeframe;
+  currentPrice?: number;
+}) {
+  const symbol = toTradingViewSymbol(tradingPair);
+  const interval = timeframe
+    ? timeframeToTradingViewInterval[timeframe]
+    : timeframeToTradingViewInterval.M15;
+
+  const priceDecimals = getPriceDecimals(currentPrice);
+  const isActionable = data.direction !== "NEUTRAL";
+
   return (
-    <div className="space-y-5" data-testid="final-verdict-display">
+    <div className="space-y-6" data-testid="final-verdict-display">
       <div className="grid grid-cols-3 gap-4 p-5 rounded-xl bg-gradient-to-br from-primary/10 via-accent/10 to-primary/10 border border-primary/30 backdrop-blur-sm">
         <div className="space-y-1">
-          <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Direction</div>
+          <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+            Direction
+          </div>
           <div className="text-3xl font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             {data.direction}
           </div>
         </div>
         <div className="space-y-1">
-          <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Confidence</div>
+          <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+            Confidence
+          </div>
           <div className="text-3xl font-black text-green-400">
             {data.confidence}%
           </div>
         </div>
         <div className="space-y-1">
-          <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Duration</div>
-          <div className="text-2xl font-bold text-primary">
-            {data.duration}
+          <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+            Duration
           </div>
+          <div className="text-2xl font-bold text-primary">{data.duration}</div>
+        </div>
+      </div>
+
+      <div className="grid gap-5 lg:grid-cols-5">
+        <div className="lg:col-span-2 space-y-3">
+          <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            Trade Targets
+          </div>
+
+          <div className="p-4 rounded-xl bg-card/50 border border-border/40 backdrop-blur-sm space-y-3">
+            {isActionable && data.tradeTargets ? (
+              <div className="grid gap-3">
+                <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    ENTRY
+                  </div>
+                  <div className="font-mono text-lg font-bold text-primary">
+                    {formatRange(
+                      data.tradeTargets.entry.low,
+                      data.tradeTargets.entry.high,
+                      priceDecimals
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-lg bg-green-500/5 border border-green-500/20">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    TARGET
+                  </div>
+                  <div className="font-mono text-lg font-bold text-green-400">
+                    {formatRange(
+                      data.tradeTargets.target.low,
+                      data.tradeTargets.target.high,
+                      priceDecimals
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-lg bg-red-500/5 border border-red-500/20">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    STOP
+                  </div>
+                  <div className="font-mono text-lg font-bold text-red-400">
+                    {formatPrice(data.tradeTargets.stop, priceDecimals)}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-sm text-muted-foreground">
+                No actionable trade setup detected. Waiting for a higher-confidence entry.
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="lg:col-span-3 space-y-3">
+          <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            Live Chart
+          </div>
+          <TradingViewAdvancedChart
+            symbol={symbol}
+            interval={interval}
+            className="h-[420px] sm:h-[460px] lg:h-[520px]"
+          />
         </div>
       </div>
 
@@ -430,7 +571,7 @@ function FinalVerdictDisplay({ data }: { data: FinalVerdictData }) {
             KEY FACTORS
           </div>
           <div className="space-y-2">
-            {data.keyFactors.map((factor, idx) => (
+            {(data.keyFactors ?? []).map((factor, idx) => (
               <div
                 key={idx}
                 className="flex items-start gap-3 p-3 rounded-lg bg-green-500/5 border border-green-500/20 backdrop-blur-sm"
@@ -448,7 +589,7 @@ function FinalVerdictDisplay({ data }: { data: FinalVerdictData }) {
             RISK FACTORS
           </div>
           <div className="space-y-2">
-            {data.riskFactors.map((risk, idx) => (
+            {(data.riskFactors ?? []).map((risk, idx) => (
               <div
                 key={idx}
                 className="flex items-start gap-3 p-3 rounded-lg bg-orange-500/5 border border-orange-500/20 backdrop-blur-sm"
@@ -461,7 +602,9 @@ function FinalVerdictDisplay({ data }: { data: FinalVerdictData }) {
         </div>
 
         <div className="flex items-center justify-between p-4 rounded-xl bg-card/50 border border-border/40 backdrop-blur-sm">
-          <span className="text-sm font-medium uppercase tracking-wide">Quality Score</span>
+          <span className="text-sm font-medium uppercase tracking-wide">
+            Quality Score
+          </span>
           <span className="text-2xl font-black text-primary">{data.qualityScore}%</span>
         </div>
       </div>
@@ -469,11 +612,25 @@ function FinalVerdictDisplay({ data }: { data: FinalVerdictData }) {
   );
 }
 
-export function TransparentAnalysis({ stages, onStageComplete, isLoadedSession }: TransparentAnalysisProps) {
+export function TransparentAnalysis({
+  stages,
+  tradingPair,
+  timeframe,
+  onStageComplete,
+  isLoadedSession,
+}: TransparentAnalysisProps) {
   const [expandedStages, setExpandedStages] = useState<string[]>([]);
   const autoExpandedRef = useRef<Set<string>>(new Set());
   const stageRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const lastInProgressStageRef = useRef<string | null>(null);
+
+  const marketDataStage = stages.find(
+    (s) => s.stage === "data_collection" && s.data
+  );
+  const currentPrice =
+    typeof (marketDataStage?.data as any)?.currentPrice === "number"
+      ? ((marketDataStage?.data as any).currentPrice as number)
+      : undefined;
 
   const toggleStage = (stageName: string) => {
     setExpandedStages((prev) =>
@@ -597,7 +754,12 @@ export function TransparentAnalysis({ stages, onStageComplete, isLoadedSession }
                     />
                   )}
                   {stage.stage === "final_verdict" && (
-                    <FinalVerdictDisplay data={stage.data as FinalVerdictData} />
+                    <FinalVerdictDisplay
+                      data={stage.data as FinalVerdictData}
+                      tradingPair={tradingPair}
+                      timeframe={timeframe}
+                      currentPrice={currentPrice}
+                    />
                   )}
                 </CollapsibleContent>
               </Collapsible>

@@ -335,10 +335,36 @@ function FinalVerdictDisplay({ data }: { data: FinalVerdictData }) {
         </div>
       </div>
 
+      {data.direction !== "NEUTRAL" && data.tradeTargets && (
+        <div>
+          <div className="text-sm font-semibold mb-2">Trade Targets</div>
+          <div className="grid grid-cols-3 gap-2">
+            <div className="p-3 rounded-md bg-card-elevated">
+              <div className="text-xs text-muted-foreground font-semibold">ENTRY</div>
+              <div className="font-mono font-semibold">
+                {data.tradeTargets.entry.low.toFixed(2)} - {data.tradeTargets.entry.high.toFixed(2)}
+              </div>
+            </div>
+            <div className="p-3 rounded-md bg-green-500/10 border border-green-500/20">
+              <div className="text-xs text-muted-foreground font-semibold">TARGET</div>
+              <div className="font-mono font-semibold text-green-600 dark:text-green-400">
+                {data.tradeTargets.target.low.toFixed(2)} - {data.tradeTargets.target.high.toFixed(2)}
+              </div>
+            </div>
+            <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20">
+              <div className="text-xs text-muted-foreground font-semibold">STOP</div>
+              <div className="font-mono font-semibold text-red-600 dark:text-red-400">
+                {data.tradeTargets.stop.toFixed(2)}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div>
         <div className="text-sm font-semibold mb-2">Key Factors</div>
         <ul className="space-y-1">
-          {data.keyFactors.map((factor, idx) => (
+          {(data.keyFactors ?? []).map((factor, idx) => (
             <li key={idx} className="text-sm flex items-start gap-2">
               <span className="text-green-500 mt-1">•</span>
               <span>{factor}</span>
@@ -352,7 +378,7 @@ function FinalVerdictDisplay({ data }: { data: FinalVerdictData }) {
           Risk Factors
         </div>
         <ul className="space-y-1">
-          {data.riskFactors.map((risk, idx) => (
+          {(data.riskFactors ?? []).map((risk, idx) => (
             <li key={idx} className="text-sm flex items-start gap-2">
               <span className="text-orange-500 mt-1">⚠</span>
               <span>{risk}</span>

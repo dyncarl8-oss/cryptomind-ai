@@ -406,6 +406,8 @@ export default function Chat() {
                   <div className="ml-0 md:ml-12 mt-3 md:mt-4">
                     <TransparentAnalysis 
                       stages={analysisStages}
+                      tradingPair={selectedPair}
+                      timeframe={selectedTimeframe}
                       onStageComplete={(stage) => {
                         if (stage === "ai_thinking") {
                           sendMessage({ type: "ai_thinking_complete" });
