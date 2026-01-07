@@ -459,11 +459,17 @@ function FinalVerdictDisplay({
   tradingPair,
   timeframe,
   currentPrice,
+  aiThinkingData,
+  isLoadedSession,
+  onAiComplete,
 }: {
   data: FinalVerdictData;
   tradingPair?: TradingPair;
   timeframe?: Timeframe;
   currentPrice?: number;
+  aiThinkingData?: AIThinkingData;
+  isLoadedSession?: boolean;
+  onAiComplete?: () => void;
 }) {
   const symbol = toTradingViewSymbol(tradingPair);
   const interval = timeframe
@@ -475,15 +481,7 @@ function FinalVerdictDisplay({
 
   return (
     <div className="space-y-6" data-testid="final-verdict-display">
-      <div className="grid grid-cols-3 gap-4 p-5 rounded-xl bg-gradient-to-br from-primary/10 via-accent/10 to-primary/10 border border-primary/30 backdrop-blur-sm">
-        <div className="space-y-1">
-          <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
-            Direction
-          </div>
-          <div className="text-3xl font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            {data.direction}
-          </div>
-        </div>
+      <div className="grid grid-cols-2 gap-4 p-5 rounded-xl bg-gradient-to-br from-primary/10 via-accent/10 to-primary/10 border border-primary/30 backdrop-blur-sm">
         <div className="space-y-1">
           <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
             Confidence
@@ -500,13 +498,23 @@ function FinalVerdictDisplay({
         </div>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-5">
-        <div className="lg:col-span-2 space-y-3">
+      {aiThinkingData && (
+        <div className="animate-slide-up">
+          <AIThinkingDisplay 
+            data={aiThinkingData}
+            onComplete={onAiComplete}
+            isLoadedSession={isLoadedSession}
+          />
+        </div>
+      )}
+
+      <div className="grid gap-5 lg:grid-cols-5 items-stretch">
+        <div className="lg:col-span-2 flex flex-col space-y-3">
           <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Trade Targets
           </div>
 
-          <div className="p-4 rounded-xl bg-card/50 border border-border/40 backdrop-blur-sm space-y-3">
+          <div className="p-4 rounded-xl bg-card/50 border border-border/40 backdrop-blur-sm space-y-3 flex-1">
             {isActionable && data.tradeTargets ? (
               <div className="grid gap-3">
                 <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
@@ -552,14 +560,14 @@ function FinalVerdictDisplay({
           </div>
         </div>
 
-        <div className="lg:col-span-3 space-y-3">
+        <div className="lg:col-span-3 flex flex-col space-y-3">
           <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Live Chart
           </div>
           <TradingViewAdvancedChart
             symbol={symbol}
             interval={interval}
-            className="h-[420px] sm:h-[460px] lg:h-[520px]"
+            className="flex-1 min-h-[400px]"
           />
         </div>
       </div>
@@ -620,6 +628,9 @@ export function TransparentAnalysis({
   isLoadedSession,
 }: TransparentAnalysisProps) {
   const [expandedStages, setExpandedStages] = useState<string[]>([]);
+  const aiThinkingStage = stages.find((s) => s.stage === "ai_thinking");
+  const finalVerdictStage = stages.find((s) => s.stage === "final_verdict");
+  const isFinalVerdictComplete = finalVerdictStage?.status === "complete";
   const autoExpandedRef = useRef<Set<string>>(new Set());
   const stageRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const lastInProgressStageRef = useRef<string | null>(null);
@@ -708,7 +719,7 @@ export function TransparentAnalysis({
           >
             <StageIndicator stage={stage} />
 
-            {stage.stage === "ai_thinking" && stage.data && (
+            {stage.stage === "ai_thinking" && stage.data && !isFinalVerdictComplete && (
               <div className="mt-4 animate-slide-up">
                 <AIThinkingDisplay 
                   data={stage.data as AIThinkingData}
@@ -759,6 +770,9 @@ export function TransparentAnalysis({
                       tradingPair={tradingPair}
                       timeframe={timeframe}
                       currentPrice={currentPrice}
+                      aiThinkingData={aiThinkingStage?.data as AIThinkingData}
+                      isLoadedSession={isLoadedSession}
+                      onAiComplete={() => onStageComplete?.("ai_thinking")}
                     />
                   )}
                 </CollapsibleContent>
