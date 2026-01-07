@@ -58,7 +58,7 @@ const stageConfig = {
   ai_thinking: {
     icon: Brain,
     title: "AI Deep Analysis",
-    description: "Gemini 2.0 Flash Thinking in progress",
+    description: "Gemini 3 Pro Preview analyzing in progress",
     color: "text-pink-500",
   },
   final_verdict: {
