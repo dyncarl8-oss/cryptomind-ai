@@ -410,8 +410,6 @@ export async function generateTransparentPrediction(
     },
   });
 
-  await delay(1800);
-
   sendStageUpdate(ws, {
     type: "analysis_stage",
     stage: "final_verdict",

@@ -339,12 +339,22 @@ function AIThinkingDisplay({ data, onComplete, isLoadedSession }: { data: AIThin
   const userScrolledRef = useRef(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const completedRef = useRef(false);
+  const animationFrameRef = useRef<number | null>(null);
+
+  // Cleanup function to cancel any in-flight animations
+  const cleanupAnimation = () => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+    setIsTyping(false);
+    isTypingRef.current = false;
+  };
 
   useEffect(() => {
     if (!data.thinkingProcess) {
       setDisplayedText("");
-      setIsTyping(false);
-      isTypingRef.current = false;
+      cleanupAnimation();
       targetTextRef.current = "";
       completedRef.current = false;
       return;
@@ -361,11 +371,13 @@ function AIThinkingDisplay({ data, onComplete, isLoadedSession }: { data: AIThin
 
     if (isLoadedSession) {
       setDisplayedText(data.thinkingProcess);
-      setIsTyping(false);
-      isTypingRef.current = false;
+      cleanupAnimation();
       if (!completedRef.current) {
         completedRef.current = true;
-        onComplete?.();
+        // Use setTimeout to ensure proper state update order
+        setTimeout(() => {
+          onComplete?.();
+        }, 0);
       }
       return;
     }
@@ -375,11 +387,10 @@ function AIThinkingDisplay({ data, onComplete, isLoadedSession }: { data: AIThin
       setIsTyping(true);
       
       const startLength = displayedText.length;
-      const targetLength = data.thinkingProcess.length;
       let currentIndex = startLength;
 
       const typeNextChar = () => {
-        if (currentIndex < targetTextRef.current.length) {
+        if (currentIndex < targetTextRef.current.length && isTypingRef.current) {
           const charsToAdd = Math.min(3, targetTextRef.current.length - currentIndex);
           currentIndex += charsToAdd;
           const nextText = targetTextRef.current.slice(0, currentIndex);
@@ -389,10 +400,9 @@ function AIThinkingDisplay({ data, onComplete, isLoadedSession }: { data: AIThin
             containerRef.current.scrollTop = containerRef.current.scrollHeight;
           }
           
-          requestAnimationFrame(typeNextChar);
-        } else {
-          setIsTyping(false);
-          isTypingRef.current = false;
+          animationFrameRef.current = requestAnimationFrame(typeNextChar);
+        } else if (isTypingRef.current) {
+          cleanupAnimation();
           if (!completedRef.current) {
             completedRef.current = true;
             onComplete?.();
@@ -400,13 +410,7 @@ function AIThinkingDisplay({ data, onComplete, isLoadedSession }: { data: AIThin
         }
       };
 
-      requestAnimationFrame(typeNextChar);
-    } else if (displayedText.length === data.thinkingProcess.length && displayedText.length > 0 && !completedRef.current) {
-      if (isTyping) {
-        setIsTyping(false);
-      }
-      completedRef.current = true;
-      onComplete?.();
+      animationFrameRef.current = requestAnimationFrame(typeNextChar);
     }
   }, [data.thinkingProcess, displayedText.length, isLoadedSession]);
 
