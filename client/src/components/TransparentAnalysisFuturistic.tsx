@@ -140,13 +140,18 @@ function StageIndicator({ stage }: { stage: AnalysisStage }) {
   const isComplete = stage.status === "complete";
   const isInProgress = stage.status === "in_progress";
   const isAiThinkingStage = stage.stage === "ai_thinking";
+  const isFinalVerdictStage = stage.stage === "final_verdict";
+  const hasFinalVerdictData = isFinalVerdictStage && stage.data;
+
+  // Don't show spinner for final_verdict if we have data, even if status isn't complete yet
+  const shouldShowSpinner = isInProgress && !isAiThinkingStage && !(isFinalVerdictStage && hasFinalVerdictData);
 
   return (
     <div className="space-y-3 animate-slide-up" data-testid={`analysis-stage-${stage.stage}`}>
       <div className="flex items-center justify-between p-4 rounded-xl bg-card/50 border border-border/40 backdrop-blur-sm transition-all duration-300">
         <div className="flex items-center gap-4 flex-1">
           <div className={`relative`}>
-            {isInProgress && !isAiThinkingStage ? (
+            {shouldShowSpinner ? (
               <div className="relative">
                 <Loader2 className={`w-6 h-6 animate-spin ${config.color}`} />
                 <div className="absolute inset-0 blur-md opacity-50">
@@ -155,8 +160,8 @@ function StageIndicator({ stage }: { stage: AnalysisStage }) {
               </div>
             ) : (
               <div className="relative">
-                <Icon className={`w-6 h-6 ${isComplete ? 'text-green-400' : config.color}`} />
-                {isComplete && (
+                <Icon className={`w-6 h-6 ${isComplete || hasFinalVerdictData ? 'text-green-400' : config.color}`} />
+                {(isComplete || hasFinalVerdictData) && (
                   <div className="absolute inset-0 blur-md opacity-50">
                     <CheckCircle2 className="w-6 h-6 text-green-400" />
                   </div>
@@ -176,13 +181,13 @@ function StageIndicator({ stage }: { stage: AnalysisStage }) {
             </div>
           </div>
         </div>
-        {isComplete && (
+        {(isComplete || hasFinalVerdictData) && (
           <CheckCircle2 className="w-5 h-5 text-green-400" />
         )}
       </div>
-      <Progress 
-        value={stage.progress} 
-        className={`h-2 ${isInProgress ? 'animate-pulse' : ''}`}
+      <Progress
+        value={stage.progress}
+        className={`h-2 ${isInProgress && !hasFinalVerdictData ? 'animate-pulse' : ''}`}
       />
     </div>
   );
@@ -661,7 +666,7 @@ export function TransparentAnalysis({
 
     const allNonComplete = stages.every(s => s.status === "pending" || s.status === "in_progress");
     const isNewRun = allNonComplete && autoExpandedRef.current.size > 0;
-    
+
     if (isNewRun) {
       autoExpandedRef.current.clear();
       setExpandedStages([]);
@@ -669,7 +674,11 @@ export function TransparentAnalysis({
     }
 
     stages.forEach((stage, index) => {
-      if (stage.status === "complete" && !autoExpandedRef.current.has(stage.stage)) {
+      const shouldAutoExpand =
+        stage.status === "complete" ||
+        (stage.stage === "final_verdict" && stage.data && !autoExpandedRef.current.has(stage.stage));
+
+      if (shouldAutoExpand && !autoExpandedRef.current.has(stage.stage)) {
         autoExpandedRef.current.add(stage.stage);
         setTimeout(() => {
           setExpandedStages((prev) =>
@@ -729,7 +738,7 @@ export function TransparentAnalysis({
               </div>
             )}
 
-            {stage.status === "complete" && stage.data && stage.stage !== "ai_thinking" && (
+            {(stage.status === "complete" || (stage.stage === "final_verdict" && stage.data)) && stage.data && stage.stage !== "ai_thinking" && (
               <Collapsible
                 open={expandedStages.includes(stage.stage)}
                 onOpenChange={() => toggleStage(stage.stage)}

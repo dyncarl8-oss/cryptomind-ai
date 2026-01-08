@@ -472,23 +472,49 @@ export async function generateTransparentPrediction(
 
   const finalDuration = Date.now() - overallStartTime;
 
-  sendStageUpdate(ws, {
-    type: "analysis_stage",
-    stage: "final_verdict",
-    progress: 100,
-    status: "complete",
-    duration: finalDuration - aiDuration - aggregationDuration - technicalDuration - dataDuration,
-    data: {
-      direction,
-      confidence,
-      duration,
-      qualityScore,
-      keyFactors,
-      riskFactors,
-      tradeTargets,
-      explanation: geminiDecision?.rationale || `Strong ${direction} signal detected with ${confidence}% confidence`,
-    },
-  });
+  // Ensure final verdict is always sent with complete status, even if there are issues
+  try {
+    sendStageUpdate(ws, {
+      type: "analysis_stage",
+      stage: "final_verdict",
+      progress: 100,
+      status: "complete",
+      duration: finalDuration - aiDuration - aggregationDuration - technicalDuration - dataDuration,
+      data: {
+        direction,
+        confidence,
+        duration,
+        qualityScore,
+        keyFactors,
+        riskFactors,
+        tradeTargets,
+        explanation: geminiDecision?.rationale || `Strong ${direction} signal detected with ${confidence}% confidence`,
+      },
+    });
+  } catch (error) {
+    console.error("Error sending final_verdict complete stage:", error);
+    // Try one more time with a minimal message if the first attempt fails
+    try {
+      sendStageUpdate(ws, {
+        type: "analysis_stage",
+        stage: "final_verdict",
+        progress: 100,
+        status: "complete",
+        data: {
+          direction,
+          confidence,
+          duration,
+          qualityScore,
+          keyFactors,
+          riskFactors,
+          tradeTargets,
+          explanation: geminiDecision?.rationale || `${direction} signal`,
+        },
+      });
+    } catch (retryError) {
+      console.error("Failed to send final_verdict on retry:", retryError);
+    }
+  }
 
   const prediction: Prediction = {
     pair,
