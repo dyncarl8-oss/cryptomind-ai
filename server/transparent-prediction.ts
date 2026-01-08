@@ -427,7 +427,7 @@ export async function generateTransparentPrediction(
     },
   });
 
-  await delay(1800);
+  await delay(2500);
 
   // Check if WebSocket is still open before continuing
   if (ws.readyState !== WebSocket.OPEN) {
