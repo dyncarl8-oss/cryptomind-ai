@@ -41,12 +41,25 @@ import type {
 } from "@shared/schema";
 import { PositionManagerChart } from "@/components/PositionManagerChart";
 
-interface TransparentAnalysisProps {
+interface Position {
+  id: string;
+  type: "long" | "short";
+  entryPrice: number;
+  stopLoss?: number;
+  takeProfit?: number;
+  quantity?: number;
+  timestamp: number;
+  isActive: boolean;
+  analysisId?: string;
+}
+
+interface TransparentAnalysisWithPositionsProps {
   stages: AnalysisStage[];
   tradingPair?: TradingPair;
   timeframe?: Timeframe;
   onStageComplete?: (stage: string) => void;
   isLoadedSession?: boolean;
+  onPositionSync?: (position: Position, analysisData: FinalVerdictData) => void;
 }
 
 const stageConfig = {
@@ -466,102 +479,35 @@ function AIThinkingDisplay({ data, onComplete, isLoadedSession }: { data: AIThin
   );
 }
 
-function TradePositionOverlay({
-  data,
-  currentPrice,
-  priceDecimals,
-}: {
-  data: FinalVerdictData;
-  currentPrice?: number;
-  priceDecimals: number;
-}) {
-  if (!data.tradeTargets || data.direction === "NEUTRAL") return null;
-
-  const { entry, target, stop } = data.tradeTargets;
-  const isLong = data.direction === "UP";
-
-  const entryAvg = (entry.low + entry.high) / 2;
-  const targetAvg = (target.low + target.high) / 2;
-  
-  const profit = Math.abs(targetAvg - entryAvg);
-  const risk = Math.abs(entryAvg - stop);
-  
-  // Calculate heights proportional to R:R but within reasonable bounds
-  const totalHeight = 200;
-  const rrRatio = profit / risk;
-  
-  // Clamp the ratio so it doesn't look crazy
-  const clampedRR = Math.max(0.3, Math.min(4, rrRatio));
-  const profitHeight = (clampedRR / (clampedRR + 1)) * totalHeight;
-  const riskHeight = totalHeight - profitHeight;
-
-  const profitPercent = ((profit / entryAvg) * 100).toFixed(2);
-  const riskPercent = ((risk / entryAvg) * 100).toFixed(2);
-
-  return (
-    <div className="absolute right-10 top-1/2 -translate-y-1/2 w-24 sm:w-28 flex flex-col pointer-events-none select-none z-10 opacity-90 hover:opacity-100 transition-all duration-300 animate-in fade-in slide-in-from-right-4">
-      {/* Target Zone */}
-      <div 
-        className={cn(
-          "relative flex flex-col items-center justify-center border border-green-500/50 backdrop-blur-[1px] overflow-hidden transition-all duration-500",
-          isLong ? "bg-green-500/30 rounded-t-md border-b-0" : "bg-green-500/30 rounded-b-md order-2 border-t-0"
-        )}
-        style={{ height: `${profitHeight}px` }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-green-500/10 to-transparent opacity-50" />
-        <div className={cn("absolute flex flex-col items-center gap-0.5 z-10 px-1 text-center", isLong ? "top-2" : "bottom-2")}>
-          <span className="text-[8px] sm:text-[9px] font-black text-green-400 uppercase tracking-tighter drop-shadow-sm">Target</span>
-          <span className="text-[10px] sm:text-[12px] font-mono font-bold text-white drop-shadow-md">+{profitPercent}%</span>
-        </div>
-        <div className={cn("absolute z-10", isLong ? "bottom-1" : "top-1")}>
-          <span className="text-[7px] sm:text-[8px] font-bold text-green-400/60 tracking-tight">R:R {(profit/risk).toFixed(2)}</span>
-        </div>
-      </div>
-      
-      {/* Entry Line Indicator */}
-      <div className="relative h-0 w-full z-20">
-        <div className="absolute -left-1 -right-1 h-[2px] bg-white shadow-[0_0_10px_rgba(255,255,255,1)]" />
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 bg-white text-black text-[7px] sm:text-[8px] font-black px-1 py-0.5 rounded-l-sm shadow-xl">
-          {entryAvg.toFixed(priceDecimals)}
-        </div>
-      </div>
-      
-      {/* Stop Zone */}
-      <div 
-        className={cn(
-          "relative flex flex-col items-center justify-center border border-red-500/50 backdrop-blur-[1px] overflow-hidden transition-all duration-500",
-          isLong ? "bg-red-500/30 rounded-b-md border-t-0" : "bg-red-500/30 rounded-t-md order-1 border-b-0"
-        )}
-        style={{ height: `${riskHeight}px` }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-t from-red-500/10 to-transparent opacity-50" />
-        <div className={cn("absolute flex flex-col items-center gap-0.5 z-10 px-1 text-center", isLong ? "bottom-2" : "top-2")}>
-          <span className="text-[8px] sm:text-[9px] font-black text-red-400 uppercase tracking-tighter drop-shadow-sm">Stop</span>
-          <span className="text-[10px] sm:text-[12px] font-mono font-bold text-white drop-shadow-md">-{riskPercent}%</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function FinalVerdictDisplay({
   data,
   tradingPair,
   timeframe,
-  currentPrice,
+  onPositionCreate,
 }: {
   data: FinalVerdictData;
   tradingPair?: TradingPair;
   timeframe?: Timeframe;
-  currentPrice?: number;
+  onPositionCreate?: (direction: "long" | "short", entry: number, stopLoss?: number, takeProfit?: number) => void;
 }) {
   const symbol = toTradingViewSymbol(tradingPair);
   const interval = timeframe
     ? timeframeToTradingViewInterval[timeframe]
     : timeframeToTradingViewInterval.M15;
 
-  const priceDecimals = getPriceDecimals(currentPrice);
   const isActionable = data.direction !== "NEUTRAL";
+
+  // Create position from analysis
+  const handleCreatePosition = (direction: "long" | "short") => {
+    if (!data.tradeTargets || !isActionable) return;
+
+    const { entry, target, stop } = data.tradeTargets;
+    const entryAvg = (entry.low + entry.high) / 2;
+    const targetAvg = (target.low + target.high) / 2;
+    const stopAvg = (stop.low + stop.high) / 2;
+
+    onPositionCreate?.(direction, entryAvg, stopAvg, targetAvg);
+  };
 
   return (
     <div className="space-y-4" data-testid="final-verdict-display">
@@ -601,284 +547,314 @@ function FinalVerdictDisplay({
           <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Trade Targets
           </div>
-
-          <div className="p-3 rounded-xl bg-card/50 border border-border/40 backdrop-blur-sm space-y-3">
-            {isActionable && data.tradeTargets ? (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                <div className="p-2 rounded-lg bg-primary/5 border border-primary/20">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    ENTRY
+          {isActionable && data.tradeTargets ? (
+            <div className="grid grid-cols-1 gap-3">
+              <div className="p-4 rounded-xl bg-gradient-to-br from-green-500/10 via-emerald-500/10 to-green-500/10 border border-green-500/30 backdrop-blur-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Target className="w-4 h-4 text-green-400" />
+                    <span className="font-bold text-sm">Entry Zone</span>
                   </div>
-                  <div className="font-mono text-base sm:text-lg font-bold text-primary">
-                    {formatRange(
-                      data.tradeTargets.entry.low,
-                      data.tradeTargets.entry.high,
-                      priceDecimals
-                    )}
-                  </div>
+                  <Badge variant="outline" className="text-xs">
+                    {formatRange(data.tradeTargets.entry.low, data.tradeTargets.entry.high, 4)}
+                  </Badge>
                 </div>
-
-                <div className="p-2 rounded-lg bg-green-500/5 border border-green-500/20">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    TARGET
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <span className="text-muted-foreground">Long Entry:</span>
+                    <div className="font-mono font-bold">
+                      {formatRange(data.tradeTargets.entry.low, data.tradeTargets.entry.high, 4)}
+                    </div>
                   </div>
-                  <div className="font-mono text-base sm:text-lg font-bold text-green-400">
-                    {formatRange(
-                      data.tradeTargets.target.low,
-                      data.tradeTargets.target.high,
-                      priceDecimals
-                    )}
-                  </div>
-                </div>
-
-                <div className="p-2 rounded-lg bg-red-500/5 border border-red-500/20">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    STOP
-                  </div>
-                  <div className="font-mono text-base sm:text-lg font-bold text-red-400">
-                    {formatPrice(data.tradeTargets.stop, priceDecimals)}
-                  </div>
+                  {data.direction === "DOWN" && (
+                    <div>
+                      <span className="text-muted-foreground">Short Entry:</span>
+                      <div className="font-mono font-bold">
+                        {formatRange(data.tradeTargets.entry.low, data.tradeTargets.entry.high, 4)}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-            ) : (
-              <div className="text-sm text-muted-foreground">
-                No actionable trade setup detected. Waiting for a higher-confidence entry.
+
+              <div className="p-4 rounded-xl bg-gradient-to-br from-green-500/10 via-emerald-500/10 to-green-500/10 border border-green-500/30 backdrop-blur-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-green-400" />
+                    <span className="font-bold text-sm">Take Profit</span>
+                  </div>
+                  <Badge variant="outline" className="text-xs">
+                    {formatRange(data.tradeTargets.target.low, data.tradeTargets.target.high, 4)}
+                  </Badge>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Target range with optimal R:R ratio
+                </div>
               </div>
+
+              <div className="p-4 rounded-xl bg-gradient-to-br from-red-500/10 via-rose-500/10 to-red-500/10 border border-red-500/30 backdrop-blur-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-red-400" />
+                    <span className="font-bold text-sm">Stop Loss</span>
+                  </div>
+                  <Badge variant="outline" className="text-xs">
+                    {formatRange(data.tradeTargets.stop.low, data.tradeTargets.stop.high, 4)}
+                  </Badge>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Risk management level
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="p-4 rounded-xl bg-muted/30 border border-border/40 backdrop-blur-sm text-center">
+              <div className="text-muted-foreground text-sm">No actionable trade signals</div>
+            </div>
+          )}
+        </div>
+
+        {/* Quick Position Creation Buttons */}
+        {isActionable && data.tradeTargets && (
+          <div className="flex gap-2">
+            {data.direction === "UP" && (
+              <button
+                onClick={() => handleCreatePosition("long")}
+                className="flex-1 p-3 rounded-xl bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 hover:from-green-500/30 hover:to-emerald-500/30 transition-all duration-200 flex items-center justify-center gap-2 text-sm font-bold text-green-400 hover:text-green-300"
+              >
+                <TrendingUp className="w-4 h-4" />
+                Create Long Position
+              </button>
+            )}
+            {data.direction === "DOWN" && (
+              <button
+                onClick={() => handleCreatePosition("short")}
+                className="flex-1 p-3 rounded-xl bg-gradient-to-r from-red-500/20 to-rose-500/20 border border-red-500/30 hover:from-red-500/30 hover:to-rose-500/30 transition-all duration-200 flex items-center justify-center gap-2 text-sm font-bold text-red-400 hover:text-red-300"
+              >
+                <TrendingDown className="w-4 h-4" />
+                Create Short Position
+              </button>
             )}
           </div>
-        </div>
-
-        <div className="space-y-2">
-          <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Interactive Live Chart
-          </div>
-          <div className="relative overflow-hidden rounded-xl border border-border/40">
-            <PositionManagerChart
-              symbol={symbol}
-              interval={interval}
-              minimal={true}
-              className="h-[300px] sm:h-[350px] md:h-[400px] border-0"
-              tradingPair={tradingPair}
-              timeframe={timeframe}
-            />
-            {isActionable && data.tradeTargets && (
-              <TradePositionOverlay 
-                data={data} 
-                currentPrice={currentPrice} 
-                priceDecimals={priceDecimals} 
-              />
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="space-y-3">
-        <div className="space-y-2">
-          <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-green-400" />
-            KEY FACTORS
-          </div>
-          <div className="space-y-1">
-            {(data.keyFactors ?? []).map((factor, idx) => (
-              <div
-                key={idx}
-                className="flex items-start gap-3 p-2 rounded-lg bg-green-500/5 border border-green-500/20 backdrop-blur-sm"
-              >
-                <span className="text-green-400 mt-0.5 font-bold">•</span>
-                <span className="text-sm leading-relaxed flex-1">{factor}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent flex items-center gap-2">
-            <span className="text-orange-400">⚠</span>
-            RISK FACTORS
-          </div>
-          <div className="space-y-1">
-            {(data.riskFactors ?? []).map((risk, idx) => (
-              <div
-                key={idx}
-                className="flex items-start gap-3 p-2 rounded-lg bg-orange-500/5 border border-orange-500/20 backdrop-blur-sm"
-              >
-                <span className="text-orange-400 mt-0.5">⚠</span>
-                <span className="text-sm leading-relaxed flex-1">{risk}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between p-3 rounded-xl bg-card/50 border border-border/40 backdrop-blur-sm">
-          <span className="text-sm font-medium uppercase tracking-wide">
-            Quality Score
-          </span>
-          <span className="text-xl sm:text-2xl font-black text-primary">{data.qualityScore}%</span>
-        </div>
+        )}
       </div>
     </div>
   );
 }
 
-export function TransparentAnalysis({
+export function TransparentAnalysisWithPositions({
   stages,
   tradingPair,
   timeframe,
   onStageComplete,
   isLoadedSession,
-}: TransparentAnalysisProps) {
-  const [expandedStages, setExpandedStages] = useState<string[]>([]);
-  const autoExpandedRef = useRef<Set<string>>(new Set());
-  const stageRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-  const lastInProgressStageRef = useRef<string | null>(null);
+  onPositionSync,
+}: TransparentAnalysisWithPositionsProps) {
+  const [currentPrice, setCurrentPrice] = useState<number>(0);
+  const [analysisData, setAnalysisData] = useState<FinalVerdictData | null>(null);
+  const [expandedStages, setExpandedStages] = useState<Set<string>>(new Set(["final_verdict"]));
 
-  const marketDataStage = stages.find(
-    (s) => s.stage === "data_collection" && s.data
-  );
-  const currentPrice =
-    typeof (marketDataStage?.data as any)?.currentPrice === "number"
-      ? ((marketDataStage?.data as any).currentPrice as number)
-      : undefined;
+  // Get the final verdict data when available
+  useEffect(() => {
+    const finalVerdictStage = stages.find(stage => stage.stage === "final_verdict");
+    if (finalVerdictStage?.data) {
+      setAnalysisData(finalVerdictStage.data);
+    }
+  }, [stages]);
 
-  const toggleStage = (stageName: string) => {
-    setExpandedStages((prev) =>
-      prev.includes(stageName)
-        ? prev.filter((s) => s !== stageName)
-        : [...prev, stageName]
-    );
+  // Handle position creation from analysis
+  const handlePositionCreate = (
+    direction: "long" | "short",
+    entry: number,
+    stopLoss?: number,
+    takeProfit?: number
+  ) => {
+    if (!analysisData) return;
+
+    const position: Position = {
+      id: `analysis_${Date.now()}`,
+      type: direction,
+      entryPrice: entry,
+      stopLoss,
+      takeProfit,
+      quantity: 1,
+      timestamp: Date.now(),
+      isActive: true,
+      analysisId: "current_analysis",
+    };
+
+    // Sync with parent component
+    onPositionSync?.(position, analysisData);
   };
 
-  useEffect(() => {
-    if (stages.length === 0) {
-      autoExpandedRef.current.clear();
-      setExpandedStages([]);
-      lastInProgressStageRef.current = null;
-      return;
-    }
-
-    const allNonComplete = stages.every(s => s.status === "pending" || s.status === "in_progress");
-    const isNewRun = allNonComplete && autoExpandedRef.current.size > 0;
-
-    if (isNewRun) {
-      autoExpandedRef.current.clear();
-      setExpandedStages([]);
-      lastInProgressStageRef.current = null;
-    }
-
-    stages.forEach((stage, index) => {
-      const shouldAutoExpand =
-        stage.status === "complete" ||
-        (stage.stage === "final_verdict" && stage.data && !autoExpandedRef.current.has(stage.stage));
-
-      if (shouldAutoExpand && !autoExpandedRef.current.has(stage.stage)) {
-        autoExpandedRef.current.add(stage.stage);
-        setTimeout(() => {
-          setExpandedStages((prev) =>
-            prev.includes(stage.stage) ? prev : [...prev, stage.stage]
-          );
-        }, 300);
-      }
-    });
-  }, [stages]);
-
-  useLayoutEffect(() => {
-    const inProgressStage = stages.find(s => s.status === "in_progress");
-    if (inProgressStage && inProgressStage.stage !== lastInProgressStageRef.current) {
-      lastInProgressStageRef.current = inProgressStage.stage;
-      setTimeout(() => {
-        const element = stageRefs.current[inProgressStage.stage];
-        if (element) {
-          try {
-            element.scrollIntoView({ behavior: "smooth", block: "start" });
-          } catch (error) {
-            console.warn("Scroll failed for stage:", inProgressStage.stage, error);
-          }
-        }
-      }, 100);
-    }
-  }, [stages]);
+  const symbol = toTradingViewSymbol(tradingPair);
+  const interval = timeframe
+    ? timeframeToTradingViewInterval[timeframe]
+    : timeframeToTradingViewInterval.M15;
 
   return (
-    <Card className="mt-4 overflow-hidden border border-primary/30 shadow-xl backdrop-blur-sm" data-testid="transparent-analysis">
-      <CardHeader className="bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5">
-        <CardTitle className="flex items-center gap-3 text-xl">
-          <LineChart className="w-6 h-6 text-primary" />
-          <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent font-black">
-            Live AI Analysis
-          </span>
-        </CardTitle>
-        <CardDescription className="font-medium">
-          Watch the AI analyze in real-time - complete transparency
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-5 pt-6">
-        {stages.map((stage, idx) => (
-          <div 
-            key={`${stage.stage}-${idx}`} 
-            className="space-y-3"
-            ref={(el) => { stageRefs.current[stage.stage] = el; }}
-          >
-            <StageIndicator stage={stage} />
+    <div className="space-y-6">
+      {/* Enhanced Chart with Position Management */}
+      <div className="h-[600px] w-full">
+        <PositionManagerChart
+          symbol={symbol}
+          interval={interval}
+          className="h-full w-full"
+          tradingPair={tradingPair}
+          timeframe={timeframe}
+          onPositionUpdate={(position) => {
+            console.log("Position updated:", position);
+          }}
+          onAnalysisSync={(position, analysisData) => {
+            onPositionSync?.(position, analysisData);
+          }}
+        />
+      </div>
 
-            {stage.stage === "ai_thinking" && stage.data && (
-              <div className="mt-4 animate-slide-up">
-                <AIThinkingDisplay 
-                  data={stage.data as AIThinkingData}
-                  onComplete={() => onStageComplete?.("ai_thinking")}
-                  isLoadedSession={isLoadedSession}
-                />
-              </div>
-            )}
+      {/* Analysis Stages */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-4">
+          {stages.map((stage, index) => {
+            const isExpanded = expandedStages.has(stage.stage);
+            const config = stageConfig[stage.stage];
+            const Icon = config.icon;
 
-            {(stage.status === "complete" || (stage.stage === "final_verdict" && stage.data)) && stage.data && stage.stage !== "ai_thinking" && (
+            return (
               <Collapsible
-                open={expandedStages.includes(stage.stage)}
-                onOpenChange={() => toggleStage(stage.stage)}
+                key={stage.stage}
+                open={isExpanded}
+                onOpenChange={(open) => {
+                  const newExpanded = new Set(expandedStages);
+                  if (open) {
+                    newExpanded.add(stage.stage);
+                  } else {
+                    newExpanded.delete(stage.stage);
+                  }
+                  setExpandedStages(newExpanded);
+                }}
               >
-                <CollapsibleTrigger
-                  className="flex items-center gap-2 w-full text-sm font-medium text-primary hover:text-accent transition-colors mt-2 p-2 rounded-lg hover:bg-muted/50"
-                  data-testid={`toggle-stage-${stage.stage}`}
-                >
-                  {expandedStages.includes(stage.stage) ? (
-                    <ChevronUp className="w-4 h-4" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4" />
-                  )}
-                  <span>
-                    {expandedStages.includes(stage.stage) ? "Hide detailed breakdown" : "View detailed breakdown"}
-                  </span>
+                <CollapsibleTrigger className="w-full">
+                  <StageIndicator stage={stage} />
                 </CollapsibleTrigger>
-                <CollapsibleContent className="mt-4 p-5 rounded-xl bg-card/50 border border-border/40 backdrop-blur-sm animate-slide-up">
-                  {stage.stage === "data_collection" && (
-                    <MarketDataDisplay data={stage.data as MarketDataSnapshot} />
-                  )}
-                  {stage.stage === "technical_calculation" &&
-                    "indicators" in stage.data && (
-                      <TechnicalIndicatorsDisplay
-                        indicators={
-                          stage.data.indicators as TechnicalIndicatorDetail[]
-                        }
+                <CollapsibleContent className="space-y-4">
+                  <div className="ml-12 space-y-4">
+                    {stage.stage === "data_collection" && stage.data && (
+                      <MarketDataDisplay data={stage.data} />
+                    )}
+                    {stage.stage === "technical_calculation" && stage.data && (
+                      <TechnicalIndicatorsDisplay indicators={stage.data.indicators} />
+                    )}
+                    {stage.stage === "signal_aggregation" && stage.data && (
+                      <SignalAggregationDisplay data={stage.data} />
+                    )}
+                    {stage.stage === "ai_thinking" && stage.data && (
+                      <AIThinkingDisplay
+                        data={stage.data}
+                        onComplete={() => onStageComplete?.("ai_thinking")}
+                        isLoadedSession={isLoadedSession}
                       />
                     )}
-                  {stage.stage === "signal_aggregation" && (
-                    <SignalAggregationDisplay
-                      data={stage.data as SignalAggregationData}
-                    />
-                  )}
-                  {stage.stage === "final_verdict" && (
-                    <FinalVerdictDisplay
-                      data={stage.data as FinalVerdictData}
-                      tradingPair={tradingPair}
-                      timeframe={timeframe}
-                      currentPrice={currentPrice}
-                    />
-                  )}
+                    {stage.stage === "final_verdict" && stage.data && (
+                      <FinalVerdictDisplay
+                        data={stage.data}
+                        tradingPair={tradingPair}
+                        timeframe={timeframe}
+                        onPositionCreate={handlePositionCreate}
+                      />
+                    )}
+                  </div>
                 </CollapsibleContent>
               </Collapsible>
-            )}
-          </div>
-        ))}
-      </CardContent>
-    </Card>
+            );
+          })}
+        </div>
+
+        {/* Quick Stats Sidebar */}
+        <div className="space-y-4">
+          <Card className="bg-card/50 border-border/40 backdrop-blur-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">Analysis Status</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {stages.map((stage) => {
+                const config = stageConfig[stage.stage];
+                const Icon = config.icon;
+                const isComplete = stage.status === "complete";
+                const isFinalVerdict = stage.stage === "final_verdict";
+                const hasData = stage.data && 
+                  ((isFinalVerdict && stage.data) || (!isFinalVerdict && Object.keys(stage.data).length > 0));
+
+                return (
+                  <div key={stage.stage} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Icon className={`w-4 h-4 ${isComplete ? 'text-green-400' : 'text-muted-foreground'}`} />
+                      <span className="text-sm">{config.title}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {hasData && (
+                        <div className="w-2 h-2 rounded-full bg-green-400" />
+                      )}
+                      {isComplete && (
+                        <CheckCircle2 className="w-3 h-3 text-green-400" />
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </CardContent>
+          </Card>
+
+          {analysisData && (
+            <Card className="bg-card/50 border-border/40 backdrop-blur-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">Quick Trade</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="text-center">
+                  <div className="text-2xl font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
+                    {analysisData.direction}
+                  </div>
+                  <div className="text-lg font-bold text-green-400 mb-3">
+                    {analysisData.confidence}% Confidence
+                  </div>
+                  {analysisData.tradeTargets && isActionable && (
+                    <div className="space-y-2">
+                      {analysisData.direction === "UP" && (
+                        <button
+                          onClick={() => handlePositionCreate(
+                            "long",
+                            (analysisData.tradeTargets.entry.low + analysisData.tradeTargets.entry.high) / 2,
+                            (analysisData.tradeTargets.stop.low + analysisData.tradeTargets.stop.high) / 2,
+                            (analysisData.tradeTargets.target.low + analysisData.tradeTargets.target.high) / 2
+                          )}
+                          className="w-full p-2 rounded-lg bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 hover:from-green-500/30 hover:to-emerald-500/30 transition-all duration-200 flex items-center justify-center gap-2 text-sm font-bold text-green-400"
+                        >
+                          <TrendingUp className="w-4 h-4" />
+                          Long {analysisData.direction}
+                        </button>
+                      )}
+                      {analysisData.direction === "DOWN" && (
+                        <button
+                          onClick={() => handlePositionCreate(
+                            "short",
+                            (analysisData.tradeTargets.entry.low + analysisData.tradeTargets.entry.high) / 2,
+                            (analysisData.tradeTargets.stop.low + analysisData.tradeTargets.stop.high) / 2,
+                            (analysisData.tradeTargets.target.low + analysisData.tradeTargets.target.high) / 2
+                          )}
+                          className="w-full p-2 rounded-lg bg-gradient-to-r from-red-500/20 to-rose-500/20 border border-red-500/30 hover:from-red-500/30 hover:to-rose-500/30 transition-all duration-200 flex items-center justify-center gap-2 text-sm font-bold text-red-400"
+                        >
+                          <TrendingDown className="w-4 h-4" />
+                          Short {analysisData.direction}
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
