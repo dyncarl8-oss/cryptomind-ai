@@ -173,6 +173,12 @@ export default function Chat() {
 
     setIsTyping(false);
 
+    // Skip creating regular chat messages for analysis_stage updates
+    // The content is already displayed in the TransparentAnalysis component
+    if (latestMessage.type === "analysis_stage") {
+      return;
+    }
+
     // Check if we should skip this message to avoid duplicates
     const allStagesComplete = analysisStages.length > 0 && analysisStages.every(s => s.status === "complete");
     const isFinalVerdictComplete = allStagesComplete && analysisStages.some(s => s.stage === "final_verdict" && s.status === "complete");
