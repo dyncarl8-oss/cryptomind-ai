@@ -370,7 +370,13 @@ export async function generateTransparentPrediction(
     },
   });
 
-  const geminiDecision = await getGeminiPrediction(technicalSnapshot, ws);
+  let geminiDecision: any = null;
+  try {
+    geminiDecision = await getGeminiPrediction(technicalSnapshot, ws);
+  } catch (error) {
+    console.error("❌ Gemini prediction failed:", error);
+    geminiDecision = null;
+  }
   
   await delay(1000);
 
@@ -390,7 +396,18 @@ export async function generateTransparentPrediction(
   await delay(500);
 
   if (waitForAiThinkingComplete) {
-    await waitForAiThinkingComplete();
+    // Wait for frontend acknowledgment with a timeout to prevent hanging forever
+    const ACKNOWLEDGMENT_TIMEOUT = 10000; // 10 seconds max wait
+    console.log(`⏳ Waiting for AI thinking complete acknowledgment (max ${ACKNOWLEDGMENT_TIMEOUT}ms)...`);
+    const waitStartTime = Date.now();
+    await Promise.race([
+      waitForAiThinkingComplete().then(() => {
+        console.log(`✅ AI thinking acknowledgment received in ${Date.now() - waitStartTime}ms`);
+      }),
+      delay(ACKNOWLEDGMENT_TIMEOUT).then(() => {
+        console.log(`⏱️ AI thinking acknowledgment timed out after ${ACKNOWLEDGMENT_TIMEOUT}ms, continuing...`);
+      })
+    ]);
   } else {
     await delay(3000);
   }
@@ -411,6 +428,12 @@ export async function generateTransparentPrediction(
   });
 
   await delay(1800);
+
+  // Check if WebSocket is still open before continuing
+  if (ws.readyState !== WebSocket.OPEN) {
+    console.warn("⚠️ WebSocket closed during analysis, aborting final verdict stage");
+    throw new Error("WebSocket connection closed");
+  }
 
   sendStageUpdate(ws, {
     type: "analysis_stage",

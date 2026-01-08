@@ -339,6 +339,7 @@ function AIThinkingDisplay({ data, onComplete, isLoadedSession }: { data: AIThin
   const userScrolledRef = useRef(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const completedRef = useRef(false);
+  const safetyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!data.thinkingProcess) {
@@ -347,12 +348,30 @@ function AIThinkingDisplay({ data, onComplete, isLoadedSession }: { data: AIThin
       isTypingRef.current = false;
       targetTextRef.current = "";
       completedRef.current = false;
+      
+      // Clear safety timeout if data is reset
+      if (safetyTimeoutRef.current) {
+        clearTimeout(safetyTimeoutRef.current);
+        safetyTimeoutRef.current = null;
+      }
       return;
     }
 
     if (targetTextRef.current !== data.thinkingProcess) {
       targetTextRef.current = data.thinkingProcess;
       completedRef.current = false;
+      
+      // Set a safety timeout to ensure onComplete is called even if animation has issues
+      if (safetyTimeoutRef.current) {
+        clearTimeout(safetyTimeoutRef.current);
+      }
+      safetyTimeoutRef.current = setTimeout(() => {
+        if (!completedRef.current) {
+          console.warn("AI thinking animation timeout - forcing completion");
+          completedRef.current = true;
+          onComplete?.();
+        }
+      }, 8000); // 8 seconds safety timeout
     }
 
     if (isTypingRef.current) {
@@ -363,6 +382,10 @@ function AIThinkingDisplay({ data, onComplete, isLoadedSession }: { data: AIThin
       setDisplayedText(data.thinkingProcess);
       setIsTyping(false);
       isTypingRef.current = false;
+      if (safetyTimeoutRef.current) {
+        clearTimeout(safetyTimeoutRef.current);
+        safetyTimeoutRef.current = null;
+      }
       if (!completedRef.current) {
         completedRef.current = true;
         onComplete?.();
@@ -393,6 +416,10 @@ function AIThinkingDisplay({ data, onComplete, isLoadedSession }: { data: AIThin
         } else {
           setIsTyping(false);
           isTypingRef.current = false;
+          if (safetyTimeoutRef.current) {
+            clearTimeout(safetyTimeoutRef.current);
+            safetyTimeoutRef.current = null;
+          }
           if (!completedRef.current) {
             completedRef.current = true;
             onComplete?.();
@@ -405,10 +432,23 @@ function AIThinkingDisplay({ data, onComplete, isLoadedSession }: { data: AIThin
       if (isTyping) {
         setIsTyping(false);
       }
+      if (safetyTimeoutRef.current) {
+        clearTimeout(safetyTimeoutRef.current);
+        safetyTimeoutRef.current = null;
+      }
       completedRef.current = true;
       onComplete?.();
     }
   }, [data.thinkingProcess, displayedText.length, isLoadedSession]);
+
+  // Cleanup safety timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (safetyTimeoutRef.current) {
+        clearTimeout(safetyTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleScroll = () => {
     if (!containerRef.current) return;
