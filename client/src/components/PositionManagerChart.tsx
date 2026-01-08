@@ -1,23 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { TradingViewAdvancedChart } from "@/components/TradingViewAdvancedChart";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Slider } from "@/components/ui/slider";
 import { 
   Target, 
   Shield, 
   TrendingUp, 
-  TrendingDown, 
-  Edit3, 
-  Save, 
-  X,
-  Plus,
-  Minus,
-  Move,
-  RotateCcw
+  TrendingDown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { TradingPair, Timeframe } from "@shared/schema";
@@ -43,6 +32,7 @@ interface PositionManagerChartProps {
   timeframe?: Timeframe;
   onPositionUpdate?: (position: Position) => void;
   onAnalysisSync?: (position: Position, analysisData: any) => void;
+  initialPositions?: Position[];
 }
 
 export function PositionManagerChart({
@@ -54,72 +44,23 @@ export function PositionManagerChart({
   timeframe,
   onPositionUpdate,
   onAnalysisSync,
+  initialPositions = [],
 }: PositionManagerChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const tvWidgetRef = useRef<any>(null);
-  const [positions, setPositions] = useState<Position[]>([]);
-  const [editingPosition, setEditingPosition] = useState<string | null>(null);
-  const [showPositionPanel, setShowPositionPanel] = useState(false);
+  const [positions, setPositions] = useState<Position[]>(initialPositions);
   const [currentPrice, setCurrentPrice] = useState<number>(0);
-  const [newPosition, setNewPosition] = useState<Partial<Position>>({
-    type: "long",
-    entryPrice: 0,
-    stopLoss: 0,
-    takeProfit: 0,
-    quantity: 1,
-  });
 
-  // Generate unique position ID
-  const generatePositionId = () => `pos_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  // Update positions when initialPositions changes
+  useEffect(() => {
+    setPositions(initialPositions);
+  }, [initialPositions]);
 
-  // Add new position
-  const addPosition = useCallback(() => {
-    if (!newPosition.entryPrice || !newPosition.type) return;
-
-    const position: Position = {
-      id: generatePositionId(),
-      type: newPosition.type,
-      entryPrice: newPosition.entryPrice,
-      stopLoss: newPosition.stopLoss,
-      takeProfit: newPosition.takeProfit,
-      quantity: newPosition.quantity,
-      timestamp: Date.now(),
-      isActive: true,
-    };
-
+  // Add position from AI analysis
+  const addPositionFromAnalysis = useCallback((position: Position) => {
     setPositions(prev => [...prev, position]);
     onPositionUpdate?.(position);
-
-    // Reset form
-    setNewPosition({
-      type: "long",
-      entryPrice: 0,
-      stopLoss: 0,
-      takeProfit: 0,
-      quantity: 1,
-    });
-    setShowPositionPanel(false);
-  }, [newPosition, onPositionUpdate]);
-
-  // Update position
-  const updatePosition = useCallback((positionId: string, updates: Partial<Position>) => {
-    setPositions(prev => 
-      prev.map(pos => 
-        pos.id === positionId ? { ...pos, ...updates } : pos
-      )
-    );
-    
-    const updatedPosition = positions.find(p => p.id === positionId);
-    if (updatedPosition) {
-      onPositionUpdate?.({ ...updatedPosition, ...updates });
-    }
-  }, [positions, onPositionUpdate]);
-
-  // Delete position
-  const deletePosition = useCallback((positionId: string) => {
-    setPositions(prev => prev.filter(pos => pos.id !== positionId));
-    setEditingPosition(null);
-  }, []);
+  }, [onPositionUpdate]);
 
   // Calculate P&L for position
   const calculatePnL = useCallback((position: Position, price: number) => {
@@ -164,6 +105,19 @@ export function PositionManagerChart({
     }
   }, []);
 
+  // Listen for positions from analysis
+  useEffect(() => {
+    // Auto-add positions when they come from analysis
+    if (onAnalysisSync) {
+      const handleNewPosition = (position: Position, analysisData: any) => {
+        addPositionFromAnalysis(position);
+      };
+      
+      // Store reference for parent to call
+      (chartContainerRef.current as any).handleAnalysisPosition = handleNewPosition;
+    }
+  }, [onAnalysisSync, addPositionFromAnalysis]);
+
   return (
     <div className={cn("relative h-full w-full", className)}>
       {/* TradingView Chart */}
@@ -176,242 +130,92 @@ export function PositionManagerChart({
         />
       </div>
 
-      {/* Position Controls Overlay */}
-      <div className="absolute top-4 right-4 z-20 space-y-2">
-        <Button
-          onClick={() => setShowPositionPanel(!showPositionPanel)}
-          size="sm"
-          className="bg-primary/90 hover:bg-primary backdrop-blur-sm"
-        >
-          <Plus className="w-4 h-4 mr-1" />
-          Position
-        </Button>
-      </div>
+      {/* Position Controls Overlay - REMOVED MANUAL CONTROLS */}
+      {/* Positions are now automatically created from AI analysis */}
 
-      {/* Position Management Panel */}
-      {showPositionPanel && (
-        <div className="absolute top-16 right-4 z-30 w-80">
+      {/* Position Management Panel - REMOVED MANUAL CONTROLS */}
+      {/* All positions are now automatically created from AI analysis */}
+
+      {/* Clean Position Display - No Manual Controls */}
+      {positions.length > 0 && (
+        <div className="absolute top-4 right-4 z-20 w-80 max-h-96 overflow-y-auto">
           <Card className="bg-card/95 backdrop-blur-sm border-border/50 shadow-xl">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center justify-between text-sm">
-                Position Manager
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowPositionPanel(false)}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* New Position Form */}
-              <div className="space-y-3 p-3 bg-muted/30 rounded-lg">
-                <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    variant={newPosition.type === "long" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setNewPosition(prev => ({ ...prev, type: "long" }))}
-                    className="text-xs"
-                  >
-                    <TrendingUp className="w-3 h-3 mr-1" />
-                    Long
-                  </Button>
-                  <Button
-                    variant={newPosition.type === "short" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setNewPosition(prev => ({ ...prev, type: "short" }))}
-                    className="text-xs"
-                  >
-                    <TrendingDown className="w-3 h-3 mr-1" />
-                    Short
-                  </Button>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs">Entry Price</Label>
-                  <Input
-                    type="number"
-                    placeholder="0.00"
-                    value={newPosition.entryPrice || ""}
-                    onChange={(e) => setNewPosition(prev => ({ 
-                      ...prev, 
-                      entryPrice: parseFloat(e.target.value) || 0 
-                    }))}
-                    className="text-xs"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs">Stop Loss</Label>
-                  <Input
-                    type="number"
-                    placeholder="0.00"
-                    value={newPosition.stopLoss || ""}
-                    onChange={(e) => setNewPosition(prev => ({ 
-                      ...prev, 
-                      stopLoss: parseFloat(e.target.value) || undefined 
-                    }))}
-                    className="text-xs"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs">Take Profit</Label>
-                  <Input
-                    type="number"
-                    placeholder="0.00"
-                    value={newPosition.takeProfit || ""}
-                    onChange={(e) => setNewPosition(prev => ({ 
-                      ...prev, 
-                      takeProfit: parseFloat(e.target.value) || undefined 
-                    }))}
-                    className="text-xs"
-                  />
-                </div>
-
-                <Button onClick={addPosition} className="w-full text-xs" size="sm">
-                  <Save className="w-3 h-3 mr-1" />
-                  Add Position
-                </Button>
+            <CardContent className="p-3 space-y-2">
+              <div className="text-xs font-semibold text-muted-foreground mb-2">
+                Active Positions ({positions.length})
               </div>
-
-              {/* Active Positions */}
-              {positions.length > 0 && (
-                <div className="space-y-2">
-                  <Label className="text-xs font-medium">Active Positions</Label>
-                  {positions.map((position) => {
-                    const status = getPositionStatus(position, currentPrice);
-                    const { pnl, pnlPercent } = calculatePnL(position, currentPrice);
-                    const riskReward = calculateRiskReward(position);
-                    
-                    return (
-                      <div
-                        key={position.id}
-                        className={cn(
-                          "p-2 rounded-lg border transition-colors",
-                          status === "profitable" && "border-green-500/50 bg-green-500/10",
-                          status === "stopped" && "border-red-500/50 bg-red-500/10",
-                          status === "open" && "border-border/50 bg-muted/20"
+              {positions.map((position) => {
+                const status = getPositionStatus(position, currentPrice);
+                const { pnl, pnlPercent } = calculatePnL(position, currentPrice);
+                const riskReward = calculateRiskReward(position);
+                
+                return (
+                  <div
+                    key={position.id}
+                    className={cn(
+                      "p-2 rounded-lg border transition-colors",
+                      status === "profitable" && "border-green-500/50 bg-green-500/10",
+                      status === "stopped" && "border-red-500/50 bg-red-500/10",
+                      status === "open" && "border-border/50 bg-muted/20"
+                    )}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-1">
+                        {position.type === "long" ? (
+                          <TrendingUp className="w-3 h-3 text-green-400" />
+                        ) : (
+                          <TrendingDown className="w-3 h-3 text-red-400" />
                         )}
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            {position.type === "long" ? (
-                              <TrendingUp className="w-3 h-3 text-green-400" />
-                            ) : (
-                              <TrendingDown className="w-3 h-3 text-red-400" />
-                            )}
-                            <Badge variant="outline" className="text-xs">
-                              {position.type.toUpperCase()}
-                            </Badge>
-                            <Badge
-                              variant={
-                                status === "profitable" ? "default" :
-                                status === "stopped" ? "destructive" : "secondary"
-                              }
-                              className="text-xs"
-                            >
-                              {status}
-                            </Badge>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setEditingPosition(
-                              editingPosition === position.id ? null : position.id
-                            )}
-                            className="h-6 w-6 p-0"
-                          >
-                            <Edit3 className="w-3 h-3" />
-                          </Button>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-1 text-xs mb-2">
-                          <div>Entry: ${position.entryPrice.toFixed(2)}</div>
-                          {position.stopLoss && (
-                            <div className="text-red-400">
-                              SL: ${position.stopLoss.toFixed(2)}
-                            </div>
-                          )}
-                          {position.takeProfit && (
-                            <div className="text-green-400">
-                              TP: ${position.takeProfit.toFixed(2)}
-                            </div>
-                          )}
-                          {riskReward && (
-                            <div className="text-blue-400">
-                              R:R {riskReward.toFixed(2)}
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="flex justify-between items-center text-xs">
-                          <div className={cn(
-                            "font-medium",
-                            pnl >= 0 ? "text-green-400" : "text-red-400"
-                          )}>
-                            {pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}
-                            <span className="ml-1 text-muted-foreground">
-                              ({pnlPercent >= 0 ? "+" : ""}{pnlPercent.toFixed(1)}%)
-                            </span>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => deletePosition(position.id)}
-                            className="h-6 text-red-400 hover:text-red-300"
-                          >
-                            <X className="w-3 h-3" />
-                          </Button>
-                        </div>
-
-                        {/* Edit Form */}
-                        {editingPosition === position.id && (
-                          <div className="mt-2 pt-2 border-t border-border/30 space-y-2">
-                            <Input
-                              type="number"
-                              placeholder="Update Stop Loss"
-                              value={position.stopLoss || ""}
-                              onChange={(e) => updatePosition(position.id, {
-                                stopLoss: parseFloat(e.target.value) || undefined
-                              })}
-                              className="text-xs h-7"
-                            />
-                            <Input
-                              type="number"
-                              placeholder="Update Take Profit"
-                              value={position.takeProfit || ""}
-                              onChange={(e) => updatePosition(position.id, {
-                                takeProfit: parseFloat(e.target.value) || undefined
-                              })}
-                              className="text-xs h-7"
-                            />
-                          </div>
-                        )}
+                        <Badge variant="outline" className="text-xs px-1 py-0">
+                          {position.type.toUpperCase()}
+                        </Badge>
+                        <Badge
+                          variant={
+                            status === "profitable" ? "default" :
+                            status === "stopped" ? "destructive" : "secondary"
+                          }
+                          className="text-xs px-1 py-0"
+                        >
+                          {status}
+                        </Badge>
                       </div>
-                    );
-                  })}
-                </div>
-              )}
+                    </div>
+
+                    <div className="text-xs space-y-1">
+                      <div>Entry: ${position.entryPrice.toFixed(4)}</div>
+                      {position.stopLoss && (
+                        <div className="text-red-400">
+                          SL: ${position.stopLoss.toFixed(4)}
+                        </div>
+                      )}
+                      {position.takeProfit && (
+                        <div className="text-green-400">
+                          TP: ${position.takeProfit.toFixed(4)}
+                        </div>
+                      )}
+                      {riskReward && (
+                        <div className="text-blue-400">
+                          R:R {riskReward.toFixed(2)}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className={cn(
+                      "text-xs font-medium mt-1",
+                      pnl >= 0 ? "text-green-400" : "text-red-400"
+                    )}>
+                      {pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}
+                      <span className="ml-1 text-muted-foreground">
+                        ({pnlPercent >= 0 ? "+" : ""}{pnlPercent.toFixed(1)}%)
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
             </CardContent>
           </Card>
         </div>
       )}
-
-      {/* Price Overlay */}
-      <div className="absolute bottom-4 left-4 z-20">
-        <Card className="bg-card/95 backdrop-blur-sm border-border/50 shadow-lg">
-          <CardContent className="p-3">
-            <div className="flex items-center gap-2">
-              <div className="text-xs text-muted-foreground">Current Price</div>
-              <div className="font-mono font-bold text-lg">
-                ${currentPrice.toFixed(2)}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 }
