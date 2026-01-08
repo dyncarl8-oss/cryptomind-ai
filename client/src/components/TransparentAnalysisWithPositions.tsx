@@ -599,7 +599,7 @@ function FinalVerdictDisplay({
                     <span className="font-bold text-sm">Stop Loss</span>
                   </div>
                   <Badge variant="outline" className="text-xs">
-                    {formatRange(data.tradeTargets.stop.low, data.tradeTargets.stop.high, 4)}
+                    {formatPrice(data.tradeTargets.stop, 4)}
                   </Badge>
                 </div>
                 <div className="text-xs text-muted-foreground">
@@ -614,27 +614,13 @@ function FinalVerdictDisplay({
           )}
         </div>
 
-        {/* Quick Position Creation Buttons */}
+        {/* Position automatically created message */}
         {isActionable && data.tradeTargets && (
-          <div className="flex gap-2">
-            {data.direction === "UP" && (
-              <button
-                onClick={() => handleCreatePosition("long")}
-                className="flex-1 p-3 rounded-xl bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 hover:from-green-500/30 hover:to-emerald-500/30 transition-all duration-200 flex items-center justify-center gap-2 text-sm font-bold text-green-400 hover:text-green-300"
-              >
-                <TrendingUp className="w-4 h-4" />
-                Create Long Position
-              </button>
-            )}
-            {data.direction === "DOWN" && (
-              <button
-                onClick={() => handleCreatePosition("short")}
-                className="flex-1 p-3 rounded-xl bg-gradient-to-r from-red-500/20 to-rose-500/20 border border-red-500/30 hover:from-red-500/30 hover:to-rose-500/30 transition-all duration-200 flex items-center justify-center gap-2 text-sm font-bold text-red-400 hover:text-red-300"
-              >
-                <TrendingDown className="w-4 h-4" />
-                Create Short Position
-              </button>
-            )}
+          <div className="p-3 rounded-xl bg-gradient-to-r from-green-500/10 via-emerald-500/10 to-green-500/10 border border-green-500/30 backdrop-blur-sm">
+            <div className="flex items-center justify-center gap-2 text-sm font-bold text-green-400">
+              <Target className="w-4 h-4" />
+              Position automatically created with AI trade targets
+            </div>
           </div>
         )}
       </div>
@@ -653,14 +639,43 @@ export function TransparentAnalysisWithPositions({
   const [currentPrice, setCurrentPrice] = useState<number>(0);
   const [analysisData, setAnalysisData] = useState<FinalVerdictData | null>(null);
   const [expandedStages, setExpandedStages] = useState<Set<string>>(new Set(["final_verdict"]));
+  const [autoPositionCreated, setAutoPositionCreated] = useState<string | null>(null);
 
   // Get the final verdict data when available
   useEffect(() => {
     const finalVerdictStage = stages.find(stage => stage.stage === "final_verdict");
     if (finalVerdictStage?.data) {
       setAnalysisData(finalVerdictStage.data);
+      
+      // Automatically create position when final verdict arrives
+      const verdictData = finalVerdictStage.data as FinalVerdictData;
+      if (verdictData.direction !== "NEUTRAL" && verdictData.tradeTargets && !autoPositionCreated) {
+        const direction = verdictData.direction === "UP" ? "long" : "short";
+        const { entry, target, stop } = verdictData.tradeTargets;
+        const entryAvg = (entry.low + entry.high) / 2;
+        const targetAvg = (target.low + target.high) / 2;
+        const stopValue = stop; // Stop is already a single value, not a range
+        
+        const autoPosition: Position = {
+          id: `auto_${Date.now()}`,
+          type: direction,
+          entryPrice: entryAvg,
+          stopLoss: stopValue,
+          takeProfit: targetAvg,
+          quantity: 1,
+          timestamp: Date.now(),
+          isActive: true,
+          analysisId: "current_analysis",
+        };
+
+        // Mark as auto-created to avoid duplicates
+        setAutoPositionCreated(autoPosition.id);
+        
+        // Sync with parent component
+        onPositionSync?.(autoPosition, verdictData);
+      }
     }
-  }, [stages]);
+  }, [stages, autoPositionCreated, onPositionSync]);
 
   // Handle position creation from analysis
   const handlePositionCreate = (
@@ -807,7 +822,7 @@ export function TransparentAnalysisWithPositions({
           {analysisData && (
             <Card className="bg-card/50 border-border/40 backdrop-blur-sm">
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Quick Trade</CardTitle>
+                <CardTitle className="text-sm">AI Analysis Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="text-center">
@@ -818,35 +833,25 @@ export function TransparentAnalysisWithPositions({
                     {analysisData.confidence}% Confidence
                   </div>
                   {analysisData.tradeTargets && isActionable && (
-                    <div className="space-y-2">
-                      {analysisData.direction === "UP" && (
-                        <button
-                          onClick={() => handlePositionCreate(
-                            "long",
-                            (analysisData.tradeTargets.entry.low + analysisData.tradeTargets.entry.high) / 2,
-                            (analysisData.tradeTargets.stop.low + analysisData.tradeTargets.stop.high) / 2,
-                            (analysisData.tradeTargets.target.low + analysisData.tradeTargets.target.high) / 2
-                          )}
-                          className="w-full p-2 rounded-lg bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 hover:from-green-500/30 hover:to-emerald-500/30 transition-all duration-200 flex items-center justify-center gap-2 text-sm font-bold text-green-400"
-                        >
-                          <TrendingUp className="w-4 h-4" />
-                          Long {analysisData.direction}
-                        </button>
-                      )}
-                      {analysisData.direction === "DOWN" && (
-                        <button
-                          onClick={() => handlePositionCreate(
-                            "short",
-                            (analysisData.tradeTargets.entry.low + analysisData.tradeTargets.entry.high) / 2,
-                            (analysisData.tradeTargets.stop.low + analysisData.tradeTargets.stop.high) / 2,
-                            (analysisData.tradeTargets.target.low + analysisData.tradeTargets.target.high) / 2
-                          )}
-                          className="w-full p-2 rounded-lg bg-gradient-to-r from-red-500/20 to-rose-500/20 border border-red-500/30 hover:from-red-500/30 hover:to-rose-500/30 transition-all duration-200 flex items-center justify-center gap-2 text-sm font-bold text-red-400"
-                        >
-                          <TrendingDown className="w-4 h-4" />
-                          Short {analysisData.direction}
-                        </button>
-                      )}
+                    <div className="space-y-2 text-xs">
+                      <div className="p-2 rounded-lg bg-green-500/10 border border-green-500/20">
+                        <div className="text-green-400 font-semibold">Entry Range</div>
+                        <div className="font-mono">
+                          ${analysisData.tradeTargets.entry.low.toFixed(4)} - ${analysisData.tradeTargets.entry.high.toFixed(4)}
+                        </div>
+                      </div>
+                      <div className="p-2 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                        <div className="text-blue-400 font-semibold">Take Profit</div>
+                        <div className="font-mono">
+                          ${analysisData.tradeTargets.target.low.toFixed(4)} - ${analysisData.tradeTargets.target.high.toFixed(4)}
+                        </div>
+                      </div>
+                      <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20">
+                        <div className="text-red-400 font-semibold">Stop Loss</div>
+                        <div className="font-mono">
+                          ${analysisData.tradeTargets.stop.toFixed(4)}
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
