@@ -173,13 +173,7 @@ export default function Chat() {
 
     setIsTyping(false);
 
-    // Check if we should skip this message to avoid duplicates
-    const allStagesComplete = analysisStages.length > 0 && analysisStages.every(s => s.status === "complete");
-    const isFinalVerdictComplete = allStagesComplete && analysisStages.some(s => s.stage === "final_verdict" && s.status === "complete");
-    const isPredictionMessage = latestMessage.type === "prediction";
-    
-    // Skip the prediction message if final verdict is already complete (to avoid duplicates)
-    if (isPredictionMessage && isFinalVerdictComplete) {
+    if (latestMessage.type === "prediction") {
       return;
     }
 
@@ -251,10 +245,14 @@ export default function Chat() {
       const response = await apiRequest("GET", `/api/chat/sessions/${sessionId}`);
       const session: ChatSessionWithMessages = await response.json();
       
-      setMessages(session.messages.map(msg => ({
-        ...msg,
-        timestamp: new Date(msg.timestamp),
-      })));
+      setMessages(
+        session.messages
+          .filter(msg => !msg.prediction)
+          .map(msg => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp),
+          }))
+      );
       setSelectedPair(session.tradingPair as TradingPair | undefined);
       setSelectedTimeframe(session.timeframe as Timeframe | undefined);
       setCurrentSessionId(sessionId);
