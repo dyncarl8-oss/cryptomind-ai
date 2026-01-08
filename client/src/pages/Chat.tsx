@@ -35,6 +35,7 @@ export default function Chat() {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [isLoadedSession, setIsLoadedSession] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const lastProcessedIndexRef = useRef(0);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const clearAnalysisTimerRef = useRef<NodeJS.Timeout | null>(null);
   const params = useParams<{ experienceId?: string }>();
@@ -72,7 +73,9 @@ export default function Chat() {
   };
 
   useEffect(() => {
-    const hasInProgressAnalysis = analysisStages.some(s => s.status === "in_progress");
+    const hasInProgressAnalysis = analysisStages.some(s => 
+      s.status === "in_progress" && !(s.stage === "final_verdict" && s.data)
+    );
     if (!hasInProgressAnalysis) {
       scrollToBottom();
     }
@@ -87,105 +90,112 @@ export default function Chat() {
 
   // Process server messages
   useEffect(() => {
-    if (serverMessages.length === 0) return;
-
-    const latestMessage = serverMessages[serverMessages.length - 1];
-    
-    // Re-enable auto-save when new messages arrive (resume from loaded session)
-    if (isLoadedSession) {
-      setIsLoadedSession(false);
-    }
-
-    if (latestMessage.type === "typing") {
-      setIsTyping(true);
+    if (serverMessages.length === 0) {
+      lastProcessedIndexRef.current = 0;
       return;
     }
 
-    if (latestMessage.type === "ai_thinking_stream") {
-      setAnalysisStages((prev) => {
-        const existingIndex = prev.findIndex((s) => s.stage === "ai_thinking");
-        if (existingIndex >= 0) {
-          const updated = [...prev];
-          const currentData = updated[existingIndex].data || { thinkingProcess: "", analysisTime: 0, modelUsed: "" };
-          updated[existingIndex] = {
-            ...updated[existingIndex],
-            data: {
-              ...currentData,
-              thinkingProcess: (latestMessage as any).fullThinking || currentData.thinkingProcess,
-            }
-          };
-          return updated;
-        }
-        return prev;
-      });
-      return;
-    }
-
-    if (latestMessage.type === "analysis_stage" && latestMessage.stage) {
-      if (clearAnalysisTimerRef.current) {
-        clearTimeout(clearAnalysisTimerRef.current);
-        clearAnalysisTimerRef.current = null;
+    for (let i = lastProcessedIndexRef.current; i < serverMessages.length; i++) {
+      const latestMessage = serverMessages[i];
+      
+      // Re-enable auto-save when new messages arrive (resume from loaded session)
+      if (isLoadedSession) {
+        setIsLoadedSession(false);
       }
-      
-      setShowAnalysis(true);
-      setIsTyping(true);
-      
-      const newStage: AnalysisStage = {
-        stage: latestMessage.stage,
-        progress: latestMessage.progress || 0,
-        status: latestMessage.status || "pending",
-        duration: latestMessage.duration,
-        data: latestMessage.data,
-      };
 
-      setAnalysisStages((prev) => {
-        const existingIndex = prev.findIndex((s) => s.stage === newStage.stage);
-        if (existingIndex >= 0) {
-          const updated = [...prev];
-          updated[existingIndex] = newStage;
-          return updated;
+      if (latestMessage.type === "typing") {
+        setIsTyping(true);
+        continue;
+      }
+
+      if (latestMessage.type === "ai_thinking_stream") {
+        setAnalysisStages((prev) => {
+          const existingIndex = prev.findIndex((s) => s.stage === "ai_thinking");
+          if (existingIndex >= 0) {
+            const updated = [...prev];
+            const currentData = updated[existingIndex].data || { thinkingProcess: "", analysisTime: 0, modelUsed: "" };
+            updated[existingIndex] = {
+              ...updated[existingIndex],
+              data: {
+                ...currentData,
+                thinkingProcess: (latestMessage as any).fullThinking || currentData.thinkingProcess,
+              }
+            };
+            return updated;
+          }
+          return prev;
+        });
+        continue;
+      }
+
+      if (latestMessage.type === "analysis_stage" && latestMessage.stage) {
+        if (clearAnalysisTimerRef.current) {
+          clearTimeout(clearAnalysisTimerRef.current);
+          clearAnalysisTimerRef.current = null;
         }
-        return [...prev, newStage];
-      });
-      return;
-    }
+        
+        setShowAnalysis(true);
+        setIsTyping(true);
+        
+        const newStage: AnalysisStage = {
+          stage: latestMessage.stage,
+          progress: latestMessage.progress || 0,
+          status: latestMessage.status || "pending",
+          duration: latestMessage.duration,
+          data: latestMessage.data,
+        };
 
-    if (latestMessage.type === "credits_update") {
-      queryClient.invalidateQueries({ queryKey: ["/api/credits"] });
-      return;
-    }
+        setAnalysisStages((prev) => {
+          const existingIndex = prev.findIndex((s) => s.stage === newStage.stage);
+          if (existingIndex >= 0) {
+            const updated = [...prev];
+            updated[existingIndex] = newStage;
+            return updated;
+          }
+          return [...prev, newStage];
+        });
+        continue;
+      }
 
-    if (latestMessage.type === "insufficient_credits") {
+      if (latestMessage.type === "credits_update") {
+        queryClient.invalidateQueries({ queryKey: ["/api/credits"] });
+        continue;
+      }
+
+      if (latestMessage.type === "insufficient_credits") {
+        setIsTyping(false);
+        setShowAnalysis(false);
+        setShowPurchaseDialog(true);
+        queryClient.invalidateQueries({ queryKey: ["/api/credits"] });
+        
+        const newMessage: Message = {
+          id: Date.now().toString() + Math.random(),
+          sender: "bot",
+          content: latestMessage.content,
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, newMessage]);
+        continue;
+      }
+
       setIsTyping(false);
-      setShowAnalysis(false);
-      setShowPurchaseDialog(true);
-      queryClient.invalidateQueries({ queryKey: ["/api/credits"] });
-      
+
+      if (latestMessage.type === "prediction") {
+        continue;
+      }
+
       const newMessage: Message = {
         id: Date.now().toString() + Math.random(),
         sender: "bot",
         content: latestMessage.content,
         timestamp: new Date(),
+        prediction: latestMessage.prediction as Message["prediction"],
       };
+
       setMessages((prev) => [...prev, newMessage]);
-      return;
     }
 
-    setIsTyping(false);
-
-    if (latestMessage.type === "prediction") {
-      return;
-    }
-
-    const newMessage: Message = {
-      id: Date.now().toString() + Math.random(),
-      sender: "bot",
-      content: latestMessage.content,
-      timestamp: new Date(),
-      prediction: latestMessage.prediction as Message["prediction"],
-    };
-
-    setMessages((prev) => [...prev, newMessage]);
+    lastProcessedIndexRef.current = serverMessages.length;
   }, [serverMessages]);
 
   // Auto-save session when messages change
@@ -392,10 +402,11 @@ export default function Chat() {
           
           {messages.map((message, index) => {
             const allStagesComplete = analysisStages.length > 0 && analysisStages.every(s => s.status === "complete");
+            const hasFinalVerdictData = analysisStages.some(s => s.stage === "final_verdict" && s.data);
             const showPairSelector = message.sender === "bot" &&
                                     !message.prediction &&
                                     index === messages.length - 1 &&
-                                    (analysisStages.length === 0 || allStagesComplete) &&
+                                    (analysisStages.length === 0 || allStagesComplete || hasFinalVerdictData) &&
                                     !awaitingTimeframeSelection;
             const showTimeframeSelector = message.sender === "bot" &&
                                          message.content.includes("trading timeframe") &&
