@@ -721,9 +721,7 @@ export function TransparentAnalysis({
                 <AIThinkingDisplay 
                   data={stage.data as AIThinkingData}
                   onComplete={() => {
-                    if (stage.progress === 100) {
-                      onStageComplete?.("ai_thinking");
-                    }
+                    onStageComplete?.("ai_thinking");
                   }}
                   isLoadedSession={isLoadedSession}
                 />
