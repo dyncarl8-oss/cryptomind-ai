@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
   Card,
@@ -28,6 +29,11 @@ import {
   TrendingDown,
   Target,
   Shield,
+  Info,
+  Settings2,
+  Edit3,
+  Save,
+  X,
 } from "lucide-react";
 import type {
   AnalysisStage,
@@ -467,18 +473,18 @@ function AIThinkingDisplay({ data, onComplete, isLoadedSession }: { data: AIThin
 }
 
 function TradePositionOverlay({
-  data,
+  targets,
+  direction,
   currentPrice,
   priceDecimals,
 }: {
-  data: FinalVerdictData;
+  targets: NonNullable<FinalVerdictData["tradeTargets"]>;
+  direction: "UP" | "DOWN";
   currentPrice?: number;
   priceDecimals: number;
 }) {
-  if (!data.tradeTargets || data.direction === "NEUTRAL") return null;
-
-  const { entry, target, stop } = data.tradeTargets;
-  const isLong = data.direction === "UP";
+  const { entry, target, stop } = targets;
+  const isLong = direction === "UP";
 
   const entryAvg = (entry.low + entry.high) / 2;
   const targetAvg = (target.low + target.high) / 2;
@@ -499,7 +505,19 @@ function TradePositionOverlay({
   const riskPercent = ((risk / entryAvg) * 100).toFixed(2);
 
   return (
-    <div className="absolute right-10 top-1/2 -translate-y-1/2 w-24 sm:w-28 flex flex-col pointer-events-none select-none z-10 opacity-90 hover:opacity-100 transition-all duration-300 animate-in fade-in slide-in-from-right-4">
+    <motion.div 
+      drag
+      dragMomentum={false}
+      className="absolute right-10 top-1/2 -translate-y-1/2 w-24 sm:w-28 flex flex-col cursor-grab active:cursor-grabbing select-none z-10 opacity-90 hover:opacity-100 transition-opacity duration-300 group/overlay"
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 0.9, x: 0 }}
+    >
+      <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover/overlay:opacity-100 transition-opacity duration-200 pointer-events-none">
+        <div className="bg-primary/80 text-[10px] text-primary-foreground px-2 py-0.5 rounded-full flex items-center gap-1 font-black whitespace-nowrap shadow-lg">
+          <Edit3 className="w-2.5 h-2.5" />
+          DRAG
+        </div>
+      </div>
       {/* Target Zone */}
       <div 
         className={cn(
@@ -540,7 +558,7 @@ function TradePositionOverlay({
           <span className="text-[10px] sm:text-[12px] font-mono font-bold text-white drop-shadow-md">-{riskPercent}%</span>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -555,6 +573,13 @@ function FinalVerdictDisplay({
   timeframe?: Timeframe;
   currentPrice?: number;
 }) {
+  const [editedTargets, setEditedTargets] = useState(data.tradeTargets);
+  const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    setEditedTargets(data.tradeTargets);
+  }, [data.tradeTargets]);
+
   const symbol = toTradingViewSymbol(tradingPair);
   const interval = timeframe
     ? timeframeToTradingViewInterval[timeframe]
@@ -598,46 +623,129 @@ function FinalVerdictDisplay({
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Trade Targets
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Trade Targets
+            </div>
+            {isActionable && data.tradeTargets && (
+              <button
+                onClick={() => setIsEditing(!isEditing)}
+                className="flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-bold transition-all hover:bg-primary/10 text-primary border border-primary/20"
+              >
+                {isEditing ? (
+                  <>
+                    <Save className="w-3 h-3" />
+                    Save Targets
+                  </>
+                ) : (
+                  <>
+                    <Edit3 className="w-3 h-3" />
+                    Adjust Setup
+                  </>
+                )}
+              </button>
+            )}
           </div>
 
           <div className="p-3 rounded-xl bg-card/50 border border-border/40 backdrop-blur-sm space-y-3">
-            {isActionable && data.tradeTargets ? (
+            {isActionable && editedTargets ? (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <div className="p-2 rounded-lg bg-primary/5 border border-primary/20">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
                     ENTRY
                   </div>
-                  <div className="font-mono text-base sm:text-lg font-bold text-primary">
-                    {formatRange(
-                      data.tradeTargets.entry.low,
-                      data.tradeTargets.entry.high,
-                      priceDecimals
-                    )}
-                  </div>
+                  {isEditing ? (
+                    <div className="space-y-1">
+                      <input
+                        type="number"
+                        step="any"
+                        value={editedTargets.entry.low}
+                        onChange={(e) => setEditedTargets({
+                          ...editedTargets,
+                          entry: { ...editedTargets.entry, low: parseFloat(e.target.value) || 0 }
+                        })}
+                        className="w-full bg-background/50 border border-border rounded px-1.5 py-0.5 text-xs font-mono"
+                      />
+                      <input
+                        type="number"
+                        step="any"
+                        value={editedTargets.entry.high}
+                        onChange={(e) => setEditedTargets({
+                          ...editedTargets,
+                          entry: { ...editedTargets.entry, high: parseFloat(e.target.value) || 0 }
+                        })}
+                        className="w-full bg-background/50 border border-border rounded px-1.5 py-0.5 text-xs font-mono"
+                      />
+                    </div>
+                  ) : (
+                    <div className="font-mono text-base sm:text-lg font-bold text-primary">
+                      {formatRange(
+                        editedTargets.entry.low,
+                        editedTargets.entry.high,
+                        priceDecimals
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="p-2 rounded-lg bg-green-500/5 border border-green-500/20">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
                     TARGET
                   </div>
-                  <div className="font-mono text-base sm:text-lg font-bold text-green-400">
-                    {formatRange(
-                      data.tradeTargets.target.low,
-                      data.tradeTargets.target.high,
-                      priceDecimals
-                    )}
-                  </div>
+                  {isEditing ? (
+                    <div className="space-y-1">
+                      <input
+                        type="number"
+                        step="any"
+                        value={editedTargets.target.low}
+                        onChange={(e) => setEditedTargets({
+                          ...editedTargets,
+                          target: { ...editedTargets.target, low: parseFloat(e.target.value) || 0 }
+                        })}
+                        className="w-full bg-background/50 border border-border rounded px-1.5 py-0.5 text-xs font-mono"
+                      />
+                      <input
+                        type="number"
+                        step="any"
+                        value={editedTargets.target.high}
+                        onChange={(e) => setEditedTargets({
+                          ...editedTargets,
+                          target: { ...editedTargets.target, high: parseFloat(e.target.value) || 0 }
+                        })}
+                        className="w-full bg-background/50 border border-border rounded px-1.5 py-0.5 text-xs font-mono"
+                      />
+                    </div>
+                  ) : (
+                    <div className="font-mono text-base sm:text-lg font-bold text-green-400">
+                      {formatRange(
+                        editedTargets.target.low,
+                        editedTargets.target.high,
+                        priceDecimals
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="p-2 rounded-lg bg-red-500/5 border border-red-500/20">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
                     STOP
                   </div>
-                  <div className="font-mono text-base sm:text-lg font-bold text-red-400">
-                    {formatPrice(data.tradeTargets.stop, priceDecimals)}
-                  </div>
+                  {isEditing ? (
+                    <input
+                      type="number"
+                      step="any"
+                      value={editedTargets.stop}
+                      onChange={(e) => setEditedTargets({
+                        ...editedTargets,
+                        stop: parseFloat(e.target.value) || 0
+                      })}
+                      className="w-full bg-background/50 border border-border rounded px-1.5 py-0.5 text-xs font-mono"
+                    />
+                  ) : (
+                    <div className="font-mono text-base sm:text-lg font-bold text-red-400">
+                      {formatPrice(editedTargets.stop, priceDecimals)}
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (
@@ -649,8 +757,23 @@ function FinalVerdictDisplay({
         </div>
 
         <div className="space-y-2">
-          <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Interactive Live Chart
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Interactive Live Chart
+            </div>
+            <div className="group relative">
+              <Info className="w-4 h-4 text-muted-foreground cursor-help hover:text-primary transition-colors" />
+              <div className="absolute bottom-full right-0 mb-2 w-72 p-3 bg-card/95 backdrop-blur-md text-foreground text-xs rounded-xl shadow-2xl border border-primary/20 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50 scale-95 group-hover:scale-100 origin-bottom-right">
+                <div className="font-bold mb-1 text-primary flex items-center gap-1">
+                  <Settings2 className="w-3 h-3" />
+                  Chart Display Info
+                </div>
+                The SL/TP levels are AI-generated recommendations. You can <b>drag</b> the overlay to move it, or use the <b>Adjust Setup</b> button to change the prices.
+                <div className="mt-2 pt-2 border-t border-border/50 text-green-400 font-medium">
+                  Pro Tip: Use the "Long/Short Position" tools in the TradingView sidebar to place interactive markers directly on the chart.
+                </div>
+              </div>
+            </div>
           </div>
           <div className="relative overflow-hidden rounded-xl border border-border/40">
             <PositionManagerChart
@@ -661,9 +784,10 @@ function FinalVerdictDisplay({
               tradingPair={tradingPair}
               timeframe={timeframe}
             />
-            {isActionable && data.tradeTargets && (
+            {isActionable && editedTargets && (
               <TradePositionOverlay 
-                data={data} 
+                targets={editedTargets}
+                direction={data.direction as "UP" | "DOWN"}
                 currentPrice={currentPrice} 
                 priceDecimals={priceDecimals} 
               />
