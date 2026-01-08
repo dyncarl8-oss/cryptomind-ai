@@ -339,6 +339,17 @@ function AIThinkingDisplay({ data, onComplete, isLoadedSession }: { data: AIThin
   const userScrolledRef = useRef(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const completedRef = useRef(false);
+  const animationFrameRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    // Cancel any in-flight animation when component unmounts or data changes
+    return () => {
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!data.thinkingProcess) {
@@ -347,36 +358,49 @@ function AIThinkingDisplay({ data, onComplete, isLoadedSession }: { data: AIThin
       isTypingRef.current = false;
       targetTextRef.current = "";
       completedRef.current = false;
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
       return;
     }
 
+    // New text arrived - reset completion state
     if (targetTextRef.current !== data.thinkingProcess) {
       targetTextRef.current = data.thinkingProcess;
       completedRef.current = false;
+      
+      // If there was an ongoing animation, cancel it
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
     }
 
+    // If already typing, don't start another animation
     if (isTypingRef.current) {
       return;
     }
 
+    // For loaded sessions, display all text immediately
     if (isLoadedSession) {
       setDisplayedText(data.thinkingProcess);
       setIsTyping(false);
       isTypingRef.current = false;
       if (!completedRef.current) {
         completedRef.current = true;
-        onComplete?.();
+        // Call onComplete after state update
+        setTimeout(() => onComplete?.(), 0);
       }
       return;
     }
 
-    if (displayedText.length < data.thinkingProcess.length) {
+    // Only start typewriter if we haven't displayed all the text yet
+    if (displayedText.length < data.thinkingProcess.length && !completedRef.current) {
       isTypingRef.current = true;
       setIsTyping(true);
 
-      const startLength = displayedText.length;
-      const targetLength = data.thinkingProcess.length;
-      let currentIndex = startLength;
+      let currentIndex = displayedText.length;
 
       const typeNextChar = () => {
         if (currentIndex < targetTextRef.current.length) {
@@ -389,27 +413,25 @@ function AIThinkingDisplay({ data, onComplete, isLoadedSession }: { data: AIThin
             containerRef.current.scrollTop = containerRef.current.scrollHeight;
           }
 
-          requestAnimationFrame(typeNextChar);
+          animationFrameRef.current = requestAnimationFrame(typeNextChar);
         } else {
+          // Typewriter animation complete
+          animationFrameRef.current = null;
           setIsTyping(false);
           isTypingRef.current = false;
+          
+          // Only call onComplete once
           if (!completedRef.current) {
             completedRef.current = true;
-            onComplete?.();
+            // Call onComplete after final state update
+            setTimeout(() => onComplete?.(), 0);
           }
         }
       };
 
-      requestAnimationFrame(typeNextChar);
-    } else if (displayedText.length === data.thinkingProcess.length && displayedText.length > 0 && !completedRef.current) {
-      if (isTyping) {
-        setIsTyping(false);
-      }
-      isTypingRef.current = false;
-      completedRef.current = true;
-      onComplete?.();
+      animationFrameRef.current = requestAnimationFrame(typeNextChar);
     }
-  }, [data.thinkingProcess, displayedText.length, isLoadedSession]);
+  }, [data.thinkingProcess, displayedText.length, isLoadedSession, onComplete]);
 
   const handleScroll = () => {
     if (!containerRef.current) return;

@@ -392,24 +392,30 @@ export async function generateTransparentPrediction(
     },
   });
 
-  // Give frontend time to receive the full text and start typewriter animation
-  await delay(500);
-
+  // Wait for frontend acknowledgment that the typewriter animation is truly finished.
+  // This prevents the final verdict stage from starting early.
   if (waitForAiThinkingComplete) {
-    // Wait for frontend acknowledgment with a timeout to prevent hanging forever
-    // Increased timeout to 30s to allow for long typewriter animations on the frontend
-    const ACKNOWLEDGMENT_TIMEOUT = 30000; 
-    console.log(`⏳ Waiting for AI thinking complete acknowledgment (max ${ACKNOWLEDGMENT_TIMEOUT}ms)...`);
+    // Timeout is a safety net in case the client disconnects or never acknowledges.
+    // Keep this generous for long AI thought processes.
+    const ACKNOWLEDGMENT_TIMEOUT = 30000;
+    console.log(
+      `⏳ Waiting for AI thinking complete acknowledgment (max ${ACKNOWLEDGMENT_TIMEOUT}ms)...`
+    );
     const waitStartTime = Date.now();
     await Promise.race([
       waitForAiThinkingComplete().then(() => {
-        console.log(`✅ AI thinking acknowledgment received in ${Date.now() - waitStartTime}ms`);
+        console.log(
+          `✅ AI thinking acknowledgment received in ${Date.now() - waitStartTime}ms`
+        );
       }),
       delay(ACKNOWLEDGMENT_TIMEOUT).then(() => {
-        console.log(`⏱️ AI thinking acknowledgment timed out after ${ACKNOWLEDGMENT_TIMEOUT}ms, continuing...`);
-      })
+        console.log(
+          `⏱️ AI thinking acknowledgment timed out after ${ACKNOWLEDGMENT_TIMEOUT}ms, continuing...`
+        );
+      }),
     ]);
   } else {
+    // Fallback for callers that don't provide an acknowledgment hook.
     await delay(3000);
   }
 
@@ -422,13 +428,13 @@ export async function generateTransparentPrediction(
     status: "complete",
     duration: aiDuration,
     data: {
-      thinkingProcess: geminiDecision?.thinkingProcess || "AI deep analysis complete. Evaluating all technical indicators and market conditions to generate high-confidence prediction.",
+      thinkingProcess:
+        geminiDecision?.thinkingProcess ||
+        "AI deep analysis complete. Evaluating all technical indicators and market conditions to generate high-confidence prediction.",
       analysisTime: aiDuration,
       modelUsed: "Gemini 3 Pro (Thinking Mode)",
     },
   });
-
-  await delay(2500);
 
   // Check if WebSocket is still open before continuing
   if (ws.readyState !== WebSocket.OPEN) {
