@@ -720,7 +720,11 @@ export function TransparentAnalysis({
               <div className="mt-4 animate-slide-up">
                 <AIThinkingDisplay 
                   data={stage.data as AIThinkingData}
-                  onComplete={() => onStageComplete?.("ai_thinking")}
+                  onComplete={() => {
+                    if (stage.progress === 100) {
+                      onStageComplete?.("ai_thinking");
+                    }
+                  }}
                   isLoadedSession={isLoadedSession}
                 />
               </div>

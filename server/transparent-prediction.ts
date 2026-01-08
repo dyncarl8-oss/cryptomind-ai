@@ -397,7 +397,8 @@ export async function generateTransparentPrediction(
 
   if (waitForAiThinkingComplete) {
     // Wait for frontend acknowledgment with a timeout to prevent hanging forever
-    const ACKNOWLEDGMENT_TIMEOUT = 10000; // 10 seconds max wait
+    // Increased timeout to 30s to allow for long typewriter animations on the frontend
+    const ACKNOWLEDGMENT_TIMEOUT = 30000; 
     console.log(`⏳ Waiting for AI thinking complete acknowledgment (max ${ACKNOWLEDGMENT_TIMEOUT}ms)...`);
     const waitStartTime = Date.now();
     await Promise.race([
