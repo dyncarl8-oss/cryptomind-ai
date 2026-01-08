@@ -41,6 +41,42 @@ export function TradingViewAdvancedChart({
       show_popup_button: false,
       popup_width: "1000",
       popup_height: "650",
+      // Enable interactive drawing tools and position management
+      enable_mouse_wheel_zoom: true,
+      enable_mouse_wheel_zoom_mode: "bottom",
+      enable_mouse_zoom: true,
+      enable_drawing_tools: true,
+      enable_drawings_access: {
+        from: 1,
+        to: Date.now() + 1000 * 60 * 60 * 24 * 365,
+        tool_bar: {
+          ["order.buy"]: {
+            enabled: true,
+            icon: "order.buy",
+            title: "Buy Order",
+          },
+          ["order.sell"]: {
+            enabled: true,
+            icon: "order.sell", 
+            title: "Sell Order",
+          },
+          ["position.long"]: {
+            enabled: true,
+            icon: "position.long",
+            title: "Long Position",
+          },
+          ["position.short"]: {
+            enabled: true,
+            icon: "position.short",
+            title: "Short Position",
+          },
+          ["chart_trading.study"]: {
+            enabled: true,
+            icon: "chart_trading.study",
+            title: "Trading Study",
+          },
+        },
+      },
     }),
     [symbol, interval, theme, minimal]
   );
