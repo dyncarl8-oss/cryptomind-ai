@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
+import { cn } from "@/lib/utils";
 import {
   Card,
   CardContent,
@@ -463,6 +464,84 @@ function AIThinkingDisplay({ data, onComplete, isLoadedSession }: { data: AIThin
   );
 }
 
+function TradePositionOverlay({
+  data,
+  currentPrice,
+  priceDecimals,
+}: {
+  data: FinalVerdictData;
+  currentPrice?: number;
+  priceDecimals: number;
+}) {
+  if (!data.tradeTargets || data.direction === "NEUTRAL") return null;
+
+  const { entry, target, stop } = data.tradeTargets;
+  const isLong = data.direction === "UP";
+
+  const entryAvg = (entry.low + entry.high) / 2;
+  const targetAvg = (target.low + target.high) / 2;
+  
+  const profit = Math.abs(targetAvg - entryAvg);
+  const risk = Math.abs(entryAvg - stop);
+  
+  // Calculate heights proportional to R:R but within reasonable bounds
+  const totalHeight = 200;
+  const rrRatio = profit / risk;
+  
+  // Clamp the ratio so it doesn't look crazy
+  const clampedRR = Math.max(0.3, Math.min(4, rrRatio));
+  const profitHeight = (clampedRR / (clampedRR + 1)) * totalHeight;
+  const riskHeight = totalHeight - profitHeight;
+
+  const profitPercent = ((profit / entryAvg) * 100).toFixed(2);
+  const riskPercent = ((risk / entryAvg) * 100).toFixed(2);
+
+  return (
+    <div className="absolute right-10 top-1/2 -translate-y-1/2 w-24 sm:w-28 flex flex-col pointer-events-none select-none z-10 opacity-90 hover:opacity-100 transition-all duration-300 animate-in fade-in slide-in-from-right-4">
+      {/* Target Zone */}
+      <div 
+        className={cn(
+          "relative flex flex-col items-center justify-center border border-green-500/50 backdrop-blur-[1px] overflow-hidden transition-all duration-500",
+          isLong ? "bg-green-500/30 rounded-t-md border-b-0" : "bg-green-500/30 rounded-b-md order-2 border-t-0"
+        )}
+        style={{ height: `${profitHeight}px` }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-green-500/10 to-transparent opacity-50" />
+        <div className={cn("absolute flex flex-col items-center gap-0.5 z-10 px-1 text-center", isLong ? "top-2" : "bottom-2")}>
+          <span className="text-[8px] sm:text-[9px] font-black text-green-400 uppercase tracking-tighter drop-shadow-sm">Target</span>
+          <span className="text-[10px] sm:text-[12px] font-mono font-bold text-white drop-shadow-md">+{profitPercent}%</span>
+        </div>
+        <div className={cn("absolute z-10", isLong ? "bottom-1" : "top-1")}>
+          <span className="text-[7px] sm:text-[8px] font-bold text-green-400/60 tracking-tight">R:R {(profit/risk).toFixed(2)}</span>
+        </div>
+      </div>
+      
+      {/* Entry Line Indicator */}
+      <div className="relative h-0 w-full z-20">
+        <div className="absolute -left-1 -right-1 h-[2px] bg-white shadow-[0_0_10px_rgba(255,255,255,1)]" />
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 bg-white text-black text-[7px] sm:text-[8px] font-black px-1 py-0.5 rounded-l-sm shadow-xl">
+          {entryAvg.toFixed(priceDecimals)}
+        </div>
+      </div>
+      
+      {/* Stop Zone */}
+      <div 
+        className={cn(
+          "relative flex flex-col items-center justify-center border border-red-500/50 backdrop-blur-[1px] overflow-hidden transition-all duration-500",
+          isLong ? "bg-red-500/30 rounded-b-md border-t-0" : "bg-red-500/30 rounded-t-md order-1 border-b-0"
+        )}
+        style={{ height: `${riskHeight}px` }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-t from-red-500/10 to-transparent opacity-50" />
+        <div className={cn("absolute flex flex-col items-center gap-0.5 z-10 px-1 text-center", isLong ? "bottom-2" : "top-2")}>
+          <span className="text-[8px] sm:text-[9px] font-black text-red-400 uppercase tracking-tighter drop-shadow-sm">Stop</span>
+          <span className="text-[10px] sm:text-[12px] font-mono font-bold text-white drop-shadow-md">-{riskPercent}%</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function FinalVerdictDisplay({
   data,
   tradingPair,
@@ -571,12 +650,21 @@ function FinalVerdictDisplay({
           <div className="text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Live Chart
           </div>
-          <TradingViewAdvancedChart
-            symbol={symbol}
-            interval={interval}
-            minimal={true}
-            className="h-[300px] sm:h-[350px] md:h-[400px]"
-          />
+          <div className="relative overflow-hidden rounded-xl border border-border/40">
+            <TradingViewAdvancedChart
+              symbol={symbol}
+              interval={interval}
+              minimal={true}
+              className="h-[300px] sm:h-[350px] md:h-[400px] border-0"
+            />
+            {isActionable && data.tradeTargets && (
+              <TradePositionOverlay 
+                data={data} 
+                currentPrice={currentPrice} 
+                priceDecimals={priceDecimals} 
+              />
+            )}
+          </div>
         </div>
       </div>
 
