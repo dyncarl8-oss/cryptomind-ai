@@ -35,9 +35,11 @@ export function ChatMessage({ message }: ChatMessageProps) {
               : "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground shadow-md shadow-primary/20"
           }`}
         >
-          <p className="text-sm md:text-base leading-relaxed whitespace-pre-wrap break-words">
-            {message.content}
-          </p>
+          {(!message.prediction) && (
+            <p className="text-sm md:text-base leading-relaxed whitespace-pre-wrap break-words">
+              {message.content}
+            </p>
+          )}
           
           {message.prediction && (
             <div className="mt-2.5 md:mt-3">
