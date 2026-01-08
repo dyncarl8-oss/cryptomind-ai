@@ -392,10 +392,10 @@ export default function Chat() {
           
           {messages.map((message, index) => {
             const allStagesComplete = analysisStages.length > 0 && analysisStages.every(s => s.status === "complete");
-            const showPairSelector = message.sender === "bot" && 
-                                    !message.prediction && 
+            const showPairSelector = message.sender === "bot" &&
+                                    !message.prediction &&
                                     index === messages.length - 1 &&
-                                    (!showAnalysis || allStagesComplete) &&
+                                    (analysisStages.length === 0 || allStagesComplete) &&
                                     !awaitingTimeframeSelection;
             const showTimeframeSelector = message.sender === "bot" &&
                                          message.content.includes("trading timeframe") &&
