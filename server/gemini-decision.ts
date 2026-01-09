@@ -196,11 +196,11 @@ TRADE TARGET GUIDELINES:
 
 7. Duration: Provide a typical duration for this trade (e.g., "1-4 hours", "12-24 hours", etc.)
 
-TREND ALIGNMENT:
-- You will see Entry Timeframe and Anchor Timeframe data
-- Entry TF is the user's selected timeframe
-- Anchor TF is one level higher (the "Big Picture")
-- Prefer trades where Entry trend aligns with Anchor trend.
+TREND ALIGNMENT & TIMEFRAME FOCUS:
+- You will see Entry Timeframe and Anchor Timeframe data.
+- **CRITICAL**: The USER'S selected "Entry Timeframe" is the Boss. Analyze the chart PRIMARILY based on this timeframe.
+- Use the Anchor Timeframe ONLY for context/confirmation. Do not let a conflicting Anchor timeframe override a perfect setup on the Entry timeframe.
+- If Entry TF says UP and Anchor says DOWN, you can still trade UP if the Entry pattern is strong.
 - If trends conflict, you may still proceed if you see a strong reversal pattern or significant momentum, but reduce confidence accordingly.
 
 VOLUME CONFIRMATION:

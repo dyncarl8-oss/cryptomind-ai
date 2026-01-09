@@ -221,7 +221,7 @@ function calculateValidatedConfidence(
   shouldProceed: boolean;
   rejectionReason: string | null;
 } {
-  // SUPER OVERRIDE: If the AI is highly confident (>85%), trust the AI and override technical warnings.
+  // SUPER OVERRIDE: If the AI is highly confident (>=85%), trust the AI and override technical warnings.
   if (baseConfidence >= 85) {
     return {
       confidence: baseConfidence,
@@ -229,6 +229,10 @@ function calculateValidatedConfidence(
       rejectionReason: null,
     };
   }
+
+  // SEMI-OVERRIDE: If confidence is 80-84%, ONLY strictly invalidating flaws should stop it.
+  // We want to avoid "thinking says yes, verdict says no" for decent setups.
+  const isDecentSetup = baseConfidence >= 80;
 
   // Rule 1: Minimum confidence threshold (Adjusted from 90 to 80)
   if (baseConfidence < 80) {
@@ -239,9 +243,9 @@ function calculateValidatedConfidence(
     };
   }
 
-  // Rule 2: Trend alignment (Now a warning unless confidence is very low, relaxed threshold 85→82)
   // Rule 2: Trend alignment (Relaxed: Allow counter-trend if confidence is decent > 80)
-  if (!trendAlignment && baseConfidence < 80) {
+  // If decent setup (80+), we ignore trend conflict if it's not catastrophic.
+  if (!trendAlignment && !isDecentSetup) {
     return {
       confidence: baseConfidence,
       shouldProceed: false,
@@ -249,8 +253,10 @@ function calculateValidatedConfidence(
     };
   }
 
-  // Rule 3: Volume confirmation (Relaxed from 1.1x to 1.0x, override threshold 85->82)
-  if (volumeRatio < 1.0 && baseConfidence < 82) {
+  // Rule 3: Volume confirmation (Relaxed)
+  // If decent setup, allow lower volume (0.8x)
+  const volThreshold = isDecentSetup ? 0.8 : 1.0;
+  if (volumeRatio < volThreshold && baseConfidence < 85) {
     return {
       confidence: baseConfidence,
       shouldProceed: false,
@@ -280,12 +286,14 @@ function calculateValidatedConfidence(
 
   // Rule 6: ADX < 15 = ranging market (Relaxed from 20)
   // Rule 6: ADX < 12 = ranging market (Relaxed from 15)
-  // Ensure this check doesn't kill high confidence setups (already covered by super override above, but kept safe)
-  if (adxValue < 12 && baseConfidence < 85) {
+  // Rule 6: ADX < 12 = ranging market
+  // If decent setup, allow ADX down to 10
+  const adxThreshold = isDecentSetup ? 10 : 12;
+  if (adxValue < adxThreshold) {
     return {
       confidence: baseConfidence,
       shouldProceed: false,
-      rejectionReason: "ADX < 12 - Dead market, no volatility",
+      rejectionReason: `ADX < ${adxThreshold} - Dead market, no volatility`,
     };
   }
 
