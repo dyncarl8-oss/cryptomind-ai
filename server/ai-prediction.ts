@@ -704,7 +704,7 @@ function determineDuration(
   }
 }
 
-export async function generateAIPrediction(pair: TradingPair): Promise<Prediction> {
+export async function generateAIPrediction(pair: TradingPair, timeframe: string = "M1"): Promise<Prediction> {
   try {
     console.log(`\n${'='.repeat(60)}`);
     console.log(`🔮 Generating AI Prediction for ${pair}`);
@@ -803,15 +803,22 @@ export async function generateAIPrediction(pair: TradingPair): Promise<Predictio
       currentPrice: marketData.currentPrice,
       priceChange24h: marketData.priceChange24h,
       marketRegime: indicators.marketRegime,
+      entryTimeframe: timeframe,
+      anchorTimeframe: timeframe,
+      entryTrendBias: indicators.trendBias,
+      anchorTrendBias: indicators.trendBias,
       upSignals,
       downSignals,
       upScore,
       downScore,
       volumeIndicator: indicators.volumeIndicator,
+      volumeMA: indicators.volumeMA,
+      currentVolume: marketData.candles[marketData.candles.length - 1]?.volume || 0,
       trendStrength: indicators.trendStrength,
       volatility: indicators.atr,
       rsiValue: indicators.rsi,
-      macdSignal: indicators.macd.histogram > 0 ? "bullish" : "bearish"
+      macdSignal: indicators.macd.histogram > 0 ? "bullish" : "bearish",
+      adxValue: indicators.adx.value
     });
     
     if (geminiDecision && geminiDecision.direction !== "NEUTRAL") {

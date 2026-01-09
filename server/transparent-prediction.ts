@@ -1,6 +1,6 @@
 import { WebSocket } from "ws";
 import { type TradeTargets, type TradingPair } from "@shared/schema";
-import { fetchMarketData } from "./crypto-data";
+import { fetchMarketData, getAnchorTimeframes } from "./crypto-data";
 import { analyzeMarket, type TechnicalIndicators } from "./technical-analysis";
 import { getGeminiPrediction } from "./gemini-decision";
 import type { Prediction } from "./ai-prediction";
@@ -60,6 +60,225 @@ function computeFallbackTradeTargets(
       high: currentPrice - safeAtr * 1.5,
     },
     stop: entryHigh + safeAtr * 1.05,
+  };
+}
+
+/**
+ * Check if volume meets the 1.5x Volume MA threshold
+ * This is the "Fuel" rule - volume must be at least 1.5x average
+ */
+function checkVolumeConfirmation(currentVolume: number, volumeMA: number): {
+  passes: boolean;
+  reason: string;
+  ratio: number;
+} {
+  const ratio = volumeMA > 0 ? currentVolume / volumeMA : 1;
+  const passes = ratio >= 1.5;
+
+  return {
+    passes,
+    reason: passes
+      ? `Volume confirmed: ${ratio.toFixed(2)}x MA (≥1.5x threshold)`
+      : `Volume too low: ${ratio.toFixed(2)}x MA (<1.5x threshold)`,
+    ratio,
+  };
+}
+
+/**
+ * Check for volume divergence (price up but volume down = weak breakout)
+ */
+function checkVolumeDivergence(
+  candles: any[],
+  direction: "UP" | "DOWN" | "NEUTRAL"
+): {
+  hasDivergence: boolean;
+  reason: string;
+  details?: string;
+} {
+  if (candles.length < 5) {
+    return { hasDivergence: false, reason: "Not enough data for divergence check" };
+  }
+
+  const recentCandles = candles.slice(-5);
+  const currentCandle = recentCandles[recentCandles.length - 1];
+  const prevCandle = recentCandles[recentCandles.length - 2];
+
+  // Check if price is making new highs but volume is decreasing
+  if (direction === "UP") {
+    const price新高 = currentCandle.close > prevCandle.close;
+    const volumeDecreasing = currentCandle.volume < prevCandle.volume;
+
+    if (price新高 && volumeDecreasing) {
+      return {
+        hasDivergence: true,
+        reason: "Weak Breakout: Price rising on declining volume",
+        details: `Price: ${currentCandle.close.toFixed(2)} (↑) | Volume: ${currentCandle.volume.toFixed(0)} (↓)`,
+      };
+    }
+  }
+
+  // Check if price is making new lows but volume is decreasing
+  if (direction === "DOWN") {
+    const price新低 = currentCandle.close < prevCandle.close;
+    const volumeDecreasing = currentCandle.volume < prevCandle.volume;
+
+    if (price新低 && volumeDecreasing) {
+      return {
+        hasDivergence: true,
+        reason: "Weak Breakdown: Price falling on declining volume",
+        details: `Price: ${currentCandle.close.toFixed(2)} (↓) | Volume: ${currentCandle.volume.toFixed(0)} (↓)`,
+      };
+    }
+  }
+
+  return { hasDivergence: false, reason: "No volume divergence detected" };
+}
+
+/**
+ * Check RSI for neutral zone (45-55 = observation mode)
+ */
+function checkRSINeutralZone(rsi: number): {
+  isNeutral: boolean;
+  reason: string;
+} {
+  if (rsi >= 45 && rsi <= 55) {
+    return {
+      isNeutral: true,
+      reason: `RSI in neutral zone (${rsi.toFixed(1)}) - Observation Mode`,
+    };
+  }
+  return {
+    isNeutral: false,
+    reason: `RSI ${rsi.toFixed(1)} - outside neutral zone`,
+  };
+}
+
+/**
+ * Check trend alignment between entry timeframe and anchor timeframe
+ * Returns true if signals align, false if conflict
+ */
+function checkTrendAlignment(
+  entryTrendBias: "BULLISH" | "BEARISH" | "NEUTRAL",
+  anchorTrendBias: "BULLISH" | "BEARISH" | "NEUTRAL",
+  entryDirection: "UP" | "DOWN" | "NEUTRAL"
+): {
+  aligned: boolean;
+  reason: string;
+} {
+  // Convert direction to trend bias
+  const entryBiasFromDirection =
+    entryDirection === "UP"
+      ? "BULLISH"
+      : entryDirection === "DOWN"
+      ? "BEARISH"
+      : "NEUTRAL";
+
+  // If anchor is neutral, we can proceed but with caution
+  if (anchorTrendBias === "NEUTRAL") {
+    return {
+      aligned: true,
+      reason: "Anchor trend neutral - proceeding with caution",
+    };
+  }
+
+  // If entry direction is neutral, we can proceed
+  if (entryBiasFromDirection === "NEUTRAL") {
+    return {
+      aligned: true,
+      reason: "Entry direction neutral - proceeding",
+    };
+  }
+
+  // Check if they align
+  if (entryBiasFromDirection === anchorTrendBias) {
+    return {
+      aligned: true,
+      reason: `Trend aligned: Entry (${entryBiasFromDirection}) matches Anchor (${anchorTrendBias})`,
+    };
+  }
+
+  // They don't align - reject the trade
+  return {
+    aligned: false,
+    reason: `Trend Conflict: Entry (${entryBiasFromDirection}) conflicts with Anchor (${anchorTrendBias}) - Entry rejected`,
+  };
+}
+
+/**
+ * Calculate confidence score with all validation rules
+ * Returns minimum of 90 for valid signals, otherwise neutral
+ */
+function calculateValidatedConfidence(
+  baseConfidence: number,
+  volumeRatio: number,
+  adxValue: number,
+  trendAlignment: boolean,
+  rsiNeutral: boolean,
+  hasVolumeDivergence: boolean
+): {
+  confidence: number;
+  shouldProceed: boolean;
+  rejectionReason: string | null;
+} {
+  // Rule 1: Minimum 90+ confidence required
+  if (baseConfidence < 90) {
+    return {
+      confidence: baseConfidence,
+      shouldProceed: false,
+      rejectionReason: `Confidence below threshold (${baseConfidence}% < 90%)`,
+    };
+  }
+
+  // Rule 2: Trend alignment
+  if (!trendAlignment) {
+    return {
+      confidence: baseConfidence,
+      shouldProceed: false,
+      rejectionReason: "Trend Conflict: Entry timeframe conflicts with anchor trend",
+    };
+  }
+
+  // Rule 3: Volume confirmation (1.5x threshold)
+  if (volumeRatio < 1.5) {
+    return {
+      confidence: baseConfidence,
+      shouldProceed: false,
+      rejectionReason: `Volume below threshold (${volumeRatio.toFixed(2)}x < 1.5x MA)`,
+    };
+  }
+
+  // Rule 4: Volume divergence check
+  if (hasVolumeDivergence) {
+    return {
+      confidence: baseConfidence,
+      shouldProceed: false,
+      rejectionReason: "Volume divergence detected - weak breakout",
+    };
+  }
+
+  // Rule 5: RSI neutral zone
+  if (rsiNeutral) {
+    return {
+      confidence: baseConfidence,
+      shouldProceed: false,
+      rejectionReason: "RSI in neutral zone (45-55) - Observation Mode",
+    };
+  }
+
+  // Rule 6: ADX < 20 = ranging market
+  if (adxValue < 20) {
+    return {
+      confidence: baseConfidence,
+      shouldProceed: false,
+      rejectionReason: "ADX < 20 - Ranging market, no high-probability setup",
+    };
+  }
+
+  // All checks passed
+  return {
+    confidence: Math.min(98, baseConfidence),
+    shouldProceed: true,
+    rejectionReason: null,
   };
 }
 
@@ -173,9 +392,21 @@ export async function generateTransparentPrediction(
 
   const technicalStartTime = Date.now();
   const indicators = analyzeMarket(marketData.candles);
-  
+
   await delay(2000);
-  
+
+  // Fetch anchor timeframe data for trend alignment
+  const anchorTf = getAnchorTimeframes(timeframe);
+  let anchorIndicators: TechnicalIndicators | null = null;
+  let anchorTrendValidationResult: { aligned: boolean; reason: string } = { aligned: true, reason: "No anchor check performed" };
+
+  try {
+    const anchorMarketData = await fetchMarketData(pair, anchorTf.primary);
+    anchorIndicators = analyzeMarket(anchorMarketData.candles);
+  } catch (error) {
+    console.warn(`Failed to fetch anchor timeframe (${anchorTf.primary}) data:`, error);
+  }
+
   sendStageUpdate(ws, {
     type: "analysis_stage",
     stage: "technical_calculation",
@@ -346,15 +577,22 @@ export async function generateTransparentPrediction(
     currentPrice: marketData.currentPrice,
     priceChange24h: marketData.priceChange24h,
     marketRegime: indicators.marketRegime,
+    entryTimeframe: timeframe,
+    anchorTimeframe: anchorTf.primary,
+    entryTrendBias: indicators.trendBias,
+    anchorTrendBias: anchorIndicators?.trendBias || "NEUTRAL",
     upSignals: upSignals.map(s => ({ category: s.category, reason: s.description, strength: s.strength })),
     downSignals: downSignals.map(s => ({ category: s.category, reason: s.description, strength: s.strength })),
     upScore,
     downScore,
     volumeIndicator: marketData.volumeChange24h,
+    volumeMA: indicators.volumeMA,
+    currentVolume: marketData.candles[marketData.candles.length - 1]?.volume || 0,
     trendStrength: indicators.trendStrength,
     volatility: indicators.atr,
     rsiValue: indicators.rsi,
     macdSignal: indicators.macd.histogram > 0 ? "bullish" : "bearish",
+    adxValue: indicators.adx.value,
   };
 
   await delay(2000);
@@ -438,36 +676,102 @@ export async function generateTransparentPrediction(
     return durations[tf] || "1-2 minutes";
   };
 
-  const direction = geminiDecision?.direction || (upScore > downScore ? "UP" : "DOWN") as "UP" | "DOWN" | "NEUTRAL";
-  const confidence = geminiDecision?.confidence || Math.round(Math.min(95, (signalAlignment * 0.8) + (indicators.trendStrength * 0.2)));
+  let direction = geminiDecision?.direction || (upScore > downScore ? "UP" : "DOWN") as "UP" | "DOWN" | "NEUTRAL";
+  let confidence = geminiDecision?.confidence || Math.round(Math.min(95, (signalAlignment * 0.8) + (indicators.trendStrength * 0.2)));
   const duration = getDurationBasedOnTimeframe(timeframe);
   const qualityScore = Math.round((signalAlignment + indicators.trendStrength) / 2);
 
-  const keyFactors = geminiDecision?.keyFactors || [
-    `${upSignals.length}/${totalSignals} indicators bullish (${signalAlignment.toFixed(1)}% alignment)`,
-    `${indicators.marketRegime} market (ADX: ${indicators.adx.value.toFixed(1)})`,
-    `Volume ${marketData.volumeChange24h > 0 ? "+" : ""}${marketData.volumeChange24h.toFixed(1)}% - ${Math.abs(marketData.volumeChange24h) > 15 ? "Strong" : "Normal"} confirmation`,
-  ];
+  // Perform all validation checks
+  const currentVolume = marketData.candles[marketData.candles.length - 1]?.volume || 0;
+  const volumeMA = indicators.volumeMA;
 
-  const riskFactors = geminiDecision?.riskFactors || [
-    marketData.volumeChange24h < 0 ? "Volume declining - weaker conviction" : "Monitor for volume decrease",
-    indicators.atr > 3 ? "High volatility - wider stops recommended" : "Normal volatility range",
-  ];
+  // Check 1: Volume confirmation (1.5x threshold)
+  const volumeConfirmation = checkVolumeConfirmation(currentVolume, volumeMA);
 
-  const tradeTargets: TradeTargets | undefined =
-    direction === "NEUTRAL"
-      ? undefined
-      : normalizeTradeTargets(
-            geminiDecision?.tradeTargets,
-            direction,
-            marketData.currentPrice,
-            indicators.atr
-          ) ??
-          computeFallbackTradeTargets(
-            direction,
-            marketData.currentPrice,
-            indicators.atr
-          );
+  // Check 2: Volume divergence
+  const volumeDivergence = checkVolumeDivergence(marketData.candles, direction);
+
+  // Check 3: RSI neutral zone
+  const rsiNeutralCheck = checkRSINeutralZone(indicators.rsi);
+
+  // Check 4: Trend alignment (if we have anchor data)
+  if (anchorIndicators) {
+    anchorTrendValidationResult = checkTrendAlignment(
+      indicators.trendBias,
+      anchorIndicators.trendBias,
+      direction
+    );
+  }
+
+  // Check 5: Final confidence validation with all rules
+  const validationResult = calculateValidatedConfidence(
+    confidence,
+    volumeConfirmation.ratio,
+    indicators.adx.value,
+    anchorTrendValidationResult.aligned,
+    rsiNeutralCheck.isNeutral,
+    volumeDivergence.hasDivergence
+  );
+
+  let keyFactors: string[];
+  let riskFactors: string[];
+  let explanation: string;
+  let tradeTargets: TradeTargets | undefined;
+
+  if (!validationResult.shouldProceed) {
+    // Rejection case - return neutral with explanation
+    direction = "NEUTRAL";
+    confidence = 0;
+    tradeTargets = undefined;
+
+    keyFactors = [
+      anchorTrendValidationResult.aligned ? anchorTrendValidationResult.reason : anchorTrendValidationResult.reason,
+      volumeConfirmation.reason,
+      rsiNeutralCheck.reason,
+      `ADX: ${indicators.adx.value.toFixed(1)} - ${indicators.adx.value < 20 ? "Ranging" : "Trending"}`,
+    ];
+
+    riskFactors = [
+      validationResult.rejectionReason || "Multiple validation checks failed",
+    ];
+
+    explanation = "Market Analysis: Neutral leaning. No high-probability setup detected. Standing aside.";
+  } else {
+    // Proceed with valid signal
+    confidence = validationResult.confidence;
+
+    keyFactors = geminiDecision?.keyFactors || [
+      `${upSignals.length}/${totalSignals} indicators bullish (${signalAlignment.toFixed(1)}% alignment)`,
+      `Trend Aligned: Entry (${indicators.trendBias}) matches Anchor (${anchorIndicators?.trendBias || "N/A"})`,
+      `${indicators.marketRegime} market (ADX: ${indicators.adx.value.toFixed(1)})`,
+      volumeConfirmation.reason,
+    ];
+
+    riskFactors = geminiDecision?.riskFactors || [
+      volumeDivergence.hasDivergence ? volumeDivergence.reason : "Monitor for volume decrease",
+      indicators.atr > 3 ? "High volatility - wider stops recommended" : "Normal volatility range",
+    ];
+
+    if (direction === "NEUTRAL") {
+      tradeTargets = undefined;
+    } else {
+      const nonNeutralDirection: "UP" | "DOWN" = direction;
+      tradeTargets =
+        normalizeTradeTargets(
+              geminiDecision?.tradeTargets,
+              nonNeutralDirection,
+              marketData.currentPrice,
+              indicators.atr
+            ) ??
+            computeFallbackTradeTargets(
+              nonNeutralDirection,
+              marketData.currentPrice,
+              indicators.atr
+            );
+    }
+
+    explanation = geminiDecision?.rationale || `Strong ${direction} signal detected with ${confidence}% confidence`;
+  }
 
   await delay(1500);
 
@@ -489,7 +793,7 @@ export async function generateTransparentPrediction(
         keyFactors,
         riskFactors,
         tradeTargets,
-        explanation: geminiDecision?.rationale || `Strong ${direction} signal detected with ${confidence}% confidence`,
+        explanation,
       },
     });
   } catch (error) {
@@ -509,7 +813,7 @@ export async function generateTransparentPrediction(
           keyFactors,
           riskFactors,
           tradeTargets,
-          explanation: geminiDecision?.rationale || `${direction} signal`,
+          explanation,
         },
       });
     } catch (retryError) {
@@ -522,8 +826,8 @@ export async function generateTransparentPrediction(
     direction,
     confidence,
     duration,
-    analysis: geminiDecision?.rationale || `Strong ${direction} signal detected with ${confidence}% confidence`,
-    rationale: geminiDecision?.rationale,
+    analysis: explanation,
+    rationale: explanation,
     riskFactors,
     detailedAnalysis: {
       indicators: technicalIndicatorsList.map(i => ({
@@ -560,9 +864,9 @@ export async function generateTransparentPrediction(
       marketRegime: indicators.marketRegime,
       confidenceBreakdown: {
         baseScore: Math.round(signalAlignment * 0.6),
-        volumeBonus: Math.round(Math.abs(marketData.volumeChange24h) > 15 ? 25 : 10),
+        volumeBonus: Math.round(volumeConfirmation.ratio >= 1.5 ? 25 : 0),
         regimeBonus: indicators.marketRegime === "STRONG_TRENDING" ? 18 : indicators.marketRegime === "TRENDING" ? 10 : 0,
-        alignmentPenalty: signalAlignment < 70 ? -12 : 0,
+        alignmentPenalty: !anchorTrendValidationResult.aligned ? -20 : signalAlignment < 70 ? -12 : 0,
         qualityBoost: qualityScore > 80 ? 15 : qualityScore > 60 ? 10 : 0,
         rawScore: Math.round((upScore + downScore) / 2),
         finalConfidence: confidence,
