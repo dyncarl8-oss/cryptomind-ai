@@ -287,3 +287,27 @@ export async function getCurrentPrice(pair: TradingPair): Promise<number> {
     throw error;
   }
 }
+
+/**
+ * Get anchor timeframes for trend alignment checking
+ * Based on the "Big Picture" rule:
+ * - Scalping (1m, 3m, 5m) → Check 15m & 1hr → Match 1hr trend
+ * - Swing (15m, 30m, 1hr) → Check 4hr & 1d → Match 4hr trend
+ * - Position (2hr, 4hr, 1d) → Check 1d & 1w → Match 1w trend
+ */
+export function getAnchorTimeframes(entryTimeframe: string): { primary: string; secondary: string } {
+  const scalping = ["M1", "M3", "M5"];
+  const swing = ["M15", "M30", "H1"];
+  const position = ["H2", "H4", "D1"];
+  
+  if (scalping.includes(entryTimeframe)) {
+    return { primary: "H1", secondary: "M15" };
+  } else if (swing.includes(entryTimeframe)) {
+    return { primary: "H4", secondary: "D1" };
+  } else if (position.includes(entryTimeframe)) {
+    return { primary: "W1", secondary: "D1" };
+  }
+  
+  // Default fallback
+  return { primary: "H4", secondary: "D1" };
+}

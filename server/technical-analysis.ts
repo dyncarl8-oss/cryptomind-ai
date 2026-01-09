@@ -30,6 +30,7 @@ export interface TechnicalIndicators {
     bandwidth: number;
   };
   volumeIndicator: number;
+  volumeMA: number;
   stochastic: {
     k: number;
     d: number;
@@ -39,6 +40,7 @@ export interface TechnicalIndicators {
     plusDI: number;
     minusDI: number;
   };
+  trendBias: "BULLISH" | "BEARISH" | "NEUTRAL";
   atr: number;
   obv: number;
   momentum: number;
@@ -172,6 +174,15 @@ export function calculateVolumeIndicator(candles: Candle[]): number {
   return ((recentAvg / olderAvg - 1) * 100);
 }
 
+export function calculateVolumeMA(candles: Candle[], period: number = 20): number {
+  if (candles.length < period) {
+    return candles.length > 0 ? candles[candles.length - 1].volume : 0;
+  }
+  
+  const volumes = candles.slice(-period).map(c => c.volume);
+  return volumes.reduce((a, b) => a + b) / volumes.length;
+}
+
 export function calculateStochastic(candles: Candle[], kPeriod: number = 14, dPeriod: number = 3): {
   k: number;
   d: number;
@@ -278,6 +289,63 @@ export function calculateADX(candles: Candle[], period: number = 14): {
     : dx;
   
   return { value: adx, plusDI, minusDI };
+}
+
+export function determineTrendBias(adx: { value: number; plusDI: number; minusDI: number }, ema12: number, ema26: number, currentPrice: number, sma50: number): "BULLISH" | "BEARISH" | "NEUTRAL" {
+  // First check ADX to see if there's a trend at all
+  if (adx.value < 20) {
+    return "NEUTRAL"; // No significant trend
+  }
+
+  // Check directional indicators
+  const diDifference = adx.plusDI - adx.minusDI;
+  const diThreshold = Math.max(5, adx.value * 0.15); // Dynamic threshold based on ADX strength
+
+  let bullishSignals = 0;
+  let bearishSignals = 0;
+
+  // DI lines signal
+  if (diDifference > diThreshold) {
+    bullishSignals += 2;
+  } else if (diDifference < -diThreshold) {
+    bearishSignals += 2;
+  }
+
+  // EMA alignment signal
+  if (ema12 > ema26) {
+    bullishSignals += 1;
+  } else {
+    bearishSignals += 1;
+  }
+
+  // Price vs SMA50 signal
+  if (currentPrice > sma50) {
+    bullishSignals += 1;
+  } else {
+    bearishSignals += 1;
+  }
+
+  // Strong trend confirmation (ADX > 40)
+  if (adx.value > 40) {
+    if (diDifference > 0) {
+      bullishSignals += 1;
+    } else {
+      bearishSignals += 1;
+    }
+  }
+
+  // Determine final bias
+  if (bullishSignals >= 3 && bullishSignals > bearishSignals) {
+    return "BULLISH";
+  } else if (bearishSignals >= 3 && bearishSignals > bullishSignals) {
+    return "BEARISH";
+  } else if (bullishSignals > bearishSignals) {
+    return "BULLISH";
+  } else if (bearishSignals > bullishSignals) {
+    return "BEARISH";
+  }
+
+  return "NEUTRAL";
 }
 
 export function calculateATR(candles: Candle[], period: number = 14): number {
@@ -434,19 +502,24 @@ export function analyzeMarket(candles: Candle[]): TechnicalIndicators {
   const bollingerBands = calculateBollingerBands(candles, 20);
   const bandwidth = ((bollingerBands.upper - bollingerBands.lower) / bollingerBands.middle) * 100;
   
+  const ema12 = calculateEMA(prices, 12);
+  const ema26 = calculateEMA(prices, 26);
+  const sma50 = calculateSMA(prices, 50);
+  
   const trendStrength = calculateTrendStrength(candles, adx.value);
   const marketRegime = determineMarketRegime(adx.value, atr, currentPrice);
+  const trendBias = determineTrendBias(adx, ema12, ema26, currentPrice, sma50);
   
   return {
     rsi: calculateRSI(candles, 14),
     macd: calculateMACD(candles),
     movingAverages: {
       sma20: calculateSMA(prices, 20),
-      sma50: calculateSMA(prices, 50),
+      sma50: sma50,
       sma100: calculateSMA(prices, 100),
       sma200: calculateSMA(prices, 200),
-      ema12: calculateEMA(prices, 12),
-      ema26: calculateEMA(prices, 26),
+      ema12: ema12,
+      ema26: ema26,
       ema50: calculateEMA(prices, 50),
     },
     bollingerBands: {
@@ -454,8 +527,10 @@ export function analyzeMarket(candles: Candle[]): TechnicalIndicators {
       bandwidth,
     },
     volumeIndicator: calculateVolumeIndicator(candles),
+    volumeMA: calculateVolumeMA(candles, 20),
     stochastic: calculateStochastic(candles, 14, 3),
     adx,
+    trendBias,
     atr,
     obv: calculateOBV(candles),
     momentum: calculateMomentum(candles, 10),
