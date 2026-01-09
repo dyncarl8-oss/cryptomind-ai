@@ -286,14 +286,14 @@ function calculateValidatedConfidence(
 
   // Rule 6: ADX < 15 = ranging market (Relaxed from 20)
   // Rule 6: ADX < 12 = ranging market (Relaxed from 15)
-  // Rule 6: ADX < 12 = ranging market
-  // If decent setup, allow ADX down to 10
-  const adxThreshold = isDecentSetup ? 10 : 12;
-  if (adxValue < adxThreshold) {
+  // Rule 6: ADX Check
+  // If confidence is >= 80%, we TRUST the AI's judgment on volatility (e.g. trading a breakout from a squeeze).
+  // We only block low ADX for low-confidence/weak signals.
+  if (!isDecentSetup && adxValue < 12) {
     return {
       confidence: baseConfidence,
       shouldProceed: false,
-      rejectionReason: `ADX < ${adxThreshold} - Dead market, no volatility`,
+      rejectionReason: "ADX < 12 - Dead market, no volatility",
     };
   }
 
