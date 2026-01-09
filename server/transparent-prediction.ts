@@ -221,6 +221,15 @@ function calculateValidatedConfidence(
   shouldProceed: boolean;
   rejectionReason: string | null;
 } {
+  // SUPER OVERRIDE: If the AI is highly confident (>85%), trust the AI and override technical warnings.
+  if (baseConfidence >= 85) {
+    return {
+      confidence: baseConfidence,
+      shouldProceed: true,
+      rejectionReason: null,
+    };
+  }
+
   // Rule 1: Minimum confidence threshold (Adjusted from 90 to 80)
   if (baseConfidence < 80) {
     return {
@@ -271,7 +280,8 @@ function calculateValidatedConfidence(
 
   // Rule 6: ADX < 15 = ranging market (Relaxed from 20)
   // Rule 6: ADX < 12 = ranging market (Relaxed from 15)
-  if (adxValue < 12) {
+  // Ensure this check doesn't kill high confidence setups (already covered by super override above, but kept safe)
+  if (adxValue < 12 && baseConfidence < 85) {
     return {
       confidence: baseConfidence,
       shouldProceed: false,
