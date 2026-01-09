@@ -293,7 +293,7 @@ export function calculateADX(candles: Candle[], period: number = 14): {
 
 export function determineTrendBias(adx: { value: number; plusDI: number; minusDI: number }, ema12: number, ema26: number, currentPrice: number, sma50: number): "BULLISH" | "BEARISH" | "NEUTRAL" {
   // First check ADX to see if there's a trend at all
-  if (adx.value < 20) {
+  if (adx.value < 15) {
     return "NEUTRAL"; // No significant trend
   }
 
@@ -484,9 +484,9 @@ export function calculateTrendStrength(candles: Candle[], adxValue: number): num
 export function determineMarketRegime(adx: number, atr: number, currentPrice: number): "STRONG_TRENDING" | "TRENDING" | "RANGING" {
   const volatilityRatio = (atr / currentPrice) * 100;
   
-  if (adx > 40 && volatilityRatio > 0.5) {
+  if (adx > 35 && volatilityRatio > 0.4) {
     return "STRONG_TRENDING";
-  } else if (adx > 25) {
+  } else if (adx > 20) {
     return "TRENDING";
   } else {
     return "RANGING";

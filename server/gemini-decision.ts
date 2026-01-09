@@ -155,7 +155,7 @@ async function callGeminiModelStreaming(
   }
 
   const decision: GeminiPredictionDecision = JSON.parse(jsonText);
-  decision.confidence = Math.round(Math.max(90, Math.min(98, decision.confidence)));
+  decision.confidence = Math.round(Math.max(80, Math.min(98, decision.confidence)));
   
   if (thinkingProcess) {
     decision.thinkingProcess = thinkingProcess;
@@ -173,11 +173,11 @@ export async function getGeminiPrediction(
 Your task: Analyze the provided technical indicators and market data to make a precise trading prediction. THINK DEEPLY about each aspect before deciding.
 
 CRITICAL REQUIREMENTS:
-1. Direction: Choose "UP", "DOWN", or "NEUTRAL" (only use NEUTRAL if truly no edge exists)
-2. Confidence: Must be between 90-98%. Use the full range intelligently:
-   - 90-92%: Moderate setup with some conflicting signals
-   - 93-95%: Strong setup with good alignment
-   - 96-98%: Exceptional setup with near-perfect alignment
+1. Direction: Choose "UP", "DOWN", or "NEUTRAL"
+2. Confidence: Must be between 80-98%. Use the full range intelligently:
+   - 80-85%: Moderate setup with some conflicting signals
+   - 86-92%: Strong setup with good alignment
+   - 93-98%: Exceptional setup with near-perfect alignment
    IMPORTANT: Vary your confidence naturally - do NOT always return the same value!
 3. Rationale: 2-3 sentences explaining the key factors driving your decision
 4. Risk Factors: 2-4 specific risks to this trade
@@ -195,25 +195,23 @@ TRADE TARGET GUIDELINES:
 
 7. Duration: Provide a typical duration for this trade (e.g., "1-4 hours", "12-24 hours", etc.)
 
-TREND ALIGNMENT (CRITICAL):
+TREND ALIGNMENT:
 - You will see Entry Timeframe and Anchor Timeframe data
 - Entry TF is the user's selected timeframe
 - Anchor TF is one level higher (the "Big Picture")
-- REJECT trades where Entry trend conflicts with Anchor trend
-- Example: If Entry is LONG but Anchor is BEARISH → Reject as "Trend Conflict"
-- Only proceed when trends align or both are neutral
+- Prefer trades where Entry trend aligns with Anchor trend.
+- If trends conflict, you may still proceed if you see a strong reversal pattern or significant momentum, but reduce confidence accordingly.
 
-VOLUME CONFIRMATION RULES:
-- Volume must be at least 1.5x the 20-period Volume MA
-- If price makes new high but volume decreases → "Weak Breakout" (reject)
-- If price makes new low but volume decreases → "Weak Breakdown" (reject)
+VOLUME CONFIRMATION:
+- Volume at least 1.1x the 20-period Volume MA is preferred for confirmation.
+- If price makes new high/low but volume is significantly decreasing, be cautious of a "Weak Breakout/Breakdown".
 
 CONFIDENCE CALIBRATION:
-- If signals are mixed or market regime is RANGING → 90-92%
-- If strong directional bias but some counter-signals → 93-94%
-- If very strong alignment and favorable regime → 95-96%
-- If exceptional alignment, strong trend, and volume confirmation → 97-98%
-- ADX < 20 indicates ranging market → Use NEUTRAL or lower confidence
+- If signals are mixed or market regime is RANGING → 80-85%
+- If strong directional bias but some counter-signals → 86-90%
+- If very strong alignment and favorable regime → 91-95%
+- If exceptional alignment, strong trend, and volume confirmation → 96-98%
+- ADX < 15 indicates a very tight ranging market → Use NEUTRAL unless a breakout is imminent.
 
 Think critically about the data quality and signal alignment. Not every prediction deserves 97%! Reason through your decision step by step.`;
 
@@ -234,18 +232,18 @@ TREND ALIGNMENT STATUS:
 ${snapshot.entryTrendBias === snapshot.anchorTrendBias ? '✓ Trends Aligned' : '⚠ Trend Conflict Risk'}
 ${snapshot.entryTrendBias === 'BULLISH' && snapshot.anchorTrendBias === 'BULLISH' ? '  → Both timeframes show bullish bias - favorable for LONG trades' : ''}
 ${snapshot.entryTrendBias === 'BEARISH' && snapshot.anchorTrendBias === 'BEARISH' ? '  → Both timeframes show bearish bias - favorable for SHORT trades' : ''}
-${snapshot.entryTrendBias !== snapshot.anchorTrendBias ? '  → ENTRY CONFLICT: Entry timeframe conflicts with anchor trend - RECOMMEND REJECTION' : ''}
+${snapshot.entryTrendBias !== snapshot.anchorTrendBias ? '  → ENTRY CONFLICT: Entry timeframe conflicts with anchor trend - EXERCISE CAUTION' : ''}
 
 TECHNICAL INDICATORS:
-- RSI: ${snapshot.rsiValue.toFixed(1)} ${snapshot.rsiValue >= 45 && snapshot.rsiValue <= 55 ? '(NEUTRAL ZONE - OBSERVATION MODE)' : ''}
+- RSI: ${snapshot.rsiValue.toFixed(1)} ${snapshot.rsiValue >= 48 && snapshot.rsiValue <= 52 ? '(NEUTRAL ZONE)' : ''}
 - MACD Signal: ${snapshot.macdSignal}
 - Trend Strength: ${snapshot.trendStrength.toFixed(1)}%
 - Volume Indicator: ${snapshot.volumeIndicator.toFixed(1)}%
 - Current Volume: ${snapshot.currentVolume.toFixed(0)}
 - Volume MA (20): ${snapshot.volumeMA.toFixed(0)}
-- Volume Ratio: ${(snapshot.volumeMA > 0 ? snapshot.currentVolume / snapshot.volumeMA : 1).toFixed(2)}x ${(snapshot.volumeMA > 0 && snapshot.currentVolume / snapshot.volumeMA >= 1.5 ? '✓ Confirmed' : '⚠ Below threshold (1.5x)')}
+- Volume Ratio: ${(snapshot.volumeMA > 0 ? snapshot.currentVolume / snapshot.volumeMA : 1).toFixed(2)}x ${(snapshot.volumeMA > 0 && snapshot.currentVolume / snapshot.volumeMA >= 1.1 ? '✓ Confirmed' : '⚠ Below preferred threshold (1.1x)')}
 - Volatility (ATR): ${snapshot.volatility.toFixed(2)}
-- ADX: ${snapshot.adxValue.toFixed(1)} ${snapshot.adxValue < 20 ? '(Ranging market - low confidence)' : '(Trending market)'}
+- ADX: ${snapshot.adxValue.toFixed(1)} ${snapshot.adxValue < 15 ? '(Tight range)' : '(Trending market)'}
 
 SIGNAL ANALYSIS:
 UP Signals (Score: ${snapshot.upScore.toFixed(1)}):
@@ -265,7 +263,7 @@ Based on this multi-timeframe technical analysis, provide your trading decision.
       },
       confidence: {
         type: "number",
-        minimum: 90,
+        minimum: 80,
         maximum: 98,
       },
       rationale: { type: "string" },
