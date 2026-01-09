@@ -220,26 +220,26 @@ function calculateValidatedConfidence(
   shouldProceed: boolean;
   rejectionReason: string | null;
 } {
-  // Rule 1: Minimum confidence threshold (Relaxed from 90 to 75)
-  if (baseConfidence < 75) {
+  // Rule 1: Minimum confidence threshold (Adjusted from 90 to 80)
+  if (baseConfidence < 80) {
     return {
       confidence: baseConfidence,
       shouldProceed: false,
-      rejectionReason: `Confidence below minimum threshold (${baseConfidence}% < 75%)`,
+      rejectionReason: `Confidence below minimum threshold (${baseConfidence}% < 80%)`,
     };
   }
 
-  // Rule 2: Trend alignment (Now a warning unless confidence is very low)
-  if (!trendAlignment && baseConfidence < 85) {
+  // Rule 2: Trend alignment (Now a warning unless confidence is very low, relaxed threshold 85→82)
+  if (!trendAlignment && baseConfidence < 82) {
     return {
       confidence: baseConfidence,
       shouldProceed: false,
-      rejectionReason: "Trend Conflict: Counter-trend setups require higher confidence (>85%)",
+      rejectionReason: "Trend Conflict: Counter-trend setups require higher confidence (>82%)",
     };
   }
 
-  // Rule 3: Volume confirmation (Relaxed from 1.5x to 1.1x)
-  if (volumeRatio < 1.1 && baseConfidence < 88) {
+  // Rule 3: Volume confirmation (Relaxed from 1.5x to 1.1x, override threshold 88→85)
+  if (volumeRatio < 1.1 && baseConfidence < 85) {
     return {
       confidence: baseConfidence,
       shouldProceed: false,
@@ -247,8 +247,8 @@ function calculateValidatedConfidence(
     };
   }
 
-  // Rule 4: Volume divergence check (Only reject if extreme)
-  if (hasVolumeDivergence && baseConfidence < 90) {
+  // Rule 4: Volume divergence check (Only reject if extreme, override threshold 90→85)
+  if (hasVolumeDivergence && baseConfidence < 85) {
     return {
       confidence: baseConfidence,
       shouldProceed: false,
@@ -721,7 +721,7 @@ export async function generateTransparentPrediction(
   if (!validationResult.shouldProceed) {
     // Rejection case - return neutral with explanation
     direction = "NEUTRAL";
-    confidence = 0;
+    confidence = validationResult.confidence; // Show actual confidence, not 0
     tradeTargets = undefined;
 
     keyFactors = [
@@ -735,7 +735,7 @@ export async function generateTransparentPrediction(
       validationResult.rejectionReason || "Multiple validation checks failed",
     ];
 
-    explanation = "Market Analysis: Neutral leaning. No high-probability setup detected. Standing aside.";
+    explanation = `Market Analysis: Neutral leaning. ${validationResult.rejectionReason}. Standing aside.`;
   } else {
     // Proceed with valid signal
     confidence = validationResult.confidence;
