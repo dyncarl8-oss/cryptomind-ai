@@ -175,10 +175,11 @@ Your task: Analyze the provided technical indicators and market data to make a p
 CRITICAL REQUIREMENTS:
 1. Direction: Choose "UP", "DOWN", or "NEUTRAL"
 2. Confidence: Must be between 80-99%. Use the full range intelligently:
-   - 80-85%: Moderate setup with some conflicting signals
+   - 80-85%: Moderate setup with some conflicting signals or ranging conditions
    - 86-92%: Strong setup with good alignment
    - 93-99%: Exceptional setup with near-perfect alignment
-   IMPORTANT: Vary your confidence naturally - do NOT always return the same value!
+   IMPORTANT: BE DECISIVE. If you see a good edge, do NOT default to NEUTRAL. Use the 80-88% range for decent "probable" setups.
+   Only use NEUTRAL if the market is completely dead (ADX < 12) or providing truly conflicting chaos.
 3. Rationale: 2-3 sentences explaining the key factors driving your decision
 4. Risk Factors: 2-4 specific risks to this trade
 5. Key Factors: 3-6 bullet points listing the most important indicators supporting your decision
@@ -211,9 +212,11 @@ CONFIDENCE CALIBRATION:
 - If strong directional bias but some counter-signals → 86-92%
 - If very strong alignment and favorable regime → 93-96%
 - If exceptional alignment, strong trend, and volume confirmation → 97-99%
-- ADX < 12 indicates a very tight ranging market → Use NEUTRAL unless a breakout is imminent.
+- ADX < 12 is the ONLY "hard" neutral indicator. Anything else can be traded if price action/momentum is good.
+- Don't simply average the signals. Look for the "story" of the chart. A divergence + support bounce is a high probability trade even if moving averages are mixed.
+- Trust high conviction signals. If you see a 99% setup, give it 99%.
 
-Think critically about the data quality and signal alignment. Not every prediction deserves 99%! Reason through your decision step by step.`;
+Think like a hedge fund algorithm: Risk/Reward is key. If the setup is decent (3:1 reward), take the trade with 85% confidence.`;
 
   const analysisText = `
 MARKET SNAPSHOT:
