@@ -701,7 +701,10 @@ export async function generateTransparentPrediction(
 
   let direction = geminiDecision?.direction || (upScore > downScore ? "UP" : "DOWN") as "UP" | "DOWN" | "NEUTRAL";
   let confidence = geminiDecision?.confidence || Math.round(Math.min(95, (signalAlignment * 0.8) + (indicators.trendStrength * 0.2)));
-  const duration = getDurationBasedOnTimeframe(timeframe);
+
+  // Use AI's specific duration if available, otherwise fallback to timeframe estimate
+  const duration = geminiDecision?.duration || getDurationBasedOnTimeframe(timeframe);
+
   const qualityScore = Math.round((signalAlignment + indicators.trendStrength) / 2);
 
   // Perform all validation checks
