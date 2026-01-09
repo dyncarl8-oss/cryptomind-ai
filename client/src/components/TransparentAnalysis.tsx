@@ -110,6 +110,18 @@ function StageIndicator({ stage }: { stage: AnalysisStage }) {
 }
 
 function MarketDataDisplay({ data }: { data: MarketDataSnapshot }) {
+  const priceDecimals = data.currentPrice >= 1
+    ? 2
+    : data.currentPrice >= 0.1
+    ? 3
+    : data.currentPrice >= 0.01
+    ? 4
+    : data.currentPrice >= 0.001
+    ? 6
+    : data.currentPrice >= 0.0001
+    ? 8
+    : 10;
+
   return (
     <div
       className="grid grid-cols-2 gap-3 text-sm"
@@ -118,7 +130,7 @@ function MarketDataDisplay({ data }: { data: MarketDataSnapshot }) {
       <div>
         <div className="text-xs text-muted-foreground">Current Price</div>
         <div className="font-mono font-semibold">
-          ${data.currentPrice.toFixed(2)}
+          ${data.currentPrice.toLocaleString(undefined, { minimumFractionDigits: priceDecimals, maximumFractionDigits: priceDecimals })}
         </div>
       </div>
       <div>
@@ -318,6 +330,26 @@ function AIThinkingDisplay({ data }: { data: AIThinkingData }) {
 }
 
 function FinalVerdictDisplay({ data }: { data: FinalVerdictData }) {
+  const priceDecimals = data.tradeTargets
+    ? (data.tradeTargets.entry.low >= 100
+      ? 2
+      : data.tradeTargets.entry.low >= 10
+      ? 3
+      : data.tradeTargets.entry.low >= 1
+      ? 4
+      : data.tradeTargets.entry.low >= 0.1
+      ? 5
+      : data.tradeTargets.entry.low >= 0.01
+      ? 6
+      : data.tradeTargets.entry.low >= 0.001
+      ? 7
+      : data.tradeTargets.entry.low >= 0.0001
+      ? 8
+      : data.tradeTargets.entry.low >= 0.00001
+      ? 9
+      : 10)
+    : 2;
+
   return (
     <div className="space-y-3" data-testid="final-verdict-display">
       <div className="flex items-center justify-between p-4 rounded-md bg-primary/10 border border-primary/20">
@@ -348,19 +380,19 @@ function FinalVerdictDisplay({ data }: { data: FinalVerdictData }) {
             <div className="p-3 rounded-md bg-card-elevated">
               <div className="text-xs text-muted-foreground font-semibold">ENTRY</div>
               <div className="font-mono font-semibold">
-                {data.tradeTargets.entry.low.toFixed(2)} - {data.tradeTargets.entry.high.toFixed(2)}
+                {data.tradeTargets.entry.low.toLocaleString(undefined, { minimumFractionDigits: priceDecimals, maximumFractionDigits: priceDecimals })} - {data.tradeTargets.entry.high.toLocaleString(undefined, { minimumFractionDigits: priceDecimals, maximumFractionDigits: priceDecimals })}
               </div>
             </div>
             <div className="p-3 rounded-md bg-green-500/10 border border-green-500/20">
               <div className="text-xs text-muted-foreground font-semibold">TARGET</div>
               <div className="font-mono font-semibold text-green-600 dark:text-green-400">
-                {data.tradeTargets.target.low.toFixed(2)} - {data.tradeTargets.target.high.toFixed(2)}
+                {data.tradeTargets.target.low.toLocaleString(undefined, { minimumFractionDigits: priceDecimals, maximumFractionDigits: priceDecimals })} - {data.tradeTargets.target.high.toLocaleString(undefined, { minimumFractionDigits: priceDecimals, maximumFractionDigits: priceDecimals })}
               </div>
             </div>
             <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20">
               <div className="text-xs text-muted-foreground font-semibold">STOP</div>
               <div className="font-mono font-semibold text-red-600 dark:text-red-400">
-                {data.tradeTargets.stop.toFixed(2)}
+                {data.tradeTargets.stop.toLocaleString(undefined, { minimumFractionDigits: priceDecimals, maximumFractionDigits: priceDecimals })}
               </div>
             </div>
           </div>

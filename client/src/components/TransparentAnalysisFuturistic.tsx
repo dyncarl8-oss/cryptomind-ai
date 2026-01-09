@@ -120,7 +120,12 @@ function getPriceDecimals(price?: number) {
   if (price >= 100) return 2;
   if (price >= 10) return 3;
   if (price >= 1) return 4;
-  return 6;
+  if (price >= 0.1) return 5;
+  if (price >= 0.01) return 6;
+  if (price >= 0.001) return 7;
+  if (price >= 0.0001) return 8;
+  if (price >= 0.00001) return 9;
+  return 10;
 }
 
 function formatPrice(value: number, decimals: number) {
@@ -194,12 +199,14 @@ function StageIndicator({ stage }: { stage: AnalysisStage }) {
 }
 
 function MarketDataDisplay({ data }: { data: MarketDataSnapshot }) {
+  const priceDecimals = getPriceDecimals(data.currentPrice);
+
   return (
     <div className="grid grid-cols-2 gap-4 p-4 rounded-xl bg-card/50 border border-border/40 backdrop-blur-sm">
       <div className="space-y-1">
         <div className="text-xs text-muted-foreground font-medium">Current Price</div>
         <div className="font-mono font-bold text-2xl glow-text">
-          ${data.currentPrice.toFixed(2)}
+          ${formatPrice(data.currentPrice, priceDecimals)}
         </div>
       </div>
       <div className="space-y-1">

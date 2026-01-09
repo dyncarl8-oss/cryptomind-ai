@@ -15,10 +15,33 @@ interface PredictionCardProps {
   };
 }
 
+function getPriceDecimals(price: number) {
+  if (price >= 100) return 2;
+  if (price >= 10) return 3;
+  if (price >= 1) return 4;
+  if (price >= 0.1) return 5;
+  if (price >= 0.01) return 6;
+  if (price >= 0.001) return 7;
+  if (price >= 0.0001) return 8;
+  if (price >= 0.00001) return 9;
+  return 10;
+}
+
+function formatPrice(value: number, decimals: number) {
+  return value.toLocaleString(undefined, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
+
 export function PredictionCard({ prediction }: PredictionCardProps) {
   const isUp = prediction.direction === "UP";
   const isDown = prediction.direction === "DOWN";
   const isNeutral = prediction.direction === "NEUTRAL";
+
+  const priceDecimals = prediction.tradeTargets
+    ? getPriceDecimals(prediction.tradeTargets.entry.low)
+    : 2;
 
   return (
     <div
@@ -68,19 +91,19 @@ export function PredictionCard({ prediction }: PredictionCardProps) {
           <div className="space-y-1">
             <div className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider">Entry</div>
             <div className="font-mono text-xs font-bold">
-              {prediction.tradeTargets.entry.low.toFixed(2)}-{prediction.tradeTargets.entry.high.toFixed(2)}
+              {formatPrice(prediction.tradeTargets.entry.low, priceDecimals)}-{formatPrice(prediction.tradeTargets.entry.high, priceDecimals)}
             </div>
           </div>
           <div className="space-y-1">
             <div className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider">Target</div>
             <div className="font-mono text-xs font-bold text-chart-2">
-              {prediction.tradeTargets.target.low.toFixed(2)}-{prediction.tradeTargets.target.high.toFixed(2)}
+              {formatPrice(prediction.tradeTargets.target.low, priceDecimals)}-{formatPrice(prediction.tradeTargets.target.high, priceDecimals)}
             </div>
           </div>
           <div className="space-y-1">
             <div className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider">Stop</div>
             <div className="font-mono text-xs font-bold text-destructive">
-              {prediction.tradeTargets.stop.toFixed(2)}
+              {formatPrice(prediction.tradeTargets.stop, priceDecimals)}
             </div>
           </div>
         </div>
