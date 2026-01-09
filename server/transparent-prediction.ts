@@ -64,8 +64,8 @@ function computeFallbackTradeTargets(
 }
 
 /**
- * Check if volume meets the 1.5x Volume MA threshold
- * This is the "Fuel" rule - volume must be at least 1.5x average
+ * Check if volume meets the 1.1x Volume MA threshold
+ * This is the "Fuel" rule - volume must be at least 1.1x average
  */
 function checkVolumeConfirmation(currentVolume: number, volumeMA: number): {
   passes: boolean;
@@ -73,13 +73,13 @@ function checkVolumeConfirmation(currentVolume: number, volumeMA: number): {
   ratio: number;
 } {
   const ratio = volumeMA > 0 ? currentVolume / volumeMA : 1;
-  const passes = ratio >= 1.5;
+  const passes = ratio >= 1.1;
 
   return {
     passes,
     reason: passes
-      ? `Volume confirmed: ${ratio.toFixed(2)}x MA (≥1.5x threshold)`
-      : `Volume too low: ${ratio.toFixed(2)}x MA (<1.5x threshold)`,
+      ? `Volume confirmed: ${ratio.toFixed(2)}x MA (≥1.1x threshold)`
+      : `Volume low: ${ratio.toFixed(2)}x MA (<1.1x threshold)`,
     ratio,
   };
 }
@@ -141,15 +141,15 @@ function checkRSINeutralZone(rsi: number): {
   isNeutral: boolean;
   reason: string;
 } {
-  if (rsi >= 45 && rsi <= 55) {
+  if (rsi >= 48 && rsi <= 52) {
     return {
       isNeutral: true,
-      reason: `RSI in neutral zone (${rsi.toFixed(1)}) - Observation Mode`,
+      reason: `RSI in tight neutral zone (${rsi.toFixed(1)})`,
     };
   }
   return {
     isNeutral: false,
-    reason: `RSI ${rsi.toFixed(1)} - outside neutral zone`,
+    reason: `RSI ${rsi.toFixed(1)} - directional momentum`,
   };
 }
 
@@ -206,7 +206,7 @@ function checkTrendAlignment(
 
 /**
  * Calculate confidence score with all validation rules
- * Returns minimum of 90 for valid signals, otherwise neutral
+ * Returns minimum of 75 for valid signals, otherwise neutral
  */
 function calculateValidatedConfidence(
   baseConfidence: number,
@@ -220,61 +220,61 @@ function calculateValidatedConfidence(
   shouldProceed: boolean;
   rejectionReason: string | null;
 } {
-  // Rule 1: Minimum 90+ confidence required
-  if (baseConfidence < 90) {
+  // Rule 1: Minimum confidence threshold (Relaxed from 90 to 75)
+  if (baseConfidence < 75) {
     return {
       confidence: baseConfidence,
       shouldProceed: false,
-      rejectionReason: `Confidence below threshold (${baseConfidence}% < 90%)`,
+      rejectionReason: `Confidence below minimum threshold (${baseConfidence}% < 75%)`,
     };
   }
 
-  // Rule 2: Trend alignment
-  if (!trendAlignment) {
+  // Rule 2: Trend alignment (Now a warning unless confidence is very low)
+  if (!trendAlignment && baseConfidence < 85) {
     return {
       confidence: baseConfidence,
       shouldProceed: false,
-      rejectionReason: "Trend Conflict: Entry timeframe conflicts with anchor trend",
+      rejectionReason: "Trend Conflict: Counter-trend setups require higher confidence (>85%)",
     };
   }
 
-  // Rule 3: Volume confirmation (1.5x threshold)
-  if (volumeRatio < 1.5) {
+  // Rule 3: Volume confirmation (Relaxed from 1.5x to 1.1x)
+  if (volumeRatio < 1.1 && baseConfidence < 88) {
     return {
       confidence: baseConfidence,
       shouldProceed: false,
-      rejectionReason: `Volume below threshold (${volumeRatio.toFixed(2)}x < 1.5x MA)`,
+      rejectionReason: `Low volume (${volumeRatio.toFixed(2)}x) requires higher baseline confidence`,
     };
   }
 
-  // Rule 4: Volume divergence check
-  if (hasVolumeDivergence) {
+  // Rule 4: Volume divergence check (Only reject if extreme)
+  if (hasVolumeDivergence && baseConfidence < 90) {
     return {
       confidence: baseConfidence,
       shouldProceed: false,
-      rejectionReason: "Volume divergence detected - weak breakout",
+      rejectionReason: "Volume divergence detected - weak breakout/breakdown",
     };
   }
 
-  // Rule 5: RSI neutral zone
-  if (rsiNeutral) {
+  // Rule 5: RSI neutral zone (Much tighter now: 48-52)
+  if (rsiNeutral && baseConfidence < 80) {
     return {
       confidence: baseConfidence,
       shouldProceed: false,
-      rejectionReason: "RSI in neutral zone (45-55) - Observation Mode",
+      rejectionReason: "RSI in neutral zone - low momentum setup",
     };
   }
 
-  // Rule 6: ADX < 20 = ranging market
-  if (adxValue < 20) {
+  // Rule 6: ADX < 15 = ranging market (Relaxed from 20)
+  if (adxValue < 15) {
     return {
       confidence: baseConfidence,
       shouldProceed: false,
-      rejectionReason: "ADX < 20 - Ranging market, no high-probability setup",
+      rejectionReason: "ADX < 15 - Extremely ranging market, no edge detected",
     };
   }
 
-  // All checks passed
+  // All checks passed or overridden by high confidence
   return {
     confidence: Math.min(98, baseConfidence),
     shouldProceed: true,
@@ -725,10 +725,10 @@ export async function generateTransparentPrediction(
     tradeTargets = undefined;
 
     keyFactors = [
-      anchorTrendValidationResult.aligned ? anchorTrendValidationResult.reason : anchorTrendValidationResult.reason,
+      anchorTrendValidationResult.reason,
       volumeConfirmation.reason,
       rsiNeutralCheck.reason,
-      `ADX: ${indicators.adx.value.toFixed(1)} - ${indicators.adx.value < 20 ? "Ranging" : "Trending"}`,
+      `ADX: ${indicators.adx.value.toFixed(1)} - ${indicators.adx.value < 15 ? "Tight Range" : "Directional Momentum"}`,
     ];
 
     riskFactors = [
@@ -864,7 +864,7 @@ export async function generateTransparentPrediction(
       marketRegime: indicators.marketRegime,
       confidenceBreakdown: {
         baseScore: Math.round(signalAlignment * 0.6),
-        volumeBonus: Math.round(volumeConfirmation.ratio >= 1.5 ? 25 : 0),
+        volumeBonus: Math.round(volumeConfirmation.ratio >= 1.1 ? 25 : 0),
         regimeBonus: indicators.marketRegime === "STRONG_TRENDING" ? 18 : indicators.marketRegime === "TRENDING" ? 10 : 0,
         alignmentPenalty: !anchorTrendValidationResult.aligned ? -20 : signalAlignment < 70 ? -12 : 0,
         qualityBoost: qualityScore > 80 ? 15 : qualityScore > 60 ? 10 : 0,
