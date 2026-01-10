@@ -130,18 +130,7 @@ export function MemberSidebar({ open, onOpenChange, user, credits, onSessionSele
 
         <Separator className="flex-shrink-0" />
 
-        <div className="flex-shrink-0 px-6 py-4 space-y-3">
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 px-2 pt-2">
-            <Link href="/terms">
-              <a className="text-[10px] uppercase tracking-widest text-muted-foreground/50 hover:text-primary transition-colors font-bold">Terms</a>
-            </Link>
-            <Link href="/privacy">
-              <a className="text-[10px] uppercase tracking-widest text-muted-foreground/50 hover:text-primary transition-colors font-bold">Privacy</a>
-            </Link>
-            <Link href="/risk">
-              <a className="text-[10px] uppercase tracking-widest text-muted-foreground/50 hover:text-primary transition-colors font-bold">Risk</a>
-            </Link>
-          </div>
+        <div className="flex-shrink-0 px-6 py-4 space-y-3 pb-6">
 
           {credits && (
             <div className="space-y-3">
@@ -206,6 +195,18 @@ export function MemberSidebar({ open, onOpenChange, user, credits, onSessionSele
                 </p>
               )}
             </div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 pt-2 opacity-60 hover:opacity-100 transition-opacity">
+            <Link href="/terms">
+              <a className="text-[9px] uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors font-medium">Terms</a>
+            </Link>
+            <Link href="/privacy">
+              <a className="text-[9px] uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors font-medium">Privacy</a>
+            </Link>
+            <Link href="/risk">
+              <a className="text-[9px] uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors font-medium">Risk Disclosure</a>
+            </Link>
           </div>
         </div>
       </SheetContent>
