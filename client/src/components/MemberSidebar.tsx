@@ -1,9 +1,9 @@
-import { 
-  Sheet, 
-  SheetContent, 
-  SheetHeader, 
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
   SheetTitle,
-  SheetDescription 
+  SheetDescription
 } from "@/components/ui/sheet";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import { MessageSquare, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
+import { Link } from "wouter";
 import type { ChatSessionWithMessages } from "@shared/schema";
 
 interface WhopUser {
@@ -44,11 +45,11 @@ interface MemberSidebarProps {
 export function MemberSidebar({ open, onOpenChange, user, credits, onSessionSelect, onPurchase, isPurchasing, subscriptionManageUrl }: MemberSidebarProps) {
   const initials = user?.name
     ? user.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2)
     : "U";
 
   const { data: sessions = [], isLoading } = useQuery<ChatSessionWithMessages[]>({
@@ -86,7 +87,7 @@ export function MemberSidebar({ open, onOpenChange, user, credits, onSessionSele
             <div className="flex flex-col gap-1.5 pb-4">
               {sessions.map((session) => {
                 const displayTitle = session.tradingPair || "Chat Session";
-                
+
                 return (
                   <Button
                     key={session.id}
@@ -130,6 +131,18 @@ export function MemberSidebar({ open, onOpenChange, user, credits, onSessionSele
         <Separator className="flex-shrink-0" />
 
         <div className="flex-shrink-0 px-6 py-4 space-y-3">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 px-2 pt-2">
+            <Link href="/terms">
+              <a className="text-[10px] uppercase tracking-widest text-muted-foreground/50 hover:text-primary transition-colors font-bold">Terms</a>
+            </Link>
+            <Link href="/privacy">
+              <a className="text-[10px] uppercase tracking-widest text-muted-foreground/50 hover:text-primary transition-colors font-bold">Privacy</a>
+            </Link>
+            <Link href="/risk">
+              <a className="text-[10px] uppercase tracking-widest text-muted-foreground/50 hover:text-primary transition-colors font-bold">Risk</a>
+            </Link>
+          </div>
+
           {credits && (
             <div className="space-y-3">
               <div className="flex items-center gap-3 p-3 rounded-lg bg-card border border-border/50">
@@ -175,8 +188,8 @@ export function MemberSidebar({ open, onOpenChange, user, credits, onSessionSele
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10" data-testid="sidebar-avatar-user">
               {user?.profile_pic_url && (
-                <AvatarImage 
-                  src={user.profile_pic_url} 
+                <AvatarImage
+                  src={user.profile_pic_url}
                   alt={user.name || "User"}
                   crossOrigin="anonymous"
                 />

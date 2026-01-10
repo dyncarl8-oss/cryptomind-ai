@@ -19,11 +19,11 @@ function AdminRedirect() {
     // Check URL hash for resource ID (Whop iframe context)
     const hash = window.location.hash;
     const searchParams = new URLSearchParams(window.location.search);
-    
+
     // Try to extract from query params or hash
     const experienceId = searchParams.get('experienceId') || searchParams.get('experience_id');
     const companyId = searchParams.get('companyId') || searchParams.get('company_id');
-    
+
     if (experienceId) {
       console.log("[AdminRedirect] Found experienceId in URL:", experienceId);
       setResourceId(experienceId);
@@ -143,12 +143,19 @@ function ExperienceRoute() {
   return <Chat />;
 }
 
+import Terms from "@/pages/Terms";
+import Privacy from "@/pages/Privacy";
+import RiskDisclosure from "@/pages/RiskDisclosure";
+
 function Router() {
   return (
     <Switch>
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/webhook-tester" component={WebhookTester} />
       <Route path="/experiences/:experienceId" component={ExperienceRoute} />
+      <Route path="/terms" component={Terms} />
+      <Route path="/privacy" component={Privacy} />
+      <Route path="/risk" component={RiskDisclosure} />
       <Route path="/" component={Chat} />
     </Switch>
   );

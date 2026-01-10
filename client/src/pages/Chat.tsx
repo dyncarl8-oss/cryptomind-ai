@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useParams } from "wouter";
+import { useParams, Link } from "wouter";
 import { type Message, type TradingPair, type AnalysisStage, type Timeframe, type ChatSessionWithMessages } from "@shared/schema";
 import { ChatHeader } from "@/components/ChatHeader";
 import { ChatMessage } from "@/components/ChatMessage";
@@ -470,6 +470,13 @@ export default function Chat() {
           })}
 
           <div ref={messagesEndRef} />
+        </div>
+        {/* Disclaimers & Info */}
+        <div className="flex-shrink-0 px-4 py-2 bg-background/50 border-t border-border/10">
+          <p className="text-[10px] text-center text-muted-foreground/40 leading-tight max-w-2xl mx-auto">
+            AI can make mistakes. Always double-check results. Trading involves significant risk.{" "}
+            <Link href="/risk" className="underline hover:text-primary transition-colors">Risk Disclosure</Link>
+          </p>
         </div>
       </div>
 
