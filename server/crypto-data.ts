@@ -49,7 +49,7 @@ const pairToSymbols = (pair: TradingPair): { from: string; to: string } => {
     "EUR/USD": { from: "EUR", to: "USD" },
     "GBP/USD": { from: "GBP", to: "USD" },
     "AUD/USD": { from: "AUD", to: "USD" },
-    "XAU/USD": { from: "XAU", to: "USD" },
+    "XAU/USD": { from: "PAXG", to: "USDT" }, // Use PAXG crypto token as 24/7 live gold proxy
     "US100/USD": { from: "US100", to: "USD" },
   };
 
@@ -163,7 +163,13 @@ export async function fetchMarketData(pair: TradingPair, timeframe: string = "M1
   // Use Yahoo Finance for XAU/USD and US100/USD
   if (pair === "XAU/USD" || pair === "US100/USD") {
     try {
-      const yfSymbol = pair === "XAU/USD" ? "GC=F" : "^NDX"; // Use GC=F for Gold as XAUUSD=X is flaky
+      // Use NQ=F for US100 (Nasdaq 100 Futures) - trades almost 24/5 and more relevant than the index
+      const yfSymbol = pair === "US100/USD" ? "NQ=F" : null;
+
+      if (!yfSymbol && pair === "XAU/USD") {
+        // Gold is handled by PAXG/USDT in the CryptoCompare section for 24/7 live movement
+        throw new Error("Use CryptoCompare PAXG proxy for Gold");
+      }
 
       // Yahoo timeframe mapping
       const yahooTimeframeMap: Record<string, string> = {
@@ -177,8 +183,8 @@ export async function fetchMarketData(pair: TradingPair, timeframe: string = "M1
       };
       const range = rangeMap[timeframe] || "5d";
 
-      const data = await fetchFromYahoo(yfSymbol, interval, range);
-      const result = data.chart.result?.[0];
+      const data = yfSymbol ? await fetchFromYahoo(yfSymbol, interval, range) : null;
+      const result = data?.chart?.result?.[0];
 
       if (result) {
         const currentPrice = result.meta.regularMarketPrice;
@@ -225,8 +231,8 @@ export async function fetchMarketData(pair: TradingPair, timeframe: string = "M1
     if (!currentPrice) {
       console.log(`[CryptoCompare API] Using synthetic price for ${pair}`);
       // Default fallback prices based on 2026 market levels
-      if (pair.includes("XAU")) currentPrice = 4500;
-      else if (pair.includes("US100")) currentPrice = 25000;
+      if (pair.includes("XAU")) currentPrice = 4514.50;
+      else if (pair.includes("US100")) currentPrice = 25938.25;
       else if (pair.includes("BTC")) currentPrice = 100000;
       else currentPrice = 100;
     }
@@ -362,15 +368,14 @@ export async function fetchMarketData(pair: TradingPair, timeframe: string = "M1
 export async function getCurrentPrice(pair: TradingPair): Promise<number> {
   const { from, to } = pairToSymbols(pair);
 
-  if (pair === "XAU/USD" || pair === "US100/USD") {
+  if (pair === "US100/USD") {
     try {
-      const yfSymbol = pair === "XAU/USD" ? "GC=F" : "^NDX";
+      const yfSymbol = "NQ=F";
       const data = await fetchFromYahoo(yfSymbol, '1m', '1d');
       const result = data.chart.result?.[0];
       if (result) return result.meta.regularMarketPrice;
     } catch (error) {
       console.error(`[Yahoo API] Price error for ${pair}:`, error);
-      // Fallback
     }
   }
 
