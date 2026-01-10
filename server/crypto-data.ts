@@ -112,6 +112,32 @@ const getHistoEndpoint = (timeframe: string): { endpoint: string; aggregate: num
   return { endpoint: "histominute", aggregate: 1, limit: 300 };
 };
 
+const ALPHA_VANTAGE_KEY = process.env.ALPHA_VANTAGE_API_KEY || "9EWIX673WCGVHWK0";
+
+async function fetchFromAlphaVantage(functionName: string, symbol: string, extraParams: string = ""): Promise<any> {
+  const url = `https://www.alphavantage.co/query?function=${functionName}&symbol=${symbol}${extraParams}&apikey=${ALPHA_VANTAGE_KEY}`;
+  console.log(`[Alpha Vantage API] Fetching: ${functionName} for ${symbol}`);
+
+  return new Promise((resolve, reject) => {
+    https.get(url, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.Information || parsed["Note"]) {
+            console.warn(`[Alpha Vantage API] Rate limited or Info: ${JSON.stringify(parsed)}`);
+          }
+          resolve(parsed);
+        } catch (e) {
+          reject(new Error(`Failed to parse Alpha Vantage data for ${symbol}`));
+        }
+      });
+      res.on('error', reject);
+    }).on('error', reject);
+  });
+}
+
 async function fetchFromYahoo(symbol: string, interval: string, range: string): Promise<any> {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${range}`;
   console.log(`[Yahoo API] Fetching: ${url}`);
@@ -160,12 +186,52 @@ const convertYahooCandles = (result: any): Candle[] => {
 export async function fetchMarketData(pair: TradingPair, timeframe: string = "M1"): Promise<MarketData> {
   const { from, to } = pairToSymbols(pair);
 
-  // Use Yahoo Finance for XAU/USD and US100/USD
-  if (pair === "XAU/USD" || pair === "US100/USD") {
+  // Use Alpha Vantage or Yahoo Finance for US100/USD
+  if (pair === "US100/USD") {
     try {
-      // Use NQ=F for US100 (Nasdaq 100 Futures) - trades almost 24/5 and more relevant than the index
-      // Gold (XAU/USD) is intentionally skipped here because it's handled by the CryptoCompare PAXG proxy section for 24/7 live movement
-      const yfSymbol = pair === "US100/USD" ? "NQ=F" : null;
+      // Primary: Alpha Vantage (Institution-grade Accuracy)
+      const avData = await fetchFromAlphaVantage("GLOBAL_QUOTE", "QQQ");
+      const quote = avData?.["Global Quote"];
+
+      if (quote && quote["05. price"]) {
+        const currentPrice = parseFloat(quote["05. price"]);
+        const priceChange24h = parseFloat(quote["10. change percent"].replace('%', ''));
+
+        // Fetch intraday for candles
+        const avIntraday = await fetchFromAlphaVantage("TIME_SERIES_DAILY", "QQQ");
+        const timeSeries = avIntraday?.["Time Series (Daily)"];
+        const candles: Candle[] = [];
+
+        if (timeSeries) {
+          Object.entries(timeSeries).slice(0, 100).forEach(([date, data]: [string, any]) => {
+            candles.push({
+              timestamp: new Date(date).getTime(),
+              open: parseFloat(data["1. open"]),
+              high: parseFloat(data["2. high"]),
+              low: parseFloat(data["3. low"]),
+              close: parseFloat(data["4. close"]),
+              volume: parseFloat(data["5. volume"]),
+            });
+          });
+          candles.reverse();
+        }
+
+        console.log(`[Alpha Vantage API] Successfully fetched ${pair}: $${currentPrice}`);
+
+        return {
+          currentPrice,
+          candles: candles.length > 0 ? candles : [],
+          priceChange24h,
+          volumeChange24h: 0,
+        };
+      }
+    } catch (error) {
+      console.error(`[Alpha Vantage API] Error for ${pair}, falling back to Yahoo:`, error);
+    }
+
+    try {
+      // Fallback: Yahoo Finance (Stable backup)
+      const yfSymbol = "NQ=F";
 
       if (yfSymbol) {
         // Yahoo timeframe mapping
@@ -361,65 +427,73 @@ export async function fetchMarketData(pair: TradingPair, timeframe: string = "M1
     console.error(`Error fetching market data for ${pair}:`, error);
     throw error;
   }
-}
+  export async function getCurrentPrice(pair: TradingPair): Promise<number> {
+    const { from, to } = pairToSymbols(pair);
 
-export async function getCurrentPrice(pair: TradingPair): Promise<number> {
-  const { from, to } = pairToSymbols(pair);
+    if (pair === "US100/USD") {
+      try {
+        // Primary: Alpha Vantage Quote
+        const data = await fetchFromAlphaVantage("GLOBAL_QUOTE", "QQQ");
+        const price = data?.["Global Quote"]?.["05. price"];
+        if (price) return parseFloat(price);
+      } catch (error) {
+        console.error(`[Alpha Vantage API] Current price error for ${pair}:`, error);
+      }
 
-  if (pair === "US100/USD") {
+      try {
+        // Fallback: Yahoo Finance
+        const yfSymbol = "NQ=F";
+        const data = await fetchFromYahoo(yfSymbol, '1m', '1d');
+        const result = data.chart.result?.[0];
+        if (result) return result.meta.regularMarketPrice;
+      } catch (error) {
+        console.error(`[Yahoo API] Price error for ${pair}:`, error);
+      }
+    }
+
     try {
-      const yfSymbol = "NQ=F";
-      const data = await fetchFromYahoo(yfSymbol, '1m', '1d');
-      const result = data.chart.result?.[0];
-      if (result) return result.meta.regularMarketPrice;
+      const response = await fetch(
+        `${CRYPTOCOMPARE_API_BASE}/price?fsym=${from}&tsyms=${to}`,
+        { headers: fetchHeaders }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch price for ${pair}: Status ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data[to]) {
+        throw new Error(`Price data not available for ${pair}`);
+      }
+
+      return data[to];
     } catch (error) {
-      console.error(`[Yahoo API] Price error for ${pair}:`, error);
+      console.error(`Error fetching current price for ${pair}:`, error);
+      throw error;
     }
   }
 
-  try {
-    const response = await fetch(
-      `${CRYPTOCOMPARE_API_BASE}/price?fsym=${from}&tsyms=${to}`,
-      { headers: fetchHeaders }
-    );
+  /**
+   * Get anchor timeframes for trend alignment checking
+   * Based on the "Big Picture" rule:
+   * - Scalping (1m, 3m, 5m) → Check 15m & 1hr → Match 1hr trend
+   * - Swing (15m, 30m, 1hr) → Check 4hr & 1d → Match 4hr trend
+   * - Position (2hr, 4hr, 1d) → Check 1d & 1w → Match 1w trend
+   */
+  export function getAnchorTimeframes(entryTimeframe: string): { primary: string; secondary: string } {
+    const scalping = ["M1", "M3", "M5"];
+    const swing = ["M15", "M30", "H1"];
+    const position = ["H2", "H4", "D1"];
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch price for ${pair}: Status ${response.status}`);
+    if (scalping.includes(entryTimeframe)) {
+      return { primary: "H1", secondary: "M15" };
+    } else if (swing.includes(entryTimeframe)) {
+      return { primary: "H4", secondary: "D1" };
+    } else if (position.includes(entryTimeframe)) {
+      return { primary: "W1", secondary: "D1" };
     }
 
-    const data = await response.json();
-
-    if (!data[to]) {
-      throw new Error(`Price data not available for ${pair}`);
-    }
-
-    return data[to];
-  } catch (error) {
-    console.error(`Error fetching current price for ${pair}:`, error);
-    throw error;
-  }
-}
-
-/**
- * Get anchor timeframes for trend alignment checking
- * Based on the "Big Picture" rule:
- * - Scalping (1m, 3m, 5m) → Check 15m & 1hr → Match 1hr trend
- * - Swing (15m, 30m, 1hr) → Check 4hr & 1d → Match 4hr trend
- * - Position (2hr, 4hr, 1d) → Check 1d & 1w → Match 1w trend
- */
-export function getAnchorTimeframes(entryTimeframe: string): { primary: string; secondary: string } {
-  const scalping = ["M1", "M3", "M5"];
-  const swing = ["M15", "M30", "H1"];
-  const position = ["H2", "H4", "D1"];
-
-  if (scalping.includes(entryTimeframe)) {
-    return { primary: "H1", secondary: "M15" };
-  } else if (swing.includes(entryTimeframe)) {
+    // Default fallback
     return { primary: "H4", secondary: "D1" };
-  } else if (position.includes(entryTimeframe)) {
-    return { primary: "W1", secondary: "D1" };
   }
-
-  // Default fallback
-  return { primary: "H4", secondary: "D1" };
-}
