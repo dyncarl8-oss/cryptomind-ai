@@ -427,73 +427,75 @@ export async function fetchMarketData(pair: TradingPair, timeframe: string = "M1
     console.error(`Error fetching market data for ${pair}:`, error);
     throw error;
   }
-  export async function getCurrentPrice(pair: TradingPair): Promise<number> {
-    const { from, to } = pairToSymbols(pair);
+}
 
-    if (pair === "US100/USD") {
-      try {
-        // Primary: Alpha Vantage Quote
-        const data = await fetchFromAlphaVantage("GLOBAL_QUOTE", "QQQ");
-        const price = data?.["Global Quote"]?.["05. price"];
-        if (price) return parseFloat(price);
-      } catch (error) {
-        console.error(`[Alpha Vantage API] Current price error for ${pair}:`, error);
-      }
+export async function getCurrentPrice(pair: TradingPair): Promise<number> {
+  const { from, to } = pairToSymbols(pair);
 
-      try {
-        // Fallback: Yahoo Finance
-        const yfSymbol = "NQ=F";
-        const data = await fetchFromYahoo(yfSymbol, '1m', '1d');
-        const result = data.chart.result?.[0];
-        if (result) return result.meta.regularMarketPrice;
-      } catch (error) {
-        console.error(`[Yahoo API] Price error for ${pair}:`, error);
-      }
+  if (pair === "US100/USD") {
+    try {
+      // Primary: Alpha Vantage Quote
+      const data = await fetchFromAlphaVantage("GLOBAL_QUOTE", "QQQ");
+      const price = data?.["Global Quote"]?.["05. price"];
+      if (price) return parseFloat(price);
+    } catch (error) {
+      console.error(`[Alpha Vantage API] Current price error for ${pair}:`, error);
     }
 
     try {
-      const response = await fetch(
-        `${CRYPTOCOMPARE_API_BASE}/price?fsym=${from}&tsyms=${to}`,
-        { headers: fetchHeaders }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch price for ${pair}: Status ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (!data[to]) {
-        throw new Error(`Price data not available for ${pair}`);
-      }
-
-      return data[to];
+      // Fallback: Yahoo Finance
+      const yfSymbol = "NQ=F";
+      const data = await fetchFromYahoo(yfSymbol, '1m', '1d');
+      const result = data.chart.result?.[0];
+      if (result) return result.meta.regularMarketPrice;
     } catch (error) {
-      console.error(`Error fetching current price for ${pair}:`, error);
-      throw error;
+      console.error(`[Yahoo API] Price error for ${pair}:`, error);
     }
   }
 
-  /**
-   * Get anchor timeframes for trend alignment checking
-   * Based on the "Big Picture" rule:
-   * - Scalping (1m, 3m, 5m) → Check 15m & 1hr → Match 1hr trend
-   * - Swing (15m, 30m, 1hr) → Check 4hr & 1d → Match 4hr trend
-   * - Position (2hr, 4hr, 1d) → Check 1d & 1w → Match 1w trend
-   */
-  export function getAnchorTimeframes(entryTimeframe: string): { primary: string; secondary: string } {
-    const scalping = ["M1", "M3", "M5"];
-    const swing = ["M15", "M30", "H1"];
-    const position = ["H2", "H4", "D1"];
+  try {
+    const response = await fetch(
+      `${CRYPTOCOMPARE_API_BASE}/price?fsym=${from}&tsyms=${to}`,
+      { headers: fetchHeaders }
+    );
 
-    if (scalping.includes(entryTimeframe)) {
-      return { primary: "H1", secondary: "M15" };
-    } else if (swing.includes(entryTimeframe)) {
-      return { primary: "H4", secondary: "D1" };
-    } else if (position.includes(entryTimeframe)) {
-      return { primary: "W1", secondary: "D1" };
+    if (!response.ok) {
+      throw new Error(`Failed to fetch price for ${pair}: Status ${response.status}`);
     }
 
-    // Default fallback
+    const data = await response.json();
+
+    if (!data[to]) {
+      throw new Error(`Price data not available for ${pair}`);
+    }
+
+    return data[to];
+  } catch (error) {
+    console.error(`Error fetching current price for ${pair}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Get anchor timeframes for trend alignment checking
+ * Based on the "Big Picture" rule:
+ * - Scalping (1m, 3m, 5m) → Check 15m & 1hr → Match 1hr trend
+ * - Swing (15m, 30m, 1hr) → Check 4hr & 1d → Match 4hr trend
+ * - Position (2hr, 4hr, 1d) → Check 1d & 1w → Match 1w trend
+ */
+export function getAnchorTimeframes(entryTimeframe: string): { primary: string; secondary: string } {
+  const scalping = ["M1", "M3", "M5"];
+  const swing = ["M15", "M30", "H1"];
+  const position = ["H2", "H4", "D1"];
+
+  if (scalping.includes(entryTimeframe)) {
+    return { primary: "H1", secondary: "M15" };
+  } else if (swing.includes(entryTimeframe)) {
     return { primary: "H4", secondary: "D1" };
+  } else if (position.includes(entryTimeframe)) {
+    return { primary: "W1", secondary: "D1" };
   }
+
+  // Default fallback
+  return { primary: "H4", secondary: "D1" };
+}
