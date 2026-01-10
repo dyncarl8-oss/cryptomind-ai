@@ -34,7 +34,16 @@ export const forexPairs = [
   "AUD/USD",
 ] as const;
 
-export const tradingPairs = [...cryptoPairs, ...forexPairs] as const;
+
+export const commoditiesPairs = [
+  "XAU/USD",
+] as const;
+
+export const indicesPairs = [
+  "US100/USD",
+] as const;
+
+export const tradingPairs = [...cryptoPairs, ...forexPairs, ...commoditiesPairs, ...indicesPairs] as const;
 
 export const timeframes = [
   "M1",

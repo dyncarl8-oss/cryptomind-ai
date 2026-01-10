@@ -108,6 +108,11 @@ const timeframeToTradingViewInterval: Record<Timeframe, string> = {
 
 function toTradingViewSymbol(pair?: TradingPair): string {
   if (!pair) return "BINANCE:BTCUSDT";
+
+  // Special cases for non-crypto pairs
+  if (pair === "XAU/USD") return "OANDA:XAUUSD";
+  if (pair === "US100/USD") return "CURRENCYCOM:US100";
+
   const [base, quote] = pair.split("/");
   if (!base || !quote) return pair;
 
