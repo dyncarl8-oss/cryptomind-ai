@@ -111,7 +111,7 @@ function toTradingViewSymbol(pair?: TradingPair): string {
 
   // Special cases for non-crypto pairs
   if (pair === "XAU/USD") return "OANDA:XAUUSD";
-  if (pair === "US100/USD") return "CURRENCYCOM:US100";
+  if (pair === "US100/USD") return "NASDAQ:NDX";
 
   const [base, quote] = pair.split("/");
   if (!base || !quote) return pair;

@@ -1,4 +1,8 @@
 import { type TradingPair } from "@shared/schema";
+import YahooFinance from 'yahoo-finance2';
+
+const yf = new YahooFinance();
+
 
 const CRYPTOCOMPARE_API_BASE = "https://min-api.cryptocompare.com/data";
 
@@ -111,8 +115,70 @@ const getHistoEndpoint = (timeframe: string): { endpoint: string; aggregate: num
   return { endpoint: "histominute", aggregate: 1, limit: 300 };
 };
 
+const convertYahooCandles = (quotes: any[]): Candle[] => {
+  return quotes.map(p => ({
+    timestamp: new Date(p.date).getTime(),
+    open: p.open || 0,
+    high: p.high || 0,
+    low: p.low || 0,
+    close: p.close || 0,
+    volume: p.volume || 0,
+  })).filter(c => c.open !== 0);
+};
+
 export async function fetchMarketData(pair: TradingPair, timeframe: string = "M1"): Promise<MarketData> {
   const { from, to } = pairToSymbols(pair);
+
+  // Use Yahoo Finance for XAU/USD and US100/USD
+  if (pair === "XAU/USD" || pair === "US100/USD") {
+    try {
+      const yfSymbol = pair === "XAU/USD" ? "XAUUSD=X" : "^NDX";
+      console.log(`[Yahoo Finance] Fetching market data for ${pair} (${yfSymbol})`);
+
+      const quote = await yf.quote(yfSymbol);
+      const currentPrice = quote.regularMarketPrice || 0;
+      const priceChange24h = quote.regularMarketChangePercent || 0;
+
+      // Yahoo timeframe mapping
+      const yahooTimeframeMap: Record<string, string> = {
+        "M1": "1m", "M3": "2m", "M5": "5m", "M15": "15m", "M30": "30m",
+        "H1": "1h", "H2": "1h", "H4": "1h", "D1": "1d", "W1": "1wk"
+      };
+
+      const interval = yahooTimeframeMap[timeframe] || "15m";
+
+      // Calculate start date based on timeframe to get enough data
+      const now = new Date();
+      let period1: Date;
+      if (["M1", "M3", "M5"].includes(timeframe)) {
+        period1 = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000); // 2 days
+      } else if (["M15", "M30", "H1", "H2", "H4"].includes(timeframe)) {
+        period1 = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 7 days
+      } else if (timeframe === "D1") {
+        period1 = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000); // 1 year
+      } else {
+        period1 = new Date(now.getTime() - 5 * 365 * 24 * 60 * 60 * 1000); // 5 years
+      }
+
+      const chartData = await yf.chart(yfSymbol, {
+        interval: interval as any,
+        period1: period1
+      });
+      const candles = convertYahooCandles(chartData.quotes);
+
+      console.log(`[Yahoo Finance] Successfully fetched data for ${pair}: $${currentPrice.toFixed(2)}`);
+
+      return {
+        currentPrice,
+        candles,
+        priceChange24h,
+        volumeChange24h: 0,
+      };
+    } catch (error) {
+      console.error(`[Yahoo Finance] Error for ${pair}:`, error);
+      // Fallback to synthetic if Yahoo fails
+    }
+  }
 
   try {
     console.log(`[CryptoCompare API] Fetching market data for ${pair} (${from}/${to})`);
@@ -274,6 +340,17 @@ export async function fetchMarketData(pair: TradingPair, timeframe: string = "M1
 
 export async function getCurrentPrice(pair: TradingPair): Promise<number> {
   const { from, to } = pairToSymbols(pair);
+
+  if (pair === "XAU/USD" || pair === "US100/USD") {
+    try {
+      const yfSymbol = pair === "XAU/USD" ? "XAUUSD=X" : "^NDX";
+      const quote = await yf.quote(yfSymbol);
+      return quote.regularMarketPrice || 0;
+    } catch (error) {
+      console.error(`[Yahoo Finance] Price error for ${pair}:`, error);
+      // Fallback to CryptoCompare/Synthetic
+    }
+  }
 
   try {
     const response = await fetch(
