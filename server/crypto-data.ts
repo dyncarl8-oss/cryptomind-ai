@@ -1,8 +1,5 @@
 import { type TradingPair } from "@shared/schema";
-import YahooFinance from 'yahoo-finance2';
-
-const yf = new YahooFinance();
-
+import https from 'https';
 
 const CRYPTOCOMPARE_API_BASE = "https://min-api.cryptocompare.com/data";
 
@@ -115,15 +112,49 @@ const getHistoEndpoint = (timeframe: string): { endpoint: string; aggregate: num
   return { endpoint: "histominute", aggregate: 1, limit: 300 };
 };
 
-const convertYahooCandles = (quotes: any[]): Candle[] => {
-  return quotes.map(p => ({
-    timestamp: new Date(p.date).getTime(),
-    open: p.open || 0,
-    high: p.high || 0,
-    low: p.low || 0,
-    close: p.close || 0,
-    volume: p.volume || 0,
-  })).filter(c => c.open !== 0);
+async function fetchFromYahoo(symbol: string, interval: string, range: string): Promise<any> {
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${range}`;
+  console.log(`[Yahoo API] Fetching: ${url}`);
+
+  return new Promise((resolve, reject) => {
+    const options = {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    };
+
+    https.get(url, options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          if (res.statusCode !== 200) {
+            reject(new Error(`Yahoo API error ${res.statusCode}: ${data.substring(0, 100)}`));
+            return;
+          }
+          resolve(JSON.parse(data));
+        } catch (e) {
+          reject(new Error(`Failed to parse Yahoo data for ${symbol}`));
+        }
+      });
+      res.on('error', reject);
+    }).on('error', reject);
+  });
+}
+
+const convertYahooCandles = (result: any): Candle[] => {
+  const indicators = result.indicators.quote[0];
+  const timestamps = result.timestamp;
+  if (!timestamps || !indicators) return [];
+
+  return timestamps.map((t: number, i: number) => ({
+    timestamp: t * 1000,
+    open: indicators.open[i] || indicators.close[i] || 0,
+    high: indicators.high[i] || indicators.close[i] || 0,
+    low: indicators.low[i] || indicators.close[i] || 0,
+    close: indicators.close[i] || indicators.open[i] || 0,
+    volume: indicators.volume[i] || 0,
+  })).filter((c: Candle) => c.open !== 0);
 };
 
 export async function fetchMarketData(pair: TradingPair, timeframe: string = "M1"): Promise<MarketData> {
@@ -132,12 +163,7 @@ export async function fetchMarketData(pair: TradingPair, timeframe: string = "M1
   // Use Yahoo Finance for XAU/USD and US100/USD
   if (pair === "XAU/USD" || pair === "US100/USD") {
     try {
-      const yfSymbol = pair === "XAU/USD" ? "XAUUSD=X" : "^NDX";
-      console.log(`[Yahoo Finance] Fetching market data for ${pair} (${yfSymbol})`);
-
-      const quote = await yf.quote(yfSymbol);
-      const currentPrice = quote.regularMarketPrice || 0;
-      const priceChange24h = quote.regularMarketChangePercent || 0;
+      const yfSymbol = pair === "XAU/USD" ? "GC=F" : "^NDX"; // Use GC=F for Gold as XAUUSD=X is flaky
 
       // Yahoo timeframe mapping
       const yahooTimeframeMap: Record<string, string> = {
@@ -146,37 +172,32 @@ export async function fetchMarketData(pair: TradingPair, timeframe: string = "M1
       };
 
       const interval = yahooTimeframeMap[timeframe] || "15m";
-
-      // Calculate start date based on timeframe to get enough data
-      const now = new Date();
-      let period1: Date;
-      if (["M1", "M3", "M5"].includes(timeframe)) {
-        period1 = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000); // 2 days
-      } else if (["M15", "M30", "H1", "H2", "H4"].includes(timeframe)) {
-        period1 = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 7 days
-      } else if (timeframe === "D1") {
-        period1 = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000); // 1 year
-      } else {
-        period1 = new Date(now.getTime() - 5 * 365 * 24 * 60 * 60 * 1000); // 5 years
-      }
-
-      const chartData = await yf.chart(yfSymbol, {
-        interval: interval as any,
-        period1: period1
-      });
-      const candles = convertYahooCandles(chartData.quotes);
-
-      console.log(`[Yahoo Finance] Successfully fetched data for ${pair}: $${currentPrice.toFixed(2)}`);
-
-      return {
-        currentPrice,
-        candles,
-        priceChange24h,
-        volumeChange24h: 0,
+      const rangeMap: Record<string, string> = {
+        "M1": "1d", "M5": "1d", "M15": "5d", "H1": "1mo", "D1": "1y", "W1": "5y"
       };
+      const range = rangeMap[timeframe] || "5d";
+
+      const data = await fetchFromYahoo(yfSymbol, interval, range);
+      const result = data.chart.result?.[0];
+
+      if (result) {
+        const currentPrice = result.meta.regularMarketPrice;
+        const previousClose = result.meta.previousClose || currentPrice;
+        const priceChange24h = ((currentPrice - previousClose) / previousClose) * 100;
+        const candles = convertYahooCandles(result);
+
+        console.log(`[Yahoo API] Successfully fetched ${pair}: $${currentPrice}`);
+
+        return {
+          currentPrice,
+          candles,
+          priceChange24h,
+          volumeChange24h: 0,
+        };
+      }
     } catch (error) {
-      console.error(`[Yahoo Finance] Error for ${pair}:`, error);
-      // Fallback to synthetic if Yahoo fails
+      console.error(`[Yahoo API] Custom fetch error for ${pair}:`, error);
+      // Fallback
     }
   }
 
@@ -203,10 +224,10 @@ export async function fetchMarketData(pair: TradingPair, timeframe: string = "M1
 
     if (!currentPrice) {
       console.log(`[CryptoCompare API] Using synthetic price for ${pair}`);
-      // Default fallback prices based on pair type
-      if (pair.includes("XAU")) currentPrice = 2000;
-      else if (pair.includes("US100")) currentPrice = 18000;
-      else if (pair.includes("BTC")) currentPrice = 50000;
+      // Default fallback prices based on 2026 market levels
+      if (pair.includes("XAU")) currentPrice = 4500;
+      else if (pair.includes("US100")) currentPrice = 25000;
+      else if (pair.includes("BTC")) currentPrice = 100000;
       else currentPrice = 100;
     }
 
@@ -343,12 +364,13 @@ export async function getCurrentPrice(pair: TradingPair): Promise<number> {
 
   if (pair === "XAU/USD" || pair === "US100/USD") {
     try {
-      const yfSymbol = pair === "XAU/USD" ? "XAUUSD=X" : "^NDX";
-      const quote = await yf.quote(yfSymbol);
-      return quote.regularMarketPrice || 0;
+      const yfSymbol = pair === "XAU/USD" ? "GC=F" : "^NDX";
+      const data = await fetchFromYahoo(yfSymbol, '1m', '1d');
+      const result = data.chart.result?.[0];
+      if (result) return result.meta.regularMarketPrice;
     } catch (error) {
-      console.error(`[Yahoo Finance] Price error for ${pair}:`, error);
-      // Fallback to CryptoCompare/Synthetic
+      console.error(`[Yahoo API] Price error for ${pair}:`, error);
+      // Fallback
     }
   }
 
