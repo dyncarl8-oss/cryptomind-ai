@@ -73,7 +73,7 @@ export default function Chat() {
   };
 
   useEffect(() => {
-    const hasInProgressAnalysis = analysisStages.some(s => 
+    const hasInProgressAnalysis = analysisStages.some(s =>
       s.status === "in_progress" && !(s.stage === "final_verdict" && s.data)
     );
     if (!hasInProgressAnalysis) {
@@ -97,7 +97,7 @@ export default function Chat() {
 
     for (let i = lastProcessedIndexRef.current; i < serverMessages.length; i++) {
       const latestMessage = serverMessages[i];
-      
+
       // Re-enable auto-save when new messages arrive (resume from loaded session)
       if (isLoadedSession) {
         setIsLoadedSession(false);
@@ -133,10 +133,10 @@ export default function Chat() {
           clearTimeout(clearAnalysisTimerRef.current);
           clearAnalysisTimerRef.current = null;
         }
-        
+
         setShowAnalysis(true);
         setIsTyping(true);
-        
+
         const newStage: AnalysisStage = {
           stage: latestMessage.stage,
           progress: latestMessage.progress || 0,
@@ -167,7 +167,7 @@ export default function Chat() {
         setShowAnalysis(false);
         setShowPurchaseDialog(true);
         queryClient.invalidateQueries({ queryKey: ["/api/credits"] });
-        
+
         const newMessage: Message = {
           id: Date.now().toString() + Math.random(),
           sender: "bot",
@@ -215,7 +215,7 @@ export default function Chat() {
           const response = await apiRequest("POST", "/api/chat/sessions");
           const { sessionId } = await response.json();
           setCurrentSessionId(sessionId);
-          
+
           await apiRequest("PUT", `/api/chat/sessions/${sessionId}`, {
             messages: messages.map(msg => ({
               ...msg,
@@ -236,7 +236,7 @@ export default function Chat() {
             analysisStages,
           });
         }
-        
+
         queryClient.invalidateQueries({ queryKey: ["/api/chat/sessions"] });
       } catch (error) {
         console.error("Error saving chat session:", error);
@@ -254,7 +254,7 @@ export default function Chat() {
     try {
       const response = await apiRequest("GET", `/api/chat/sessions/${sessionId}`);
       const session: ChatSessionWithMessages = await response.json();
-      
+
       setMessages(
         session.messages
           .filter(msg => !msg.prediction)
@@ -271,7 +271,7 @@ export default function Chat() {
       setAnalysisStages(session.analysisStages || []);
       setShowAnalysis((session.analysisStages || []).length > 0);
       setIsTyping(false);
-      
+
       toast({
         title: "Session loaded",
         description: `Loaded conversation from ${new Date(session.updatedAt).toLocaleDateString()}`,
@@ -301,41 +301,54 @@ export default function Chat() {
   };
 
   const handleCryptoPairSelection = (pair: TradingPair) => {
+    // Check if we should create a new session
+    // Logic: If analysis is complete (prediction exists), or if it was a loaded session
+    const hasExistingAnalysis = analysisStages.length > 0 && analysisStages.some(s => s.stage === "final_verdict" && s.data);
+
+    if (hasExistingAnalysis || isLoadedSession) {
+      setMessages([]);
+      setIsTyping(false);
+      setSelectedPair(undefined);
+      setSelectedTimeframe(undefined);
+      setAwaitingTimeframeSelection(false);
+      setAnalysisStages([]);
+      setShowAnalysis(false);
+      setCurrentSessionId(null);
+      setIsLoadedSession(false);
+      clearMessages();
+      sendMessage({ type: "new_session" });
+
+      toast({
+        title: "New Analysis Started",
+        description: `Starting separate session for ${pair}. Current analysis saved to history.`,
+      });
+    }
+
     setSelectedPair(pair);
     setSelectedTimeframe(undefined);
     setAnalysisStages([]);
     setShowAnalysis(false);
     setAwaitingTimeframeSelection(true);
-    
-    // If continuing from a loaded session, start a new session to keep analyses separate
-    if (isLoadedSession) {
-      setIsLoadedSession(false);
-      setCurrentSessionId(null);
-      toast({
-        title: "Starting new analysis",
-        description: "Your previous conversation is saved. This new analysis will create a separate session.",
-      });
-    }
-    
+
     const userMessage: Message = {
       id: Date.now().toString(),
       sender: "user",
       content: pair,
       timestamp: new Date(),
     };
-    
+
     setMessages((prev) => [...prev, userMessage]);
-    
+
     setTimeout(() => {
       if (!isConnected) return;
-      
+
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
         sender: "bot",
         content: `Great choice! ${pair} selected. Now choose your trading timeframe:`,
         timestamp: new Date(),
       };
-      
+
       setMessages((prev) => [...prev, botMessage]);
     }, 500);
   };
@@ -343,21 +356,21 @@ export default function Chat() {
   const handleTimeframeSelection = (timeframe: Timeframe) => {
     setSelectedTimeframe(timeframe);
     setAwaitingTimeframeSelection(false);
-    
+
     // Re-enable auto-save when user interacts (resume from loaded session)
     if (isLoadedSession) {
       setIsLoadedSession(false);
     }
-    
+
     const userMessage: Message = {
       id: Date.now().toString(),
       sender: "user",
       content: timeframe,
       timestamp: new Date(),
     };
-    
+
     setMessages((prev) => [...prev, userMessage]);
-    
+
     if (selectedPair) {
       sendMessage({ type: "select_pair", pair: selectedPair, timeframe });
     }
@@ -391,7 +404,7 @@ export default function Chat() {
       <header className="border-b border-border/50 bg-card/30 backdrop-blur-xl shadow-sm">
         <ChatHeader onNewSession={handleNewSession} onSessionSelect={handleLoadSession} />
       </header>
-      
+
       <div className="flex-1 overflow-y-auto px-3 md:px-6 lg:px-12 xl:px-24 py-4 md:py-8">
         <div className="space-y-3 md:space-y-6">
           {!isConnected && (
@@ -399,31 +412,31 @@ export default function Chat() {
               Connecting to CryptoMind AI...
             </div>
           )}
-          
+
           {messages.map((message, index) => {
             const allStagesComplete = analysisStages.length > 0 && analysisStages.every(s => s.status === "complete");
             const hasFinalVerdictData = analysisStages.some(s => s.stage === "final_verdict" && s.data);
             const showPairSelector = message.sender === "bot" &&
-                                    !message.prediction &&
-                                    index === messages.length - 1 &&
-                                    (analysisStages.length === 0 || allStagesComplete || hasFinalVerdictData) &&
-                                    !awaitingTimeframeSelection;
+              !message.prediction &&
+              index === messages.length - 1 &&
+              (analysisStages.length === 0 || allStagesComplete || hasFinalVerdictData) &&
+              !awaitingTimeframeSelection;
             const showTimeframeSelector = message.sender === "bot" &&
-                                         message.content.includes("trading timeframe") &&
-                                         index === messages.length - 1 &&
-                                         awaitingTimeframeSelection;
+              message.content.includes("trading timeframe") &&
+              index === messages.length - 1 &&
+              awaitingTimeframeSelection;
             const validTimeframes = ["M1", "M3", "M5", "M15", "M30", "M45", "H1", "H2", "H3", "H4", "D1", "W1"];
             const isUserTimeframeSelection = message.sender === "user" && message.content && validTimeframes.includes(message.content);
             const shouldShowAnalysisAfter = isUserTimeframeSelection && showAnalysis && analysisStages.length > 0;
-            
+
             return (
               <div key={message.id}>
-                <ChatMessage 
+                <ChatMessage
                   message={message}
                 />
                 {shouldShowAnalysisAfter && (
                   <div className="ml-0 md:ml-12 mt-3 md:mt-4">
-                    <TransparentAnalysis 
+                    <TransparentAnalysis
                       stages={analysisStages}
                       tradingPair={selectedPair}
                       timeframe={selectedTimeframe}
@@ -438,7 +451,7 @@ export default function Chat() {
                 )}
                 {showPairSelector && !isTyping && (
                   <div className="mt-2 md:mt-4 ml-0 md:ml-12">
-                    <PairSelector 
+                    <PairSelector
                       onSelectPair={handleCryptoPairSelection}
                       selectedPair={selectedPair}
                     />
@@ -446,7 +459,7 @@ export default function Chat() {
                 )}
                 {showTimeframeSelector && !isTyping && (
                   <div className="mt-2 md:mt-4 ml-0 md:ml-12">
-                    <TimeframeSelector 
+                    <TimeframeSelector
                       onSelectTimeframe={handleTimeframeSelection}
                       selectedTimeframe={selectedTimeframe}
                     />
@@ -455,7 +468,7 @@ export default function Chat() {
               </div>
             );
           })}
-          
+
           <div ref={messagesEndRef} />
         </div>
       </div>
