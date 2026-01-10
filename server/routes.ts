@@ -17,7 +17,7 @@ async function getCompanyId(): Promise<string | undefined> {
   if (process.env.WHOP_COMPANY_ID) {
     return process.env.WHOP_COMPANY_ID;
   }
-  
+
   // Fallback: get from any registered admin in the database
   try {
     const admins = await storage.getAllAdmins();
@@ -28,7 +28,7 @@ async function getCompanyId(): Promise<string | undefined> {
   } catch (error) {
     console.error("[CompanyID] Error fetching admins:", error);
   }
-  
+
   return undefined;
 }
 
@@ -63,11 +63,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/auth/verify", async (req, res) => {
     const user = await verifyWhopToken(req);
-    
+
     if (!user) {
       return res.status(401).json({ error: "Unauthorized" });
     }
-    
+
     return res.json({ user });
   });
 
@@ -90,7 +90,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Verify the user token first
       const user = await verifyWhopToken(req);
-      
+
       // In development, if no user token, return mock data
       if (!user && process.env.NODE_ENV === "development") {
         return res.json({
@@ -112,11 +112,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Fetch user details from Whop
       const userDetails = await whopSdk.users.retrieve(user.userId);
-      
+
       // Extract profile picture URL from Whop API response
       // Whop can return profile_picture in different formats, so we handle multiple cases
       let profilePicUrl: string | null = null;
-      
+
       if (userDetails.profile_picture) {
         if (typeof userDetails.profile_picture === 'string') {
           profilePicUrl = userDetails.profile_picture;
@@ -125,7 +125,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           profilePicUrl = picObj.url || picObj.image_url || null;
         }
       }
-      
+
       // Whop sometimes returns nested CDN URLs - extract the innermost URL
       if (profilePicUrl && profilePicUrl.includes('/plain/')) {
         const lastPlainIndex = profilePicUrl.lastIndexOf('/plain/');
@@ -134,7 +134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           profilePicUrl = extractedUrl;
         }
       }
-      
+
       // Save/update user in database
       await storage.upsertUser({
         id: userDetails.id,
@@ -142,7 +142,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name: userDetails.name || userDetails.username,
         profilePictureUrl: profilePicUrl,
       });
-      
+
       return res.json({
         id: userDetails.id,
         username: userDetails.username,
@@ -171,7 +171,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     // If Whop is not enabled, allow access in standalone mode
     if (!isWhopEnabled) {
-      return res.json({ 
+      return res.json({
         hasAccess: true,
         accessLevel: "customer",
       });
@@ -187,17 +187,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     // Verify the Whop token
     const user = await verifyWhopToken(req);
-    
+
     if (!user) {
-      return res.status(401).json({ 
-        error: "Unauthorized - valid Whop authentication required. Please access this app through Whop." 
+      return res.status(401).json({
+        error: "Unauthorized - valid Whop authentication required. Please access this app through Whop."
       });
     }
 
     // Verify user has access to the experience
     const access = await checkExperienceAccess(user.userId, experienceId);
-    
-    return res.json({ 
+
+    return res.json({
       hasAccess: access.hasAccess,
       accessLevel: access.accessLevel,
     });
@@ -206,7 +206,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/credits", async (req, res) => {
     try {
       let userId = "dev_user";
-      
+
       if (isWhopEnabled) {
         const user = await verifyWhopToken(req);
         if (!user) {
@@ -216,16 +216,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       let userCredits = await storage.getUserCredits(userId);
-      
+
       if (!userCredits) {
-        await storage.setUserCredits(userId, 10);
+        await storage.setUserCredits(userId, 3);
         userCredits = await storage.getUserCredits(userId);
       }
 
       // If user has unlimited access and Whop is enabled, verify the membership is still valid
       if (userCredits?.hasUnlimitedAccess && isWhopEnabled && whopSdk) {
         const companyId = await getCompanyId();
-        
+
         if (companyId) {
           try {
             // Use Memberships API to check if user has a valid membership status
@@ -316,14 +316,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Get the first active membership (should only be one)
       const activeMembership = memberships[0];
-      
+
       if (!activeMembership || !activeMembership.manage_url) {
         console.log(`[Manage URL] No active subscription found for user: ${user.userId}`);
         return res.status(404).json({ error: "No active subscription found" });
       }
 
       console.log(`[Manage URL] Returning manage URL: ${activeMembership.manage_url}`);
-      return res.json({ 
+      return res.json({
         manageUrl: activeMembership.manage_url,
         status: activeMembership.status
       });
@@ -356,7 +356,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Priority: 1) JWT token context, 2) Header params, 3) Experience resolution
       let referringAdminUserId: string | null = null;
       let referringCompanyId: string | null = null;
-      
+
       // Method 1: Try to get admin from user's company context (from JWT)
       if (user.companyId) {
         const admin = await storage.getAdminByCompanyId(user.companyId);
@@ -366,7 +366,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`[Checkout Config] Found admin from JWT company: ${admin.userId} (company: ${user.companyId})`);
         }
       }
-      
+
       // Method 2: Try to resolve from experience ID
       if (!referringAdminUserId && user.experienceId) {
         try {
@@ -383,7 +383,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.warn(`[Checkout Config] Could not resolve company from experience ${user.experienceId}`);
         }
       }
-      
+
       // Method 3: Check if user already exists as a stored member for an admin (direct lookup)
       if (!referringAdminUserId) {
         const existingMember = await storage.getStoredMemberByUserId(user.userId);
@@ -393,7 +393,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`[Checkout Config] Found existing member record: admin=${referringAdminUserId}`);
         }
       }
-      
+
       // Method 4: Check request body for explicit admin context (from frontend)
       if (!referringAdminUserId && req.body?.adminUserId) {
         const admin = await storage.getAdminByUserId(req.body.adminUserId);
@@ -403,7 +403,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`[Checkout Config] Using explicit admin from request: ${admin.userId}`);
         }
       }
-      
+
       if (!referringAdminUserId) {
         console.warn(`[Checkout Config] ⚠️  No admin found for user ${user.userId} - commission will not be attributed`);
       }
@@ -441,7 +441,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/credits/process-payment", async (req, res) => {
     try {
       console.log("[Process Payment] Starting direct payment processing (no webhook dependency)");
-      
+
       if (!isWhopEnabled || !whopSdk) {
         return res.status(503).json({ error: "Whop integration not enabled" });
       }
@@ -498,7 +498,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let admin = null;
       let referringAdminUserId = payment.metadata?.referring_admin_user_id;
       let referringCompanyId = payment.metadata?.referring_company_id;
-      
+
       // Method 1: Try metadata from checkout config
       if (referringAdminUserId) {
         admin = await storage.getAdminByUserId(referringAdminUserId);
@@ -508,7 +508,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.warn(`[Process Payment] ⚠️  Admin from metadata (${referringAdminUserId}) not found in database`);
         }
       }
-      
+
       // Method 2: Try user's company context from JWT
       if (!admin && user.companyId) {
         admin = await storage.getAdminByCompanyId(user.companyId);
@@ -518,7 +518,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`[Process Payment] ✓ Found admin from user JWT context: ${admin.userId}`);
         }
       }
-      
+
       // Method 3: Try experience resolution
       if (!admin && user.experienceId) {
         try {
@@ -535,7 +535,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.warn(`[Process Payment] Could not resolve company from experience`);
         }
       }
-      
+
       // Method 4: Check if this user already exists as a stored member for an admin (direct lookup)
       if (!admin) {
         const existingMember = await storage.getStoredMemberByUserId(customerUserId);
@@ -548,7 +548,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
       }
-      
+
       if (!admin) {
         console.warn(`[Process Payment] ⚠️  No referring admin found through any method`);
       }
@@ -559,17 +559,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const alreadyProcessed = await storage.hasProcessedPayment(payment.id);
       if (alreadyProcessed) {
         console.log(`[Process Payment] Payment ${payment.id} already processed`);
-        
+
         const userCredits = await storage.getUserCredits(customerUserId);
         const hasAccess = userCredits?.hasUnlimitedAccess || false;
-        
+
         let commissionRecorded = false;
         if (admin) {
           commissionRecorded = await storage.hasProcessedPayment(payment.id, admin.userId);
         }
-        
-        return res.json({ 
-          success: true, 
+
+        return res.json({
+          success: true,
           message: "Payment already processed",
           accessGranted: hasAccess,
           commissionRecorded,
@@ -584,7 +584,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`[Process Payment] ✅ Unlimited access granted to customer: ${customerEmail || customerUserId}`);
       } catch (error) {
         console.error(`[Process Payment] ❌ Failed to grant unlimited access:`, error);
-        return res.status(500).json({ 
+        return res.status(500).json({
           error: "Failed to grant access",
           details: error instanceof Error ? error.message : "Unknown error"
         });
@@ -596,7 +596,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // ALWAYS store member record, even if admin is unknown (for future reconciliation)
       const planId = process.env.WHOP_PLAN_ID || "unknown";
       const ownerCompanyId = process.env.WHOP_COMPANY_ID || "unknown";
-      
+
       try {
         let userDetails: any = null;
         try {
@@ -617,7 +617,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Use placeholder values if admin not found - allows future reconciliation
         const memberAdminId = admin?.userId || "pending_attribution";
         const memberCompanyId = referringCompanyId || ownerCompanyId;
-        
+
         const memberData = {
           id: `member_${payment.id}_${Date.now()}`,
           membershipId: payment.membership_id || `pay_${payment.id}`,
@@ -654,10 +654,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // ================================================================
       const SUBSCRIPTION_PRICE_CENTS = 3500;  // $35.00
       const COMMISSION_CENTS = 1750;          // $17.50 (50% of $35.00)
-      
+
       const markerAdminId = admin?.userId || "system_no_admin";
       const markerCommissionId = `comm_${payment.id}_${markerAdminId}`;
-      
+
       try {
         await storage.recordCommissionPayment({
           id: markerCommissionId,
@@ -668,7 +668,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           customerUserId: customerUserId,
           customerEmail: customerEmail || null,
         });
-        
+
         if (admin) {
           console.log(`[Process Payment] ✅ Commission recorded: $${COMMISSION_CENTS / 100} for admin ${admin.userId}`);
         } else {
@@ -676,8 +676,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       } catch (error) {
         console.error(`[Process Payment] ❌ Failed to record commission:`, error);
-        return res.json({ 
-          success: true, 
+        return res.json({
+          success: true,
           message: "Access granted but commission tracking failed",
           accessGranted: true,
           commissionRecorded: false,
@@ -685,8 +685,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       console.log(`[Process Payment] ✅ COMPLETE - Customer has access${admin ? ', admin earned commission' : ''}`);
-      return res.json({ 
-        success: true, 
+      return res.json({
+        success: true,
         message: "Payment processed successfully",
         accessGranted: true,
         commissionRecorded: admin !== null,
@@ -702,8 +702,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // LEGACY ENDPOINT - Only for dev mode when Whop is not enabled
       // When Whop is enabled, fulfillment happens via webhook only
       if (isWhopEnabled) {
-        return res.status(410).json({ 
-          error: "This endpoint is disabled when Whop is enabled. Payment fulfillment happens via webhook." 
+        return res.status(410).json({
+          error: "This endpoint is disabled when Whop is enabled. Payment fulfillment happens via webhook."
         });
       }
 
@@ -714,14 +714,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Grant unlimited access for dev mode testing
         await storage.grantUnlimitedAccess(userId);
         const updatedCredits = await storage.getUserCredits(userId);
-        return res.json({ 
-          success: true, 
-          credits: updatedCredits 
+        return res.json({
+          success: true,
+          credits: updatedCredits
         });
       } else {
-        return res.json({ 
-          success: false, 
-          error: "Payment failed" 
+        return res.json({
+          success: false,
+          error: "Payment failed"
         });
       }
     } catch (error) {
@@ -733,7 +733,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/notifications/unlimited-access-clicked", async (req, res) => {
     try {
       console.log("[Notification] Unlimited access button clicked - sending email notification");
-      
+
       let userId = "unknown";
       let username = "Unknown User";
       let userEmail: string | undefined;
@@ -743,7 +743,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const user = await verifyWhopToken(req);
         if (user) {
           userId = user.userId;
-          
+
           // Try to fetch user details for username and email
           if (whopSdk) {
             try {
@@ -786,7 +786,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/check", async (req, res) => {
     try {
       const { resourceId } = req.body;
-      
+
       // In dev mode without Whop, default to admin for testing
       if (process.env.NODE_ENV === "development" && !isWhopEnabled) {
         const isDevAdmin = process.env.DEV_ADMIN !== "false";
@@ -795,20 +795,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // If Whop is not enabled in production, return error
       if (!isWhopEnabled || !whopSdk) {
-        return res.status(503).json({ 
+        return res.status(503).json({
           error: "Authentication service unavailable",
           details: "WHOP_API_KEY and WHOP_APP_ID must be configured"
         });
       }
 
       const user = await verifyWhopToken(req);
-      
+
       // In development, if no user token, use dev defaults
       if (!user && process.env.NODE_ENV === "development") {
         const isDevAdmin = process.env.DEV_ADMIN !== "false";
         return res.json({ isAdmin: isDevAdmin });
       }
-      
+
       if (!user) {
         return res.status(401).json({ error: "Unauthorized - invalid or missing token" });
       }
@@ -824,7 +824,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let companyId: string | undefined;
 
       if (!checkResourceId) {
-        return res.status(500).json({ 
+        return res.status(500).json({
           error: "Resource ID not configured",
           details: "Resource ID must be provided or available in environment"
         });
@@ -880,7 +880,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (ownerCheck.error) {
         console.warn(`[Whop] Owner check failed for user ${user.userId}, checking cached status`);
         const cachedAdminStatus = await storage.isAdminForCompany(user.userId, companyId);
-        
+
         if (cachedAdminStatus) {
           // User was previously verified as owner, trust the cached status during outage
           console.log(`[Whop] Using cached admin status (true) for user ${user.userId} during API failure`);
@@ -889,7 +889,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // New owner or unknown status - cannot verify without API
           // Return service unavailable instead of denying access
           console.error(`[Whop] Cannot verify owner status for user ${user.userId} - no cached data and API unavailable`);
-          return res.status(503).json({ 
+          return res.status(503).json({
             error: "Owner verification service temporarily unavailable",
             details: "Unable to verify owner status. Please try again later."
           });
@@ -907,17 +907,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Remove cached admin status if it exists (handles owner demotion)
       const wasAdminForCompany = await storage.isAdminForCompany(user.userId, companyId);
       const hasAnyAdminRecord = await storage.getAdminByUserId(user.userId);
-      
+
       if (wasAdminForCompany || hasAnyAdminRecord) {
         // Remove admin record (handles both company-specific and legacy records)
         console.log(`[Whop] User ${user.userId} is not owner of company ${companyId} - removing any cached admin status`);
         await storage.removeAdmin(user.userId, companyId);
       }
-      
+
       return res.json({ isAdmin: false });
     } catch (error) {
       console.error("[Admin] Error checking status:", error instanceof Error ? error.message : "Unknown error");
-      return res.status(500).json({ 
+      return res.status(500).json({
         error: "Failed to check admin status",
         details: error instanceof Error ? error.message : "Unknown error"
       });
@@ -947,7 +947,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!config.whopAppId) missingRequired.push("WHOP_APP_ID");
       if (!config.viteWhopAppId) missingRequired.push("VITE_WHOP_APP_ID");
       if (!config.whopCompanyId) missingRequired.push("WHOP_COMPANY_ID");
-      
+
       // Optional - only needed for specific features
       if (!config.whopPlanId) missingOptional.push("WHOP_PLAN_ID (needed for subscription management)");
       if (!config.adminUserId) missingOptional.push("ADMIN_USER_ID (needed for commission tracking)");
@@ -1118,12 +1118,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const admin = await storage.getAdminByUserId(user.userId);
       if (!admin) {
         console.error(`[Whop] Access denied: User ${user.userId} is not an admin`);
-        return res.status(403).json({ 
+        return res.status(403).json({
           error: "Access denied",
           details: "You do not have admin access"
         });
       }
-      
+
       console.log(`[Whop] Access verified: User ${user.userId} is an admin - fetching their company memberships`);
 
       // Multi-tenant: Fetch memberships from OWNER's company (WHOP_COMPANY_ID)
@@ -1131,27 +1131,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const ownerCompanyId = process.env.WHOP_COMPANY_ID;
       if (!ownerCompanyId) {
         console.error(`[Whop] WHOP_COMPANY_ID not configured`);
-        return res.status(500).json({ 
+        return res.status(500).json({
           error: "Company not configured",
           details: "WHOP_COMPANY_ID environment variable is not set"
         });
       }
 
       const limit = parseInt(req.query.limit as string) || 50;
-      
+
       try {
         console.log(`[Whop] Fetching memberships from owner company (${ownerCompanyId}) for admin ${user.userId}`);
-        
+
         // STEP 1: Get stored members for THIS admin (multi-tenant filter)
         const storedMembers = await storage.getStoredMembersByAdmin(user.userId, ["active", "trialing", "completed"]);
         const storedMemberUserIds = new Set(storedMembers.map(m => m.userId));
         const storedMembershipIds = new Set(storedMembers.map(m => m.membershipId));
-        
+
         console.log(`[Whop] Admin ${user.userId} has ${storedMembers.length} stored members`);
-        
+
         // STEP 2: Fetch all active memberships from WHOP_COMPANY_ID (owner's product)
         const allMemberships: any[] = [];
-        for await (const membership of whopSdk.memberships.list({ 
+        for await (const membership of whopSdk.memberships.list({
           company_id: ownerCompanyId,
           first: 200,
           statuses: ["active", "trialing", "completed"]
@@ -1159,28 +1159,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Only include CryptoMind AI product memberships
           const productTitle = membership.product?.title || "";
           const isCryptoMindProduct = productTitle.toLowerCase().includes("cryptomind");
-          
+
           if (!membership.canceled_at && isCryptoMindProduct) {
             allMemberships.push(membership);
           }
         }
-        
+
         console.log(`[Whop] Found ${allMemberships.length} total active CryptoMind AI memberships in owner's company`);
-        
+
         // STEP 3: Filter to only memberships that belong to THIS admin's stored members
-        const memberships = allMemberships.filter(m => 
+        const memberships = allMemberships.filter(m =>
           storedMembershipIds.has(m.id) || storedMemberUserIds.has(m.user?.id)
         ).slice(0, limit);
 
         console.log(`[Whop] Successfully fetched ${memberships.length} active memberships`);
-        
+
         // Enrich membership data with user profile pictures
         const enrichedMemberships = await Promise.all(
           memberships.map(async (membership) => {
             if (membership.user?.id && whopSdk) {
               try {
                 const userDetails = await whopSdk.users.retrieve(membership.user.id);
-                
+
                 // Extract profile picture URL
                 let profilePicUrl: string | null = null;
                 if (userDetails.profile_picture) {
@@ -1191,7 +1191,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     profilePicUrl = picObj.url || picObj.image_url || null;
                   }
                 }
-                
+
                 // Whop sometimes returns nested CDN URLs - extract the innermost URL
                 if (profilePicUrl && profilePicUrl.includes('/plain/')) {
                   const lastPlainIndex = profilePicUrl.lastIndexOf('/plain/');
@@ -1200,7 +1200,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     profilePicUrl = extractedUrl;
                   }
                 }
-                
+
                 // Return enriched membership with profile picture
                 return {
                   ...membership,
@@ -1219,7 +1219,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         );
 
         console.log(`[Whop] Sample enriched membership data:`, enrichedMemberships.length > 0 ? JSON.stringify(enrichedMemberships[0], null, 2) : 'No memberships');
-        
+
         return res.json({
           data: enrichedMemberships,
           page_info: {
@@ -1233,8 +1233,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (whopError.body) {
           console.error("[Whop] Error body:", JSON.stringify(whopError.body, null, 2));
         }
-        
-        return res.status(500).json({ 
+
+        return res.status(500).json({
           error: "Failed to fetch memberships from Whop",
           details: whopError instanceof Error ? whopError.message : "Unknown error"
         });
@@ -1288,7 +1288,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const admin = await storage.getAdminByUserId(user.userId);
       if (!admin) {
-        return res.status(403).json({ 
+        return res.status(403).json({
           error: "Access denied",
           details: "You do not have admin access"
         });
@@ -1301,12 +1301,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const allMembers = await storage.getStoredMembersByAdmin(user.userId, statuses);
-      
+
       // Filter to only show CryptoMind AI product members
-      const members = allMembers.filter(m => 
+      const members = allMembers.filter(m =>
         m.productTitle?.toLowerCase().includes("cryptomind")
       );
-      
+
       return res.json({
         data: members.map(m => ({
           id: m.id,
@@ -1345,8 +1345,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/sync-memberships", async (req, res) => {
     try {
       if (process.env.NODE_ENV === "development" && !isWhopEnabled) {
-        return res.json({ 
-          success: true, 
+        return res.json({
+          success: true,
           message: "Sync not available in development mode without Whop",
           results: {}
         });
@@ -1388,7 +1388,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let userId = "dev_user";
       let username = "developer";
       let name = "Developer";
-      
+
       // Development mode: simulate withdrawal request
       if (process.env.NODE_ENV === "development" && !isWhopEnabled) {
         const { amount } = req.body;
@@ -1420,8 +1420,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           timestamp: new Date().toISOString(),
         });
 
-        return res.json({ 
-          success: true, 
+        return res.json({
+          success: true,
           withdrawalId,
           message: "Withdrawal request received! Funds will be sent to you shortly."
         });
@@ -1429,7 +1429,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Production mode: require Whop authentication
       if (!isWhopEnabled || !whopSdk) {
-        return res.status(503).json({ 
+        return res.status(503).json({
           error: "Authentication service unavailable",
           details: "Whop authentication must be configured for withdrawal requests"
         });
@@ -1498,8 +1498,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Continue - withdrawal is still recorded even if email fails
       }
 
-      return res.json({ 
-        success: true, 
+      return res.json({
+        success: true,
         withdrawalId,
         message: "Withdrawal request received! Funds will be sent to you shortly."
       });
@@ -1512,7 +1512,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/withdrawal/update-status", async (req, res) => {
     try {
       let userId = "dev_user";
-      
+
       // In production, verify admin authentication
       if (isWhopEnabled && whopSdk) {
         const user = await verifyWhopToken(req);
@@ -1529,7 +1529,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const { withdrawalId, status } = req.body;
-      
+
       if (!withdrawalId) {
         return res.status(400).json({ error: "Withdrawal ID is required" });
       }
@@ -1543,7 +1543,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update withdrawal status
       await storage.updateWithdrawalStatus(withdrawalId, status);
 
-      return res.json({ 
+      return res.json({
         success: true,
         withdrawalId,
         status,
@@ -1581,7 +1581,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get company ID from environment or admin
       const companyId = process.env.WHOP_COMPANY_ID;
       if (!companyId) {
-        return res.status(500).json({ 
+        return res.status(500).json({
           error: "Company ID not configured",
           details: "WHOP_COMPANY_ID environment variable is required for reconciliation"
         });
@@ -1594,8 +1594,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         // Fetch all payments from Whop using async iterator (handles pagination automatically)
         console.log(`[Reconciliation] Fetching payments from Whop...`);
-        
-        for await (const payment of whopSdk.payments.list({ 
+
+        for await (const payment of whopSdk.payments.list({
           company_id: companyId,
         })) {
           paymentsChecked++;
@@ -1671,7 +1671,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       } catch (whopError: any) {
         console.error("[Reconciliation] Error fetching payments from Whop:", whopError);
-        return res.status(500).json({ 
+        return res.status(500).json({
           error: "Failed to fetch payments from Whop",
           details: whopError instanceof Error ? whopError.message : "Unknown error"
         });
@@ -1702,7 +1702,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const { targetUserId, amount, reason } = req.body;
-      
+
       if (!targetUserId || typeof amount !== 'number') {
         return res.status(400).json({ error: "Invalid parameters. Required: targetUserId, amount" });
       }
@@ -1741,16 +1741,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Validate webhook signature using raw body
-      const requestBodyText = (req as any).rawBody 
+      const requestBodyText = (req as any).rawBody
         ? (req as any).rawBody.toString('utf8')
         : JSON.stringify(req.body);
       const headers = req.headers as Record<string, string>;
-      
+
       let webhookData;
-      
+
       // Check if signature headers are present (real webhook vs test webhook)
       const hasSignature = headers['webhook-signature'] && headers['webhook-timestamp'];
-      
+
       if (hasSignature) {
         // Validate signature for real webhooks
         try {
@@ -1775,19 +1775,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
       console.log("📥 WEBHOOK RECEIVED - Full Debug Info:");
       console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-      
+
       // Whop uses "action" for test webhooks and "type" for real webhooks
       const eventType = webhookData.type || webhookData.action;
       console.log("🔹 Event Type:", eventType || "MISSING TYPE!");
       console.log("🔹 Full Payload:", JSON.stringify(webhookData, null, 2));
-      
+
       // Check if this would process commissions
       const isPaymentSucceeded = eventType === "payment.succeeded";
       console.log("🔹 Would Process Commissions:", isPaymentSucceeded ? "✅ YES" : "❌ NO");
-      
+
       if (isPaymentSucceeded) {
         const payment = webhookData.data;
-        
+
         if (!payment || payment === null) {
           console.log("⚠️  TEST WEBHOOK DETECTED - No payment data provided by Whop");
           console.log("ℹ️  Real webhooks will have payment data and will process commissions");
@@ -1797,7 +1797,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log("   - Amount:", payment.final_amount || payment.subtotal || payment.amount || 0);
           console.log("   - User:", payment.user?.email || "No user data");
         }
-        
+
         // Check registered admins
         const registeredAdmins = await storage.getAllAdmins();
         console.log("👥 Registered Admins:", registeredAdmins.length);
@@ -1818,14 +1818,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Handle payment.succeeded event (support both "type" and "action" fields)
       if (eventType === "payment.succeeded") {
         const payment = webhookData.data;
-        
+
         // Skip if test webhook with no data
         if (!payment || payment === null) {
           console.log("[Webhook] Test webhook received with no payment data - skipping commission processing");
           console.log("ℹ️  Real payment webhooks will have payment data and will process automatically");
           return res.status(200).send("OK");
         }
-        
+
         console.log("[Webhook] Payment succeeded:", payment.id);
 
         // ================================================================
@@ -1842,7 +1842,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const customerUserId = payment.user?.id;
         const customerEmail = payment.user?.email;
         const customerUsername = payment.user?.username;
-        
+
         // Validate required fields
         if (!customerUserId) {
           console.error("[Webhook] ❌ Payment has no customer user ID - cannot process");
@@ -1872,7 +1872,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         let admin = null;
         let referringAdminUserId = payment.metadata?.referring_admin_user_id;
         let referringCompanyId = payment.metadata?.referring_company_id;
-        
+
         // Method 1: Try metadata from checkout config
         if (referringAdminUserId) {
           admin = await storage.getAdminByUserId(referringAdminUserId);
@@ -1882,7 +1882,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             console.warn(`[Webhook] ⚠️  Admin from metadata (${referringAdminUserId}) not found in database`);
           }
         }
-        
+
         // Method 2: Check if this user already exists as a stored member for an admin (direct lookup)
         if (!admin) {
           const existingMember = await storage.getStoredMemberByUserId(customerUserId);
@@ -1895,13 +1895,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           }
         }
-        
+
         // ================================================================
         // STORE MEMBER FOR MULTI-TENANT TRACKING (ALWAYS - even if admin unknown)
         // ================================================================
         const planId = process.env.WHOP_PLAN_ID || "unknown";
         const ownerCompanyId = process.env.WHOP_COMPANY_ID || "unknown";
-        
+
         try {
           let userDetails: any = null;
           if (whopSdk) {
@@ -1924,7 +1924,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Use placeholder values if admin not found - allows future reconciliation
           const memberAdminId = admin?.userId || "pending_attribution";
           const memberCompanyId = referringCompanyId || ownerCompanyId;
-          
+
           const memberData = {
             id: `member_${payment.id}_${Date.now()}`,
             membershipId: payment.membership_id || `pay_${payment.id}`,
@@ -1985,10 +1985,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // ================================================================
         const SUBSCRIPTION_PRICE_CENTS = 3500;  // Fixed: $35.00
         const COMMISSION_CENTS = 1750;           // Fixed: $17.50 (50% of $35.00)
-        
+
         // Read incoming payment amount for logging only - DO NOT USE for commission calculation
         const incomingPaymentAmount = (payment as any).final_amount || (payment as any).subtotal || (payment as any).amount || 0;
-        
+
         // Log if incoming amount differs from our fixed price (for debugging)
         if (incomingPaymentAmount !== SUBSCRIPTION_PRICE_CENTS) {
           console.warn(`[Webhook] ⚠️  Incoming payment amount ($${incomingPaymentAmount / 100}) doesn't match fixed price $35.00`);
@@ -2003,10 +2003,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // ================================================================
         // Record the fixed $2.50 commission for this admin
         // Access was already granted above following Whop best practices
-        
+
         // Record commission payment with deterministic ID for idempotency
         const commissionId = `comm_${payment.id}_${admin.userId}`;
-        
+
         try {
           await storage.recordCommissionPayment({
             id: commissionId,
@@ -2042,7 +2042,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/chat/sessions", async (req, res) => {
     try {
       let userId = "dev_user";
-      
+
       if (isWhopEnabled) {
         const user = await verifyWhopToken(req);
         if (!user) {
@@ -2055,9 +2055,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const createSchema = z.object({}).strict();
       const validation = createSchema.safeParse(req.body || {});
       if (!validation.success) {
-        return res.status(400).json({ 
-          error: "Validation failed", 
-          details: validation.error.errors 
+        return res.status(400).json({
+          error: "Validation failed",
+          details: validation.error.errors
         });
       }
 
@@ -2072,7 +2072,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/chat/sessions", async (req, res) => {
     try {
       let userId = "dev_user";
-      
+
       if (isWhopEnabled) {
         const user = await verifyWhopToken(req);
         if (!user) {
@@ -2094,7 +2094,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const session = await storage.getChatSession(id);
-      
+
       if (!session) {
         return res.status(404).json({ error: "Session not found" });
       }
@@ -2154,9 +2154,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const validation = updateSchema.safeParse(req.body);
       if (!validation.success) {
-        return res.status(400).json({ 
-          error: "Validation failed", 
-          details: validation.error.errors 
+        return res.status(400).json({
+          error: "Validation failed",
+          details: validation.error.errors
         });
       }
 
@@ -2173,7 +2173,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const session = await storage.getChatSession(id);
-      
+
       if (!session) {
         return res.status(404).json({ error: "Session not found" });
       }
@@ -2279,9 +2279,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
       let userCredits = await storage.getUserCredits(userId);
-      
+
       if (!userCredits) {
-        await storage.setUserCredits(userId, 10);
+        await storage.setUserCredits(userId, 3);
         userCredits = await storage.getUserCredits(userId);
       }
 
@@ -2309,23 +2309,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         content: "",
       };
       ws.send(JSON.stringify(typingMsg));
-      
+
       await new Promise(resolve => setTimeout(resolve, 600));
-      
+
       if (ws.readyState !== WebSocket.OPEN) return;
-      
+
       // Generate transparent prediction with real-time stage updates
       const aiCompletePromise = createAiThinkingCompletePromise();
       const prediction = await generateTransparentPrediction(pair, ws, () => aiCompletePromise, timeframe || "M1");
-      
+
       if (ws.readyState !== WebSocket.OPEN) return;
 
       // Only deduct credits if we got an actionable prediction (UP or DOWN, not NEUTRAL)
       const isActionablePrediction = prediction.direction !== "NEUTRAL";
-      
+
       if (isActionablePrediction && !userCredits.hasUnlimitedAccess) {
         const success = await storage.decrementUserCredits(userId);
-        
+
         if (!success) {
           // This shouldn't happen since we checked earlier, but handle it just in case
           const insufficientMsg: ServerMessage = {
@@ -2337,7 +2337,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return;
         }
       }
-      
+
       // Store in history
       history.push({
         pair: prediction.pair,
@@ -2368,9 +2368,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Inform user about credit status based on prediction type
       setTimeout(() => {
         if (ws.readyState !== WebSocket.OPEN) return;
-        
+
         let followUpContent: string;
-        
+
         if (!isActionablePrediction) {
           // NEUTRAL prediction - no credits consumed
           followUpContent = "No credits consumed for this analysis. Market conditions didn't meet our confidence threshold. Try another pair!";
@@ -2378,7 +2378,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Actionable prediction - credits were deducted
           followUpContent = "Want another prediction? Pick a different pair below.";
         }
-        
+
         const followUpMsg: ServerMessage = {
           type: "bot_message",
           content: followUpContent,
@@ -2387,9 +2387,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }, 1000);
     } catch (error) {
       console.error("Error generating prediction:", error);
-      
+
       if (ws.readyState !== WebSocket.OPEN) return;
-      
+
       const errorMsg: ServerMessage = {
         type: "bot_message",
         content: "Market data service is temporarily unavailable. Please try again in a moment.",
@@ -2430,7 +2430,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } else {
       setTimeout(() => {
         if (ws.readyState !== WebSocket.OPEN) return;
-        
+
         const helpMsg: ServerMessage = {
           type: "bot_message",
           content: "I can help you with crypto and forex predictions! Try selecting a pair like BTC/USDT, EUR/USD, or use the quick select buttons below.",

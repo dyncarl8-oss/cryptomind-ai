@@ -218,7 +218,7 @@ export const users = pgTable("users", {
   username: varchar("username").notNull(),
   name: varchar("name").notNull(),
   profilePictureUrl: varchar("profile_picture_url"),
-  credits: integer("credits").notNull().default(10),
+  credits: integer("credits").notNull().default(3),
   hasUnlimitedAccess: varchar("has_unlimited_access").notNull().default("false"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
