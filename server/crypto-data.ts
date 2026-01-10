@@ -164,42 +164,40 @@ export async function fetchMarketData(pair: TradingPair, timeframe: string = "M1
   if (pair === "XAU/USD" || pair === "US100/USD") {
     try {
       // Use NQ=F for US100 (Nasdaq 100 Futures) - trades almost 24/5 and more relevant than the index
+      // Gold (XAU/USD) is intentionally skipped here because it's handled by the CryptoCompare PAXG proxy section for 24/7 live movement
       const yfSymbol = pair === "US100/USD" ? "NQ=F" : null;
 
-      if (!yfSymbol && pair === "XAU/USD") {
-        // Gold is handled by PAXG/USDT in the CryptoCompare section for 24/7 live movement
-        throw new Error("Use CryptoCompare PAXG proxy for Gold");
-      }
-
-      // Yahoo timeframe mapping
-      const yahooTimeframeMap: Record<string, string> = {
-        "M1": "1m", "M3": "2m", "M5": "5m", "M15": "15m", "M30": "30m",
-        "H1": "1h", "H2": "1h", "H4": "1h", "D1": "1d", "W1": "1wk"
-      };
-
-      const interval = yahooTimeframeMap[timeframe] || "15m";
-      const rangeMap: Record<string, string> = {
-        "M1": "1d", "M5": "1d", "M15": "5d", "H1": "1mo", "D1": "1y", "W1": "5y"
-      };
-      const range = rangeMap[timeframe] || "5d";
-
-      const data = yfSymbol ? await fetchFromYahoo(yfSymbol, interval, range) : null;
-      const result = data?.chart?.result?.[0];
-
-      if (result) {
-        const currentPrice = result.meta.regularMarketPrice;
-        const previousClose = result.meta.previousClose || currentPrice;
-        const priceChange24h = ((currentPrice - previousClose) / previousClose) * 100;
-        const candles = convertYahooCandles(result);
-
-        console.log(`[Yahoo API] Successfully fetched ${pair}: $${currentPrice}`);
-
-        return {
-          currentPrice,
-          candles,
-          priceChange24h,
-          volumeChange24h: 0,
+      if (yfSymbol) {
+        // Yahoo timeframe mapping
+        const yahooTimeframeMap: Record<string, string> = {
+          "M1": "1m", "M3": "2m", "M5": "5m", "M15": "15m", "M30": "30m",
+          "H1": "1h", "H2": "1h", "H4": "1h", "D1": "1d", "W1": "1wk"
         };
+
+        const interval = yahooTimeframeMap[timeframe] || "15m";
+        const rangeMap: Record<string, string> = {
+          "M1": "1d", "M5": "1d", "M15": "5d", "H1": "1mo", "D1": "1y", "W1": "5y"
+        };
+        const range = rangeMap[timeframe] || "5d";
+
+        const data = await fetchFromYahoo(yfSymbol, interval, range);
+        const result = data?.chart?.result?.[0];
+
+        if (result) {
+          const currentPrice = result.meta.regularMarketPrice;
+          const previousClose = result.meta.previousClose || currentPrice;
+          const priceChange24h = ((currentPrice - previousClose) / previousClose) * 100;
+          const candles = convertYahooCandles(result);
+
+          console.log(`[Yahoo API] Successfully fetched ${pair}: $${currentPrice}`);
+
+          return {
+            currentPrice,
+            candles,
+            priceChange24h,
+            volumeChange24h: 0,
+          };
+        }
       }
     } catch (error) {
       console.error(`[Yahoo API] Custom fetch error for ${pair}:`, error);
