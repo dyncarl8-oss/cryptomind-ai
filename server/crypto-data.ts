@@ -112,32 +112,6 @@ const getHistoEndpoint = (timeframe: string): { endpoint: string; aggregate: num
   return { endpoint: "histominute", aggregate: 1, limit: 300 };
 };
 
-const ALPHA_VANTAGE_KEY = process.env.ALPHA_VANTAGE_API_KEY || "9EWIX673WCGVHWK0";
-
-async function fetchFromAlphaVantage(functionName: string, symbol: string, extraParams: string = ""): Promise<any> {
-  const url = `https://www.alphavantage.co/query?function=${functionName}&symbol=${symbol}${extraParams}&apikey=${ALPHA_VANTAGE_KEY}`;
-  console.log(`[Alpha Vantage API] Fetching: ${functionName} for ${symbol}`);
-
-  return new Promise((resolve, reject) => {
-    https.get(url, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        try {
-          const parsed = JSON.parse(data);
-          if (parsed.Information || parsed["Note"]) {
-            console.warn(`[Alpha Vantage API] Rate limited or Info: ${JSON.stringify(parsed)}`);
-          }
-          resolve(parsed);
-        } catch (e) {
-          reject(new Error(`Failed to parse Alpha Vantage data for ${symbol}`));
-        }
-      });
-      res.on('error', reject);
-    }).on('error', reject);
-  });
-}
-
 async function fetchFromYahoo(symbol: string, interval: string, range: string): Promise<any> {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${range}`;
   console.log(`[Yahoo API] Fetching: ${url}`);
@@ -186,51 +160,9 @@ const convertYahooCandles = (result: any): Candle[] => {
 export async function fetchMarketData(pair: TradingPair, timeframe: string = "M1"): Promise<MarketData> {
   const { from, to } = pairToSymbols(pair);
 
-  // Use Alpha Vantage or Yahoo Finance for US100/USD
+  // Use Yahoo Finance for US100/USD (XAU/USD handles via PAXG proxy in CryptoCompare block)
   if (pair === "US100/USD") {
     try {
-      // Primary: Alpha Vantage (Institution-grade Accuracy)
-      const avData = await fetchFromAlphaVantage("GLOBAL_QUOTE", "QQQ");
-      const quote = avData?.["Global Quote"];
-
-      if (quote && quote["05. price"]) {
-        const currentPrice = parseFloat(quote["05. price"]);
-        const priceChange24h = parseFloat(quote["10. change percent"].replace('%', ''));
-
-        // Fetch intraday for candles
-        const avIntraday = await fetchFromAlphaVantage("TIME_SERIES_DAILY", "QQQ");
-        const timeSeries = avIntraday?.["Time Series (Daily)"];
-        const candles: Candle[] = [];
-
-        if (timeSeries) {
-          Object.entries(timeSeries).slice(0, 100).forEach(([date, data]: [string, any]) => {
-            candles.push({
-              timestamp: new Date(date).getTime(),
-              open: parseFloat(data["1. open"]),
-              high: parseFloat(data["2. high"]),
-              low: parseFloat(data["3. low"]),
-              close: parseFloat(data["4. close"]),
-              volume: parseFloat(data["5. volume"]),
-            });
-          });
-          candles.reverse();
-        }
-
-        console.log(`[Alpha Vantage API] Successfully fetched ${pair}: $${currentPrice}`);
-
-        return {
-          currentPrice,
-          candles: candles.length > 0 ? candles : [],
-          priceChange24h,
-          volumeChange24h: 0,
-        };
-      }
-    } catch (error) {
-      console.error(`[Alpha Vantage API] Error for ${pair}, falling back to Yahoo:`, error);
-    }
-
-    try {
-      // Fallback: Yahoo Finance (Stable backup)
       const yfSymbol = "NQ=F";
 
       if (yfSymbol) {
@@ -434,16 +366,6 @@ export async function getCurrentPrice(pair: TradingPair): Promise<number> {
 
   if (pair === "US100/USD") {
     try {
-      // Primary: Alpha Vantage Quote
-      const data = await fetchFromAlphaVantage("GLOBAL_QUOTE", "QQQ");
-      const price = data?.["Global Quote"]?.["05. price"];
-      if (price) return parseFloat(price);
-    } catch (error) {
-      console.error(`[Alpha Vantage API] Current price error for ${pair}:`, error);
-    }
-
-    try {
-      // Fallback: Yahoo Finance
       const yfSymbol = "NQ=F";
       const data = await fetchFromYahoo(yfSymbol, '1m', '1d');
       const result = data.chart.result?.[0];
