@@ -77,7 +77,7 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState("");
-  
+
   const { data: user } = useQuery<WhopUser | null>({
     queryKey: ["/api/auth/me"],
   });
@@ -106,12 +106,12 @@ export default function AdminDashboard() {
       if (!amount || amount <= 0) {
         throw new Error("Please enter a valid amount");
       }
-      
+
       if (!balance?.balance || amount > balance.balance) {
         throw new Error("Insufficient balance");
       }
-      
-      const response = await apiRequest("POST", "/api/admin/withdraw", { 
+
+      const response = await apiRequest("POST", "/api/admin/withdraw", {
         amount
       });
       return await response.json();
@@ -144,7 +144,7 @@ export default function AdminDashboard() {
       });
       return;
     }
-    
+
     const amountInCents = Math.round(amountInDollars * 100);
     withdrawMutation.mutate(amountInCents);
   };
@@ -158,15 +158,15 @@ export default function AdminDashboard() {
 
   const initials = user?.name
     ? user.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2)
     : "A";
 
-  const getStatusCategory = (membership: Membership): { 
-    label: string; 
+  const getStatusCategory = (membership: Membership): {
+    label: string;
     variant: "default" | "secondary" | "destructive" | "outline";
     description: string;
   } => {
@@ -182,23 +182,23 @@ export default function AdminDashboard() {
       return {
         label: membership.status === "trialing" ? "Trial Active" : "Active",
         variant: "default",
-        description: membership.renewal_period_end 
-          ? "Subscription renewing" 
+        description: membership.renewal_period_end
+          ? "Subscription renewing"
           : "One-time purchase"
       };
     }
-    
+
     // At Risk
     if (membership.status === "past_due" || membership.status === "unresolved") {
       return {
         label: "At Risk",
         variant: "destructive",
-        description: membership.status === "past_due" 
-          ? "Payment overdue" 
+        description: membership.status === "past_due"
+          ? "Payment overdue"
           : "Payment issue"
       };
     }
-    
+
     // Closed statuses
     if (membership.status === "canceled" || membership.status === "expired") {
       return {
@@ -207,18 +207,18 @@ export default function AdminDashboard() {
         description: "Subscription ended"
       };
     }
-    
+
     // Completed (one-time purchase)
     if (membership.status === "completed") {
       return {
         label: "Completed",
         variant: "secondary",
-        description: membership.renewal_period_end 
-          ? "Active subscription" 
+        description: membership.renewal_period_end
+          ? "Active subscription"
           : "One-time access granted"
       };
     }
-    
+
     // Default
     return {
       label: membership.status.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase()),
@@ -236,8 +236,8 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
             <Avatar className="h-8 w-8 md:h-10 md:w-10 flex-shrink-0 ring-2 ring-primary/30" data-testid="avatar-admin">
               {user?.profile_pic_url && (
-                <AvatarImage 
-                  src={user.profile_pic_url} 
+                <AvatarImage
+                  src={user.profile_pic_url}
                   alt={user.name || "Admin"}
                   crossOrigin="anonymous"
                 />
@@ -253,7 +253,7 @@ export default function AdminDashboard() {
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
             <ThemeToggle />
             <Link href="/">
@@ -269,7 +269,7 @@ export default function AdminDashboard() {
           </div>
         </div>
       </header>
-      
+
       <div className="flex-1 overflow-y-auto px-3 md:px-6 lg:px-8 py-4 md:py-8">
         <div className="space-y-4 md:space-y-8">
           <div className="grid gap-4 md:gap-6 md:grid-cols-2">
@@ -424,11 +424,11 @@ export default function AdminDashboard() {
                     const displayName = membership.user?.name || membership.user?.username || `Member ${membership.id.slice(-8)}`;
                     const userInitials = membership.user?.name
                       ? membership.user.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .toUpperCase()
-                          .slice(0, 2)
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .toUpperCase()
+                        .slice(0, 2)
                       : membership.user?.username?.slice(0, 2).toUpperCase() || membership.id.slice(-2).toUpperCase();
 
                     return (
@@ -439,7 +439,7 @@ export default function AdminDashboard() {
                       >
                         <Avatar className="h-8 w-8 md:h-10 md:w-10 flex-shrink-0 ring-2 ring-primary/20" data-testid={`avatar-${membership.user?.username || membership.id}`}>
                           {membership.user?.profile_pic_url && (
-                            <AvatarImage 
+                            <AvatarImage
                               src={membership.user.profile_pic_url}
                               alt={displayName}
                               crossOrigin="anonymous"
@@ -450,7 +450,7 @@ export default function AdminDashboard() {
                           )}
                           <AvatarFallback className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 text-foreground">{userInitials}</AvatarFallback>
                         </Avatar>
-                        
+
                         <div className="flex-1 min-w-0 space-y-2">
                           <div className="flex items-start justify-between gap-2 flex-wrap">
                             <div className="min-w-0 flex-1">
@@ -465,7 +465,7 @@ export default function AdminDashboard() {
                               )}
                             </div>
                             <div className="flex items-center gap-2 flex-shrink-0">
-                              <Badge 
+                              <Badge
                                 variant={statusInfo.variant as any}
                                 data-testid={`badge-status-${membership.id}`}
                               >
@@ -479,7 +479,7 @@ export default function AdminDashboard() {
                               <span className="font-medium text-foreground">Product:</span>
                               <span>{membership.product.title}</span>
                             </div>
-                            
+
                             {membership.renewal_period_end ? (
                               <div className="flex items-center gap-1.5">
                                 <span className="font-medium text-foreground">
@@ -522,7 +522,7 @@ export default function AdminDashboard() {
                               <span className="font-medium text-foreground">Member since:</span>
                               <span>{format(new Date(membership.created_at), "MMM d, yyyy")}</span>
                             </div>
-                            
+
                             <div className="flex items-center gap-1.5 pt-1">
                               <span className="font-medium text-foreground">Status:</span>
                               <span className="text-muted-foreground italic">{statusInfo.description}</span>
@@ -637,7 +637,7 @@ export default function AdminDashboard() {
                   <div className="h-6 w-6 rounded-md bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span className="text-primary text-xs font-bold">1</span>
                   </div>
-                  <span>Earn $17.50 (50% commission) for each $35 subscription payment</span>
+                  <span>Earn $2.50 (50% commission) for each $5 subscription payment</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="h-6 w-6 rounded-md bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center flex-shrink-0 mt-0.5">

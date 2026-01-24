@@ -652,8 +652,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // ================================================================
       // STEP 7: Record commission payment
       // ================================================================
-      const SUBSCRIPTION_PRICE_CENTS = 3500;  // $35.00
-      const COMMISSION_CENTS = 1750;          // $17.50 (50% of $35.00)
+      const SUBSCRIPTION_PRICE_CENTS = 500;   // $5.00
+      const COMMISSION_CENTS = 250;           // $2.50 (50% of $5.00)
 
       const markerAdminId = admin?.userId || "system_no_admin";
       const markerCommissionId = `comm_${payment.id}_${markerAdminId}`;

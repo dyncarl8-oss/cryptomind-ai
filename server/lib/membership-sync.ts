@@ -2,7 +2,7 @@ import { whopSdk, isWhopEnabled } from "./whop-sdk";
 import { storage } from "../storage";
 import { InsertStoredMember, MembershipStatus } from "@shared/schema";
 
-const DEFAULT_COMMISSION_AMOUNT = 1750; // $17.50 (50% of $35)
+const DEFAULT_COMMISSION_AMOUNT = 250; // $2.50 (50% of $5)
 
 interface MembershipSyncResult {
   synced: number;
@@ -14,14 +14,14 @@ interface MembershipSyncResult {
 
 function extractProfilePictureUrl(profilePicture: any): string | null {
   if (!profilePicture) return null;
-  
+
   let profilePicUrl: string | null = null;
   if (typeof profilePicture === 'string') {
     profilePicUrl = profilePicture;
   } else if (typeof profilePicture === 'object') {
     profilePicUrl = profilePicture.url || profilePicture.image_url || null;
   }
-  
+
   if (profilePicUrl && profilePicUrl.includes('/plain/')) {
     const lastPlainIndex = profilePicUrl.lastIndexOf('/plain/');
     const extractedUrl = profilePicUrl.substring(lastPlainIndex + 7);
@@ -29,7 +29,7 @@ function extractProfilePictureUrl(profilePicture: any): string | null {
       profilePicUrl = extractedUrl;
     }
   }
-  
+
   return profilePicUrl;
 }
 
@@ -41,7 +41,7 @@ function extractProfilePictureUrl(profilePicture: any): string | null {
  * 4. Processing commissions for new active members
  */
 export async function syncMembershipsForCompany(
-  adminCompanyId: string, 
+  adminCompanyId: string,
   adminUserId: string,
   commissionAmount: number = DEFAULT_COMMISSION_AMOUNT
 ): Promise<MembershipSyncResult> {
@@ -68,17 +68,17 @@ export async function syncMembershipsForCompany(
   try {
     console.log(`[MembershipSync] Starting sync for admin ${adminUserId} (company: ${adminCompanyId})`);
     console.log(`[MembershipSync] Fetching memberships from owner company: ${ownerCompanyId}`);
-    
+
     // Get stored members for this admin to know which memberships to track
     const storedMembers = await storage.getStoredMembersByAdmin(adminUserId);
     const storedMemberUserIds = new Set(storedMembers.map(m => m.userId));
     const storedMembershipIds = new Map(storedMembers.map(m => [m.membershipId, m]));
-    
+
     console.log(`[MembershipSync] Admin has ${storedMembers.length} stored members`);
-    
+
     // Fetch all memberships from WHOP_COMPANY_ID
     const allMemberships: any[] = [];
-    for await (const membership of whopSdk.memberships.list({ 
+    for await (const membership of whopSdk.memberships.list({
       company_id: ownerCompanyId,
       first: 200,
     })) {
@@ -86,9 +86,9 @@ export async function syncMembershipsForCompany(
     }
 
     console.log(`[MembershipSync] Fetched ${allMemberships.length} total memberships from owner company`);
-    
+
     // Filter to only memberships that belong to this admin's stored members
-    const adminMemberships = allMemberships.filter(m => 
+    const adminMemberships = allMemberships.filter(m =>
       storedMembershipIds.has(m.id) || storedMemberUserIds.has(m.user?.id)
     );
 
@@ -134,12 +134,12 @@ export async function syncMembershipsForCompany(
         };
 
         const { isNew } = await storage.upsertStoredMember(memberData);
-        
+
         result.synced++;
         if (isNew) {
           result.newMembers++;
           console.log(`[MembershipSync] New member detected: ${username} (${membership.id})`);
-          
+
           if (["active", "trialing", "completed"].includes(status)) {
             await processCommissionForMember(membership.id, adminUserId, membership.user?.id, commissionAmount);
             result.commissionsProcessed++;
@@ -155,7 +155,7 @@ export async function syncMembershipsForCompany(
     }
 
     console.log(`[MembershipSync] Sync complete: ${result.synced} synced, ${result.newMembers} new, ${result.updatedMembers} updated, ${result.commissionsProcessed} commissions`);
-    
+
   } catch (error) {
     const errorMsg = `Error syncing memberships: ${error instanceof Error ? error.message : 'Unknown error'}`;
     result.errors.push(errorMsg);
@@ -166,8 +166,8 @@ export async function syncMembershipsForCompany(
 }
 
 async function processCommissionForMember(
-  membershipId: string, 
-  adminUserId: string, 
+  membershipId: string,
+  adminUserId: string,
   customerUserId: string | undefined,
   commissionAmount: number
 ): Promise<boolean> {
@@ -197,7 +197,7 @@ async function processCommissionForMember(
     });
 
     await storage.markMemberCommissionProcessed(membershipId);
-    
+
     console.log(`[MembershipSync] Commission of ${commissionAmount} added for admin ${adminUserId} from membership ${membershipId}`);
     return true;
   } catch (error) {
@@ -208,24 +208,24 @@ async function processCommissionForMember(
 
 export async function syncAllAdminMemberships(commissionAmount: number = DEFAULT_COMMISSION_AMOUNT): Promise<Map<string, MembershipSyncResult>> {
   const results = new Map<string, MembershipSyncResult>();
-  
+
   try {
     const admins = await storage.getAllAdmins();
     console.log(`[MembershipSync] Starting sync for ${admins.length} admins`);
-    
+
     for (const admin of admins) {
       if (!admin.companyId) {
         console.log(`[MembershipSync] Skipping admin ${admin.userId} - no company ID`);
         continue;
       }
-      
+
       const result = await syncMembershipsForCompany(admin.companyId, admin.userId, commissionAmount);
       results.set(admin.userId, result);
     }
   } catch (error) {
     console.error(`[MembershipSync] Error syncing all admin memberships:`, error);
   }
-  
+
   return results;
 }
 
@@ -236,13 +236,13 @@ export function startMembershipSyncPolling(intervalMs: number = 5 * 60 * 1000): 
     console.log("[MembershipSync] Polling already running");
     return;
   }
-  
+
   console.log(`[MembershipSync] Starting polling with interval ${intervalMs}ms`);
-  
+
   syncAllAdminMemberships().catch(err => {
     console.error("[MembershipSync] Initial sync error:", err);
   });
-  
+
   syncIntervalId = setInterval(() => {
     syncAllAdminMemberships().catch(err => {
       console.error("[MembershipSync] Scheduled sync error:", err);
