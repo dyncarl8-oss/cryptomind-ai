@@ -637,7 +637,7 @@ export default function AdminDashboard() {
                   <div className="h-6 w-6 rounded-md bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span className="text-primary text-xs font-bold">1</span>
                   </div>
-                  <span>Earn $2.50 (50% commission) for each $5 subscription payment</span>
+                  <span>Earn $2.17 (50% commission after fees) for each $5 weekly subscription payment</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="h-6 w-6 rounded-md bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -649,7 +649,7 @@ export default function AdminDashboard() {
                   <div className="h-6 w-6 rounded-md bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span className="text-primary text-xs font-bold">3</span>
                   </div>
-                  <span>Both initial payments and recurring renewals generate earnings</span>
+                  <span>Both initial payments and recurring weekly renewals generate earnings</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="h-6 w-6 rounded-md bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center flex-shrink-0 mt-0.5">
