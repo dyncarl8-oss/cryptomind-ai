@@ -35,7 +35,7 @@ interface UserCredits {
 export function ChatHeader({ onNewSession, onSessionSelect }: ChatHeaderProps) {
   const { toast } = useToast();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
+
   const { data: user } = useQuery<WhopUser | null>({
     queryKey: ["/api/auth/me"],
   });
@@ -70,9 +70,15 @@ export function ChatHeader({ onNewSession, onSessionSelect }: ChatHeaderProps) {
     enabled: !!user && (!!user.companyId || !!user.experienceId),
   });
 
+  const params = useParams<{ experienceId?: string }>();
+  const experienceId = params.experienceId;
+
   const purchaseMutation = useMutation({
     mutationFn: async () => {
-      const success = await purchaseCredits();
+      const success = await purchaseCredits({
+        experienceId: experienceId || user?.experienceId,
+        companyId: user?.companyId
+      });
       if (!success) {
         throw new Error("Purchase failed");
       }
@@ -95,17 +101,17 @@ export function ChatHeader({ onNewSession, onSessionSelect }: ChatHeaderProps) {
 
   const initials = user?.name
     ? user.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2)
     : "U";
 
   return (
     <>
-      <MemberSidebar 
-        open={sidebarOpen} 
+      <MemberSidebar
+        open={sidebarOpen}
         onOpenChange={setSidebarOpen}
         user={user}
         credits={credits}
@@ -126,78 +132,78 @@ export function ChatHeader({ onNewSession, onSessionSelect }: ChatHeaderProps) {
             <Menu className="h-5 w-5" />
           </Button>
           <Avatar className="h-8 w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 flex-shrink-0" data-testid="avatar-user">
-          {user?.profile_pic_url && (
-            <AvatarImage 
-              src={user.profile_pic_url} 
-              alt={user.name || "User"}
-              crossOrigin="anonymous"
-              onError={(e) => {
-                console.error("[Avatar] Failed to load profile picture:", user.profile_pic_url);
-              }}
-            />
-          )}
-          <AvatarFallback>{initials}</AvatarFallback>
-        </Avatar>
-        <div className="flex flex-col min-w-0 flex-1">
-          <h2 className="text-xs md:text-base font-semibold truncate" data-testid="text-username">
-            {user?.name || "CryptoMind AI"}
-          </h2>
-          {user?.username && (
-            <p className="text-xs text-muted-foreground truncate hidden sm:block" data-testid="text-handle">
-              @{user.username}
-            </p>
-          )}
-        </div>
-      </div>
-      
-      <div className="flex items-center gap-1 md:gap-2 lg:gap-3 flex-shrink-0 flex-wrap justify-end">
-        {adminCheck?.isAdmin && (
-          <Link href="/admin">
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-xs whitespace-nowrap px-2 md:px-3"
-              data-testid="button-admin-dashboard"
-            >
-              <span className="hidden sm:inline">Admin Dashboard</span>
-              <span className="sm:hidden">Admin</span>
-            </Button>
-          </Link>
-        )}
-        <ThemeToggle />
-        {!creditsLoading && credits && (
-          <div className="flex items-center gap-1 md:gap-2">
-            <Badge variant="secondary" className="text-xs px-2" data-testid="badge-credits">
-              <SparklesIcon className="w-3 h-3 mr-1" />
-              <span className="hidden xs:inline">{credits.hasUnlimitedAccess ? "∞ credits" : `${credits.credits} credits`}</span>
-              <span className="xs:hidden">{credits.hasUnlimitedAccess ? "∞" : credits.credits}</span>
-            </Badge>
-            {!credits.hasUnlimitedAccess && (
-              <Button
-                variant="default"
-                size="sm"
-                onClick={() => purchaseMutation.mutate()}
-                disabled={purchaseMutation.isPending}
-                className="text-xs whitespace-nowrap px-2 md:px-3"
-                data-testid="button-get-unlimited-header"
-              >
-                <span className="hidden sm:inline">{purchaseMutation.isPending ? "Processing..." : "Get Unlimited"}</span>
-                <span className="sm:hidden">{purchaseMutation.isPending ? "..." : "Unlimited"}</span>
-              </Button>
+            {user?.profile_pic_url && (
+              <AvatarImage
+                src={user.profile_pic_url}
+                alt={user.name || "User"}
+                crossOrigin="anonymous"
+                onError={(e) => {
+                  console.error("[Avatar] Failed to load profile picture:", user.profile_pic_url);
+                }}
+              />
+            )}
+            <AvatarFallback>{initials}</AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col min-w-0 flex-1">
+            <h2 className="text-xs md:text-base font-semibold truncate" data-testid="text-username">
+              {user?.name || "CryptoMind AI"}
+            </h2>
+            {user?.username && (
+              <p className="text-xs text-muted-foreground truncate hidden sm:block" data-testid="text-handle">
+                @{user.username}
+              </p>
             )}
           </div>
-        )}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onNewSession}
-          className="gap-1 md:gap-2 px-2 md:px-3"
-          data-testid="button-new-session"
-        >
-          <ArrowPathIcon className="w-3 h-3 md:w-4 md:h-4" />
-          <span className="hidden sm:inline text-xs md:text-sm">New Session</span>
-        </Button>
-      </div>
+        </div>
+
+        <div className="flex items-center gap-1 md:gap-2 lg:gap-3 flex-shrink-0 flex-wrap justify-end">
+          {adminCheck?.isAdmin && (
+            <Link href="/admin">
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs whitespace-nowrap px-2 md:px-3"
+                data-testid="button-admin-dashboard"
+              >
+                <span className="hidden sm:inline">Admin Dashboard</span>
+                <span className="sm:hidden">Admin</span>
+              </Button>
+            </Link>
+          )}
+          <ThemeToggle />
+          {!creditsLoading && credits && (
+            <div className="flex items-center gap-1 md:gap-2">
+              <Badge variant="secondary" className="text-xs px-2" data-testid="badge-credits">
+                <SparklesIcon className="w-3 h-3 mr-1" />
+                <span className="hidden xs:inline">{credits.hasUnlimitedAccess ? "∞ credits" : `${credits.credits} credits`}</span>
+                <span className="xs:hidden">{credits.hasUnlimitedAccess ? "∞" : credits.credits}</span>
+              </Badge>
+              {!credits.hasUnlimitedAccess && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => purchaseMutation.mutate()}
+                  disabled={purchaseMutation.isPending}
+                  className="text-xs whitespace-nowrap px-2 md:px-3"
+                  data-testid="button-get-unlimited-header"
+                >
+                  <span className="hidden sm:inline">{purchaseMutation.isPending ? "Processing..." : "Get Unlimited"}</span>
+                  <span className="sm:hidden">{purchaseMutation.isPending ? "..." : "Unlimited"}</span>
+                </Button>
+              )}
+            </div>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onNewSession}
+            className="gap-1 md:gap-2 px-2 md:px-3"
+            data-testid="button-new-session"
+          >
+            <ArrowPathIcon className="w-3 h-3 md:w-4 md:h-4" />
+            <span className="hidden sm:inline text-xs md:text-sm">New Session</span>
+          </Button>
+        </div>
       </div>
     </>
   );

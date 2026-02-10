@@ -350,57 +350,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       console.log(`[Checkout Config] Creating checkout configuration for user ${user.userId}`);
-      console.log(`[Checkout Config] User context: companyId=${user.companyId}, experienceId=${user.experienceId}`);
+
+      // Multi-tenant context resolution
+      const { companyId: resolvedCompanyId, experienceId: resolvedExperienceId } = getResourceIdFromRequest(req, user);
+
+      console.log(`[Checkout Config] Resolved context: companyId=${resolvedCompanyId}, experienceId=${resolvedExperienceId}`);
 
       // Multi-tenant: Find which admin this user belongs to
-      // Priority: 1) JWT token context, 2) Header params, 3) Experience resolution
       let referringAdminUserId: string | null = null;
       let referringCompanyId: string | null = null;
 
-      // Method 1: Try to get admin from user's company context (from JWT)
-      if (user.companyId) {
-        const admin = await storage.getAdminByCompanyId(user.companyId);
+      // Method 1: Try to get admin from resolved company ID
+      if (resolvedCompanyId) {
+        const admin = await storage.getAdminByCompanyId(resolvedCompanyId);
         if (admin) {
           referringAdminUserId = admin.userId;
-          referringCompanyId = user.companyId;
-          console.log(`[Checkout Config] Found admin from JWT company: ${admin.userId} (company: ${user.companyId})`);
+          referringCompanyId = resolvedCompanyId;
+          console.log(`[Checkout Config] Found admin from company context: ${admin.userId}`);
         }
       }
 
-      // Method 2: Try to resolve from experience ID
-      if (!referringAdminUserId && user.experienceId) {
+      // Method 2: Try to resolve from experience ID if company didn't work
+      if (!referringAdminUserId && resolvedExperienceId) {
         try {
-          const companyIdFromExp = await resolveCompanyIdFromExperience(user.experienceId);
+          const companyIdFromExp = await resolveCompanyIdFromExperience(resolvedExperienceId);
           if (companyIdFromExp) {
             const admin = await storage.getAdminByCompanyId(companyIdFromExp);
             if (admin) {
               referringAdminUserId = admin.userId;
               referringCompanyId = companyIdFromExp;
-              console.log(`[Checkout Config] Found admin from experience: ${admin.userId} (company: ${companyIdFromExp})`);
+              console.log(`[Checkout Config] Found admin from experience resolution: ${admin.userId}`);
             }
           }
         } catch (e) {
-          console.warn(`[Checkout Config] Could not resolve company from experience ${user.experienceId}`);
-        }
-      }
-
-      // Method 3: Check if user already exists as a stored member for an admin (direct lookup)
-      if (!referringAdminUserId) {
-        const existingMember = await storage.getStoredMemberByUserId(user.userId);
-        if (existingMember) {
-          referringAdminUserId = existingMember.adminUserId;
-          referringCompanyId = existingMember.companyId;
-          console.log(`[Checkout Config] Found existing member record: admin=${referringAdminUserId}`);
-        }
-      }
-
-      // Method 4: Check request body for explicit admin context (from frontend)
-      if (!referringAdminUserId && req.body?.adminUserId) {
-        const admin = await storage.getAdminByUserId(req.body.adminUserId);
-        if (admin) {
-          referringAdminUserId = admin.userId;
-          referringCompanyId = admin.companyId;
-          console.log(`[Checkout Config] Using explicit admin from request: ${admin.userId}`);
+          console.warn(`[Checkout Config] Could not resolve company from experience ${resolvedExperienceId}`);
         }
       }
 

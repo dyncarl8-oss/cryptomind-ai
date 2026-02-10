@@ -46,7 +46,7 @@ export default function Chat() {
 
   const purchaseMutation = useMutation({
     mutationFn: async () => {
-      const success = await purchaseCredits();
+      const success = await purchaseCredits({ experienceId });
       if (!success) {
         throw new Error("Purchase failed");
       }

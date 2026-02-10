@@ -16,33 +16,33 @@ export async function verifyWhopToken(req: Request): Promise<WhopUser | null> {
 
   try {
     const token = req.headers["x-whop-user-token"] as string;
-    
+
     if (!token) {
       return null;
     }
 
     const { userId } = await whopSdk.verifyUserToken(token);
-    
+
     // Decode the JWT to get the full payload (including resource info)
     const parts = token.split('.');
     if (parts.length === 3) {
       try {
         const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
-        
+
         // Extract resource information from JWT
         const resourceId = payload.resource_id;
         const resourceType = payload.resource_type;
-        
+
         let experienceId: string | undefined;
         let companyId: string | undefined;
-        
+
         // Determine experienceId or companyId based on resourceType
         if (resourceType === 'experience' && resourceId) {
           experienceId = resourceId;
         } else if (resourceType === 'company' && resourceId) {
           companyId = resourceId;
         }
-        
+
         return {
           userId,
           experienceId,
@@ -54,7 +54,7 @@ export async function verifyWhopToken(req: Request): Promise<WhopUser | null> {
         // JWT decode failed, return basic user info
       }
     }
-    
+
     return {
       userId,
     };
@@ -72,28 +72,30 @@ export function getResourceIdFromRequest(req: Request, user?: WhopUser | null, o
       companyId: user.companyId,
     };
   }
-  
+
   // Fallback to headers, query params, and path params
-  let companyId = (req.headers["x-whop-company-id"] as string) || 
-                  (req.query.companyId as string) ||
-                  (req.params.companyId as string) ||
-                  undefined;
-  
+  let companyId = (req.headers["x-whop-company-id"] as string) ||
+    (req.query.companyId as string) ||
+    (req.params.companyId as string) ||
+    (req.body?.companyId as string) ||
+    undefined;
+
   // Only use env variable fallback if explicitly allowed (for backward compatibility in non-admin routes)
   // NEVER use this for admin/multi-tenant routes as it creates security vulnerabilities
   if (!companyId && options?.allowEnvFallback) {
     companyId = process.env.WHOP_COMPANY_ID;
   }
-  
-  let experienceId = (req.headers["x-whop-experience-id"] as string) || 
-                     (req.query.experienceId as string) ||
-                     (req.params.experienceId as string) ||
-                     undefined;
-  
+
+  let experienceId = (req.headers["x-whop-experience-id"] as string) ||
+    (req.query.experienceId as string) ||
+    (req.params.experienceId as string) ||
+    (req.body?.experienceId as string) ||
+    undefined;
+
   if (!experienceId && options?.allowEnvFallback) {
     experienceId = process.env.WHOP_EXPERIENCE_ID;
   }
-  
+
   return { companyId, experienceId };
 }
 
@@ -108,7 +110,7 @@ export async function checkExperienceAccess(
 
   try {
     const access = await whopSdk.users.checkAccess(experienceId, { id: userId });
-    
+
     return {
       hasAccess: access.has_access,
       accessLevel: access.access_level as "customer" | "admin",
@@ -130,7 +132,7 @@ export async function checkCompanyAccess(
 
   try {
     const access = await whopSdk.users.checkAccess(companyId, { id: userId });
-    
+
     return {
       hasAccess: access.has_access,
       accessLevel: access.access_level as "customer" | "admin",
@@ -149,9 +151,9 @@ export async function resolveCompanyIdFromExperience(experienceId: string): Prom
   try {
     console.log(`[Whop] Fetching experience: ${experienceId}`);
     const experience = await whopSdk.experiences.retrieve(experienceId);
-    
+
     console.log(`[Whop] Experience API response:`, JSON.stringify(experience, null, 2));
-    
+
     const companyId = typeof experience.company === 'string' ? experience.company : experience.company.id;
     console.log(`[Whop] Resolved company_id: ${companyId}`);
     return companyId;
@@ -176,18 +178,18 @@ export async function checkIfUserIsOwner(
 
   try {
     console.log(`[Whop] Checking if user ${userId} is owner of company ${companyId}`);
-    
+
     // Whop SDK list methods return async iterators that yield individual records
     const authorizedUsersIterator = whopSdk.authorizedUsers.list({
       company_id: companyId,
       user_id: userId,
     });
-    
+
     // Iterate through authorized user records
     for await (const authorizedUser of authorizedUsersIterator) {
       // Defensive: handle both nested user object and direct user_id
       const authUserId = authorizedUser.user?.id || (authorizedUser as any).user_id;
-      
+
       if (authUserId === userId) {
         const isOwner = authorizedUser.role === "owner";
         console.log(`[Whop] User ${userId} role in company ${companyId}: ${authorizedUser.role} (owner: ${isOwner})`);
@@ -195,7 +197,7 @@ export async function checkIfUserIsOwner(
         return { isOwner };
       }
     }
-    
+
     // Iterator completed successfully with no matching user
     // This is an explicit negative: user is not an authorized user OR has been demoted
     console.log(`[Whop] User ${userId} is not an owner of company ${companyId}`);
