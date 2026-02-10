@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { purchaseCredits } from "@/lib/whop-payment";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Link } from "wouter";
+import { Link, useParams } from "wouter";
 import { ThemeToggle } from "./ThemeToggle";
 import { Menu } from "lucide-react";
 import { useState } from "react";
